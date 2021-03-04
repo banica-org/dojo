@@ -3,36 +3,38 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-    <modules>
-        <module>market</module>
-        <module>aurora</module>
-        <module>orderbook</module>
-        <module>calculator</module>
-        <module>messages</module>
-        <module>common</module>
-    </modules>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.0.RELEASE</version>
+        <version>2.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.banica</groupId>
-    <artifactId>banica</artifactId>
+
+    <groupId>com.dojo</groupId>
+    <artifactId>dojo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>banica</name>
-    <description>Banica</description>
+    <name>Dojo</name>
+    <description>Dojo</description>
+
+    <modules>
+        <module>code-execution</module>
+        <module>api-mock</module>
+        <module>notifications</module>
+        <module>messages</module>
+        <module>common</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>
-        <grpc.version>1.29.0</grpc.version>
+        <grpc.version>1.36.0</grpc.version>
     </properties>
 
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/stef2georg/banica</url>
+            <url>https://maven.pkg.github.com/banica-org/dojo</url>
         </repository>
     </distributionManagement>
 
@@ -53,6 +55,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty-shaded</artifactId>
@@ -69,13 +72,13 @@
             <version>${grpc.version}</version>
         </dependency>
     </dependencies>
-         
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.6</version>
                 <executions>
                     <execution>
                         <goals>

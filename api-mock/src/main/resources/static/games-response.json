@@ -1,0 +1,203 @@
+{
+  "items": [
+    {
+      "status": {
+        "id": "submitted",
+        "label": "Submitted"
+      },
+      "creator": {
+        "picture": "https://static.cdn.epam.com/avatar/0c5c43ee7731598ceee1c0839c194887.jpg",
+        "name": "Viktor Tsybulko",
+        "id": 108
+      },
+      "technology": [
+        "js"
+      ],
+      "tags": [
+        "#tetris",
+        "#thinkYouCanTetris",
+        "#JS",
+        "#JavaScript"
+      ],
+      "photos": [],
+      "location": [
+        0,
+        0
+      ],
+      "orgTeam": [
+        {
+          "roles": [
+            "organizer"
+          ],
+          "id": 108,
+          "user": {
+            "picture": "https://static.cdn.epam.com/avatar/0c5c43ee7731598ceee1c0839c194887.jpg",
+            "name": "Viktor Tsybulko",
+            "id": 108
+          }
+        },
+        {
+          "roles": [
+            "organizer",
+            "sensei"
+          ],
+          "id": 111,
+          "user": {
+            "picture": "https://static.cdn.epam.com/avatar/48e44d275e481eb5d11f050c4b97732c.jpg",
+            "name": "Denys Faber",
+            "id": 111
+          }
+        }
+      ],
+      "participants": [
+        {
+          "picture": "https://static.cdn.epam.com/avatar/c45868112a731cd9e9da38909799e46c.jpg",
+          "name": "Maryna Shulha1",
+          "id": 126
+        },
+        {
+          "picture": "https://static.cdn.epam.com/avatar/48e44d275e481eb5d11f050c4b97732c.jpg",
+          "name": "Denys Faber",
+          "id": 111
+        },
+        {
+          "picture": "https://static.cdn.epam.com/avatar/0c5c43ee7731598ceee1c0839c194887.jpg",
+          "name": "Viktor Tsybulko",
+          "id": 108
+        },
+        {
+          "picture": "https://graph.facebook.com/v2.6/4662915693783031/picture",
+          "name": "Viktor Tsybulko",
+          "id": 109
+        },
+        {
+          "picture": "https://static.cdn.epam.com/avatar/6a584391073d3d77746d4ee17a796bac.jpg",
+          "name": "Sofia Kurilova",
+          "id": 132
+        },
+        {
+          "picture": "https://static.cdn.epam.com/avatar/991975b588dc770fb8654a546da823e1.jpg",
+          "name": "Yaryna Mashta",
+          "id": 133
+        }
+      ],
+      "games": [
+        {
+          "id": 3,
+          "title": "Tetris",
+          "authorName": "Robert Diablo",
+          "image": "/games/tetris.png",
+          "description": "You have to write your own bot which will get more points than other bots playing Tetris.  Each player has its own board. The player can move the figure to the left and right, rotate and land it. \n\nEverything works the same way as in classic Tetris, however not all figures appear from the beginning: once you know how to deal with \"squares\" - the sticks will start appearing, and so on until you open all figures. The further you go, the more points you earn. \n\nThe primary way to score points in Tetris is to clear lines by manipulating the figures so that they fill horizontal rows within the Matrix. As the figures fall, your goal is to move and spin them so that they line up evenly at the bottom of the Matrix. To clear a line, every square of the row has to be filled."
+        }
+      ],
+      "sponsors": [],
+      "supportChannels": [
+        "viktor_tsybulko@epam.com"
+      ],
+      "messengerChannels": [
+        "https://discord.gg/xx82hkSFNU"
+      ],
+      "streams": [],
+      "endDate": "2020-12-18T15:00:00.000Z",
+      "eventVideo": [],
+      "sourceCode": [],
+      "final": [],
+      "email": [],
+      "isInternal": false,
+      "isOnline": true,
+      "city": "Online",
+      "date": "2020-12-17T11:00:00.000Z",
+      "address": "Online",
+      "description": "If you have ever played Tetris or you a fan of this game, then we have very great news !!\nWe moved Tetris to the WEB and now you have the opportunity to play this legendary game online.\nThe rules are quite simple: you need to write a bot that will play for you, make combinations of figures. Everything as before!",
+      "schedule": [],
+      "seatsCapacity": 200,
+      "title": "Think you can Tetris?",
+      "cover": "events/149/cover/20201207124129982[0].jpg",
+      "id": 149,
+      "manuals": [],
+      "leaderboards": []
+    },
+    {
+      "status": {
+        "id": "started",
+        "label": "Started"
+      },
+      "creator": {
+        "picture": "https://static.cdn.epam.com/avatar/b83ebee53461b69d99fa5386ad29a173.jpg",
+        "name": "Zlatina Mihaylova",
+        "id": 121
+      },
+      "technology": [
+        "java"
+      ],
+      "tags": [],
+      "photos": [],
+      "location": [
+        0,
+        0
+      ],
+      "orgTeam": [
+        {
+          "roles": [
+            "organizer"
+          ],
+          "id": 121,
+          "user": {
+            "picture": "https://static.cdn.epam.com/avatar/b83ebee53461b69d99fa5386ad29a173.jpg",
+            "name": "Zlatina Mihaylova",
+            "id": 121
+          }
+        }
+      ],
+      "participants": [
+        {
+          "picture": "https://static.cdn.epam.com/avatar/b83ebee53461b69d99fa5386ad29a173.jpg",
+          "name": "Zlatina Mihaylova",
+          "id": 121
+        },
+        {
+          "picture": null,
+          "name": "Zlatina Mihaylova",
+          "id": 129
+        },
+        {
+          "picture": "https://static.cdn.epam.com/avatar/7705df438db47730fb0ae5c2089f65dd.jpg",
+          "name": "Iliyan Mihov",
+          "id": 124
+        }
+      ],
+      "games": [
+        {
+          "id": 17,
+          "title": "Kata",
+          "authorName": "Oleksandr Baglai",
+          "image": "/games/kata.png",
+          "description": "There is a multitude of algorithmic problems in the queue. You are expected to solve them one by one in a contest with the colleagues. For that, you need to write a native bot that will resolve all these puzzles. Each player plays in his own field.\n\nThe player with the largest number of points is considered to be a winner (prior to the due date). The points are counted for each passed test (invigorating points) and for the solution of the whole puzzle. The faster the puzzle is solved, the more points are assigned to the player.\n\nThe game is against the clock, you can take a break between algorithms. The points are calculated depending on the algorithm complexity and the time spent.\n\nImportant! Verifying tests appear one by one as far as correct answers are given. If the answer is wrong, the new verifying test will not appear until the player corrects her/his algorithm."
+        }
+      ],
+      "sponsors": [],
+      "supportChannels": [],
+      "messengerChannels": [],
+      "streams": [],
+      "endDate": "2020-12-09T15:15:00.000Z",
+      "eventVideo": [],
+      "sourceCode": [],
+      "final": [],
+      "email": [],
+      "isInternal": false,
+      "isOnline": true,
+      "date": "2020-12-08T08:30:00.000Z",
+      "title": "Gamified Hiring Project Test ",
+      "description": "Test for Gamified Hiring Project",
+      "schedule": [],
+      "seatsCapacity": 10,
+      "cover": "events/152/cover/20201208090625992[0].jpg",
+      "id": 152,
+      "manuals": [],
+      "leaderboards": []
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "limit": 12
+}

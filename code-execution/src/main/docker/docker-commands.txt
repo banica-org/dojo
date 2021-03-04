@@ -1,0 +1,2 @@
+docker build -t test-name .
+docker run -it test-name github-username github-password/token

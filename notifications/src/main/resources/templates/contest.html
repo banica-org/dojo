@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Game Notifications</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2 style="text-align:center">Notification for game</h2>
+        <br>
+        <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
+            <div class="form-group">
+                <label for="contestId">Game:</label>
+                <th:block th:if="*{contestId}">
+                    <select class="form-control" id="contestId" th:field="*{contestId}" disabled>
+                        <option th:each="game : ${games}"
+                                th:value="${game.id}"
+                                th:utext="${game.title}"></option>
+                    </select>
+                    <input type="hidden" th:field="*{contestId}">
+                </th:block>
+                <th:block th:unless="*{contestId}">
+                    <div class="input-group">
+                        <select class="form-control" id="contestId" th:field="*{contestId}" aria-describedby="g-addon">
+                            <option th:each="game : ${games}"
+                                    th:value="${game.id}"
+                                    th:utext="${game.title}"></option>
+                        </select>
+                        <a class="input-group-addon" id="g-addon" title="Refresh games list" href="/games/refresh">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+                </th:block>
+            </div>
+            <hr>
+            <br>
+
+            <h4 style="text-align:center">Slack Notifications</h4>
+
+            <div class="form-group">
+                <label for="slackToken">Slack token:</label>
+                <input class="form-control" id="slackToken" th:field="*{slackToken}">
+            </div>
+            <div class="form-group">
+                <label for="slackChannel">Slack channel:</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <span class="input-group-text" id="sc-addon">#</span>
+                    </div>
+                    <input class="form-control" id="slackChannel" th:field="*{slackChannel}" aria-describedby="sc-addon">
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <h5>Group channel notification</h5>
+            <div class="container">
+                <div class="row border">
+                    <div class="col">
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_ANY_LEADERBOARD_CHANGE" class="form-check-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}">
+                                <label class="form-check-label" for="newParticipantSlack">On any leaderboard change</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_CHANGED_SCORE" class="form-check-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">
+                                <label class="form-check-label" for="changeInScoresSlack">On change in scores</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_CHANGED_POSITION" class="form-check-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">
+                                <label class="form-check-label" for="changeInPositionsSlack">On change in positions</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="NO_NOTIFICATIONS" class="form-check-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">
+                                <label class="form-check-label" for="newParticipantSlack">No notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <h5>Personal slack notifications</h5>
+            <div class="container">
+                <div class="row border">
+                    <div class="col">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="personalPositionChangeSlack" th:field="*{personalPositionChangeSlack}">
+                            <label class="form-check-label" for="personalPositionChangeSlack">Notify contestant for change in his position</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <h4 style="text-align:center">Email Notifications</h4>
+            <div class="form-group">
+                <label for="senseiEmailsAsString">Sensei e-mail(s):</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <span class="input-group-text" id="se-addon">@</span>
+                    </div>
+                    <input class="form-control" id="senseiEmailsAsString" th:field="*{senseiEmailsAsString}" aria-describedby="se-addon">
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <h5>Sensei's email notification</h5>
+            <div class="container">
+                <div class="row border">
+                    <div class="col">
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_ANY_LEADERBOARD_CHANGE" class="form-check-input" id="newParticipantEmail" th:field="*{emailCommonNotifications}">
+                                <label class="form-check-label" for="newParticipantEmail">On any leaderboard change</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_CHANGED_SCORE" class="form-check-input" id="changeInScoresEmail" th:field="*{emailCommonNotifications}">
+                                <label class="form-check-label" for="changeInScoresEmail">On change in scores</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="ON_CHANGED_POSITION" class="form-check-input" id="changeInPositionsEmail" th:field="*{emailCommonNotifications}">
+                                <label class="form-check-label" for="changeInPositionsEmail">On change in positions</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="radio" value="NO_NOTIFICATIONS" class="form-check-input" id="noNotificationsEmail" th:field="*{emailCommonNotifications}">
+                                <label class="form-check-label" for="newParticipantEmail">No notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <h5>Personal email notifications</h5>
+            <div class="container">
+                <div class="row border">
+                    <div class="col">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="personalPositionChangeEmail" th:field="*{personalPositionChangeEmail}">
+                            <label class="form-check-label" for="personalPositionChangeEmail">Notify contestant for change in his position</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <br>
+            <div style="text-align:center" >
+                <button style="text-align:center" class="btn btn-primary" type="submit" th:text="*{contestId} ? 'Restart Notifications' : 'Start Notifications'">Start Notifications</button>
+
+            </div>
+        </form>
+    </div>
+
+    <br>
+    <hr>
+    <div class="container my-5">
+        <h4>Listening for events</h4>
+        <div class="row border" th:each="contest : ${contests}">
+            <!--<div class="col" th:text="${contest.contestId}"></div>-->
+            <div class="col" th:text="${contest.title}"></div>
+            <div class="col">
+                <a title="Edit" th:href="@{/contest/open/{id}(id=${contest.contestId})}">
+                    <i class="fa fa-edit"></i>
+                </a>
+                <a href="#" title="Stop notifications" data-toggle="modal" data-target="#confirm">
+                    <i class="fa fa-trash"></i>
+                </a>
+            </div>
+
+            <div class="modal" id="confirm" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>Confirmation</h5>
+                        </div>
+                        <div class="modal-body">
+                            Please, confirm stopping notifications.
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-danger btn-ok" th:href="@{/contest/stop/{id}(id=${contest.contestId})}">Stop</a>
+                            <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
