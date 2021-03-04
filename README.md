@@ -1,8 +1,8 @@
 # Banica
-![Build and Publish](https://github.com/stef2georg/banica/workflows/Build%20and%20Publish/badge.svg)
-[![codecov](https://codecov.io/gh/stef2georg/banica/branch/master/graph/badge.svg)](https://codecov.io/gh/stef2georg/banica)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/stef2georg/banica.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/stef2georg/banica/alerts/)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/stef2georg/banica.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/stef2georg/banica/context:java)
+![Build and Publish](https://github.com/banica-org/dojo/workflows/Build%20and%20Publish/badge.svg)
+[![codecov](https://codecov.io/gh/banica-org/dojo/branch/master/graph/badge.svg)](https://codecov.io/gh/banica-org/dojo)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/banica-org/dojo.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/banica-org/dojo/alerts/)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/banica-org/dojo.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/banica-org/dojo/context:java)
 
 https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-apache-maven-for-use-with-github-packages
 
@@ -27,7 +27,7 @@ https://help.github.com/en/packages/using-github-packages-with-your-projects-eco
 	<repository>
           <id>github</id>
           <name>GitHub OWNER Apache Maven Packages</name>
-          <url>https://maven.pkg.github.com/stef2georg/banica</url>
+          <url>https://maven.pkg.github.com/banica-org/dojo</url>
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
