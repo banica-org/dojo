@@ -1,2 +1,5 @@
-docker build -t test-name .
-docker run -it test-name github-username github-password/token
+//docker build -t test-name .
+//docker run -it test-name github-username github-password/token
+
+docker build -t test-name --build-arg user_name=repo-username --build-arg repo_name=repo-name .
+docker run -it test-name github-username github-password/token github-child-username github-child-repo-name github-parent-repo-name
