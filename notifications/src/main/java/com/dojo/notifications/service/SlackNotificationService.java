@@ -2,12 +2,13 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.contest.Contest;
 import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.SlackWebClientLookupByEmail;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
 import com.hubspot.algebra.Result;
 import com.hubspot.slack.client.SlackClient;
-import com.hubspot.slack.client.SlackClientFactory;
 import com.hubspot.slack.client.SlackClientRuntimeConfig;
+import com.hubspot.slack.client.http.NioHttpClientFactory;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.methods.params.conversations.ConversationOpenParams;
 import com.hubspot.slack.client.methods.params.users.UserEmailParams;
@@ -72,12 +73,12 @@ public class SlackNotificationService implements NotificationService {
         }
     }
 
-    private static SlackClient getSlackClient(String token) {
+    private static SlackWebClientLookupByEmail getSlackClient(String token) {
         SlackClientRuntimeConfig runtimeConfig = SlackClientRuntimeConfig.builder()
                 .setTokenSupplier(() -> token)
                 .build();
 
-        return SlackClientFactory.defaultFactory().build(runtimeConfig);
+        return new SlackWebClientLookupByEmail(NioHttpClientFactory.defaultFactory(), runtimeConfig);
     }
 
     private String getSlackUserId(String email, SlackClient slackClient) {
