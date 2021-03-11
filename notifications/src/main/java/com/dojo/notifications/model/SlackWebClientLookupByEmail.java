@@ -1,13 +1,11 @@
 package com.dojo.notifications.model;
 
-import com.google.inject.assistedinject.AssistedInject;
 import com.hubspot.algebra.Result;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.slack.client.SlackClient;
 import com.hubspot.slack.client.SlackClientFactory;
 import com.hubspot.slack.client.SlackClientRuntimeConfig;
 import com.hubspot.slack.client.SlackWebClient;
-import com.hubspot.slack.client.http.NioHttpClient;
 import com.hubspot.slack.client.http.NioHttpClientFactory;
 import com.hubspot.slack.client.interceptors.http.DefaultHttpRequestDebugger;
 import com.hubspot.slack.client.interceptors.http.DefaultHttpResponseDebugger;
@@ -26,14 +24,9 @@ public class SlackWebClientLookupByEmail extends SlackWebClient {
 
     private final SlackClientRuntimeConfig config;
 
-    @AssistedInject
-    public SlackWebClientLookupByEmail(DefaultHttpRequestDebugger defaultHttpRequestDebugger, DefaultHttpResponseDebugger defaultHttpResponseDebugger, NioHttpClient.Factory nioHttpClientFactory, ByMethodRateLimiter defaultRateLimiter, SlackClientRuntimeConfig config) {
-        super(defaultHttpRequestDebugger, defaultHttpResponseDebugger, nioHttpClientFactory, defaultRateLimiter, config);
-        this.config = config;
-    }
-
-    public SlackWebClientLookupByEmail(NioHttpClientFactory defaultFactory, SlackClientRuntimeConfig runtimeConfig) {
-        this(new DefaultHttpRequestDebugger(), new DefaultHttpResponseDebugger(), defaultFactory, new ByMethodRateLimiter(), runtimeConfig);
+    public SlackWebClientLookupByEmail(SlackClientRuntimeConfig runtimeConfig) {
+        super(new DefaultHttpRequestDebugger(), new DefaultHttpResponseDebugger(), NioHttpClientFactory.defaultFactory(), new ByMethodRateLimiter(), runtimeConfig);
+        this.config = runtimeConfig;
     }
 
     @SneakyThrows

@@ -78,7 +78,7 @@ public class SlackNotificationService implements NotificationService {
                 .setTokenSupplier(() -> token)
                 .build();
 
-        return new SlackWebClientLookupByEmail(NioHttpClientFactory.defaultFactory(), runtimeConfig);
+        return new SlackWebClientLookupByEmail(runtimeConfig);
     }
 
     private String getSlackUserId(String email, SlackClient slackClient) {
