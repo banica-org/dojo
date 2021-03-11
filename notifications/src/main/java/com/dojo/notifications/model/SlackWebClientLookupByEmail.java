@@ -19,15 +19,12 @@ import com.hubspot.slack.client.interceptors.http.RequestDebugger;
 import com.hubspot.slack.client.interceptors.http.ResponseDebugger;
 import com.hubspot.slack.client.jackson.ObjectMapperUtils;
 import com.hubspot.slack.client.methods.SlackMethod;
-import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
-import com.hubspot.slack.client.methods.params.conversations.ConversationOpenParams;
+import com.hubspot.slack.client.methods.SlackMethods;
 import com.hubspot.slack.client.methods.params.users.UserEmailParams;
 import com.hubspot.slack.client.models.response.SlackError;
 import com.hubspot.slack.client.models.response.SlackErrorResponse;
 import com.hubspot.slack.client.models.response.SlackErrorType;
 import com.hubspot.slack.client.models.response.SlackResponse;
-import com.hubspot.slack.client.models.response.chat.ChatPostMessageResponse;
-import com.hubspot.slack.client.models.response.conversations.ConversationsOpenResponse;
 import com.hubspot.slack.client.models.response.users.UsersInfoResponse;
 import com.hubspot.slack.client.ratelimiting.ByMethodRateLimiter;
 import com.hubspot.slack.client.ratelimiting.SlackRateLimiter;
@@ -68,14 +65,14 @@ public class SlackWebClientLookupByEmail extends SlackWebClient {
         HttpRequest request = HttpRequest
                 .newBuilder()
                 .setMethod(HttpRequest.Method.GET)
-                .setUrl(config.getSlackApiBasePath().get() + "/" + SlackMethodsLookupByEmail.users_lookupByEmail.getMethod())
+                .setUrl(config.getSlackApiBasePath().get() + "/" + SlackMethods.users_lookupByEmail.getMethod())
                 .setContentType(HttpRequest.ContentType.FORM)
                 .setQueryParam("email")
                 .to(params.getEmail())
                 .addHeader("Authorization", "Bearer " + config.getTokenSupplier().get())
                 .build();
 
-        return executeLoggedAs(SlackMethodsLookupByEmail.users_lookupByEmail, request, UsersInfoResponse.class);
+        return executeLoggedAs(SlackMethods.users_lookupByEmail, request, UsersInfoResponse.class);
     }
 
 
