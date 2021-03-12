@@ -1,22 +1,23 @@
 package com.dojo.codeexecution.controller;
 
 import com.dojo.codeexecution.service.GitManager;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-class RequestReceiverTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+public class RequestReceiverTest {
 
     @InjectMocks
     private RequestReceiver requestReceiver;
@@ -25,18 +26,18 @@ class RequestReceiverTest {
     private GitManager gitManager;
 
     @Test
-    public void getRepo() throws IOException {
+    public void getRepoReturnsRepoName(){
         //Arrange
         String expected = "https://github.com/account/gamified-hiring-dummy-account";
-        String email = "dummy-account";
+        String username = "dummy-account";
 
         //Act
-        when(gitManager.getRepo(email))
-                .thenReturn(new URL("https://github.com/account/gamified-hiring-dummy-account"));
-        String actual = requestReceiver.getRepo(email);
+        when(gitManager.getRepository(username)).thenReturn(expected);
+        String actual = requestReceiver.getRepo(username);
 
         //Assert
         assertEquals(expected, actual);
-        verify(gitManager, times(1)).getRepo(email);
+        verify(gitManager, times(1)).getRepository(username);
     }
+
 }

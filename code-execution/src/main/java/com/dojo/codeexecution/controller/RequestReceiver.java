@@ -17,12 +17,7 @@ public class RequestReceiver {
     private GitManager gitManager;
 
     @GetMapping(value = "/repo")
-    public String getRepo(@RequestParam(value = "email") String email) {
-        try {
-           return gitManager.getRepo(email).toString();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return "NOT_FOUND";
-        }
+    public String getRepo(@RequestParam(value = "username") String username) {
+        return gitManager.getRepository(username);
     }
 }

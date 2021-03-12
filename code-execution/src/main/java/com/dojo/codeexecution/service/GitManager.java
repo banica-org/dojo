@@ -1,16 +1,17 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -19,63 +20,70 @@ import java.util.List;
 @Service
 public class GitManager {
 
+    final static Logger logger = LoggerFactory.getLogger(RequestReceiver.class);
+
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
 
-    @Autowired
-    private GitConfigProperties gitConfig;
+    private final GitConfigProperties gitConfig;
+    private final GitHub gitHub;
 
-    private GitHub gitHub;
+    @Autowired
+    public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
+        this.gitConfig = gitConfig;
+        this.gitHub = gitHub;
+    }
+
+    private boolean hasUserExistingRepository(GHUser user){
+        try{
+            gitHub.getRepository(getRepoNameWithOwner(user));
+        }catch(IOException e){
+            return false;
+        }
+        return true;
+    }
 
     @Retryable
-    public URL getRepo(String email) throws IOException {
-        URL repoUrl;
-        GHUser ghUser = getGhUser(email);
-        String login = ghUser.getLogin();
-
-        try {
-            repoUrl = gitHub.getRepository(getRepoNameWithOwner(login)).getHtmlUrl();
-        } catch (IOException e) {
-            repoUrl = createGitRepo(gitHub, login, ghUser);
+    public String getRepository(String username) {
+        try{
+            GHUser ghUser = getGhUser(username);
+            return createRepository(ghUser).toString();
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return "User not found!";
         }
-
-        return repoUrl;
     }
 
-    private String getRepoNameWithOwner(String login) throws IOException {
-        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + login;
+    private URL createRepository(GHUser user) throws IOException {
+        if(hasUserExistingRepository(user)){
+            return gitHub.getRepository(getRepoNameWithOwner(user)).getHtmlUrl();
+        }
+        return createGitRepo(gitHub, user);
     }
 
-    private GHUser getGhUser(String email) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(email).list().toList();
+    private String getRepoNameWithOwner(GHUser ghUser) throws IOException {
+        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + ghUser.getLogin();
+    }
+
+    private GHUser getGhUser(String username) throws IOException {
+        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
         if (users.size() == 1) {
             return users.get(0);
         }
-        throw new IllegalArgumentException("User email not visible!");
+        throw new IllegalArgumentException("User not found!");
     }
 
-    private URL createGitRepo(GitHub github, String login, GHUser user) throws IOException {
-        String repoName = REPO_PREFIX + "/" + login;
-        GHRepository repo = github.createRepository(repoName).private_(true).create();
+    private URL createGitRepo(GitHub gitHub, GHUser user) throws IOException {
+        String repoName = REPO_PREFIX + "/" + user.getLogin();
+
+        GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
 
         repo.createHook(WEB_HOOK_PREFIX, gitConfig.getWebhookConfig(),
-                Collections.singletonList(GHEvent.PUSH), true);
+               Collections.singletonList(GHEvent.PUSH), true);
 
         repo.addCollaborators(user);
 
         return repo.getHtmlUrl();
     }
-
-    @PostConstruct
-    private void createGitHubInstance() {
-        if (gitHub == null) {
-            try {
-                gitHub = new GitHubBuilder().withOAuthToken(gitConfig.getRepoToken(), gitConfig.getUser()).build();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
 }
