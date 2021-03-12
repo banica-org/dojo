@@ -5,11 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
@@ -26,7 +22,7 @@ public class RequestReceiverTest {
     private GitManager gitManager;
 
     @Test
-    public void getRepoReturnsRepoName(){
+    public void getRepoReturnsRepoName() {
         //Arrange
         String expected = "https://github.com/account/gamified-hiring-dummy-account";
         String username = "dummy-account";

@@ -3,13 +3,11 @@ package com.dojo.codeexecution.service;
 import com.dojo.codeexecution.config.GitConfigProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
@@ -18,9 +16,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -69,6 +64,6 @@ public class GitManagerTest {
         String actual = gitManager.getRepository(username);
 
         //Assert
-        assertEquals(expected,actual);
+        assertEquals(expected, actual);
     }
 }
