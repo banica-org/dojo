@@ -1,5 +1,6 @@
-package com.dojo.notifications.model;
+package com.dojo.notifications.client;
 
+import com.dojo.notifications.service.slackNotifier.SlackNotificationService;
 import com.hubspot.algebra.Result;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.slack.client.SlackClient;
@@ -20,11 +21,11 @@ import lombok.SneakyThrows;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
-public class SlackWebClientLookupByEmail extends SlackWebClient {
+public class CustomSlackWebClient extends SlackWebClient {
 
     private final SlackClientRuntimeConfig config;
 
-    public SlackWebClientLookupByEmail(SlackClientRuntimeConfig runtimeConfig) {
+    public CustomSlackWebClient(SlackClientRuntimeConfig runtimeConfig) {
         super(new DefaultHttpRequestDebugger(), new DefaultHttpResponseDebugger(), NioHttpClientFactory.defaultFactory(), new ByMethodRateLimiter(), runtimeConfig);
         this.config = runtimeConfig;
     }

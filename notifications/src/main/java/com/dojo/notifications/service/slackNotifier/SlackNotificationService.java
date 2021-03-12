@@ -1,14 +1,13 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.slackNotifier;
 
+import com.dojo.notifications.client.SlackWebClientProvider;
 import com.dojo.notifications.contest.Contest;
 import com.dojo.notifications.contest.enums.NotifierType;
-import com.dojo.notifications.model.SlackWebClientLookupByEmail;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.NotificationService;
 import com.hubspot.algebra.Result;
 import com.hubspot.slack.client.SlackClient;
-import com.hubspot.slack.client.SlackClientRuntimeConfig;
-import com.hubspot.slack.client.http.NioHttpClientFactory;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.methods.params.conversations.ConversationOpenParams;
 import com.hubspot.slack.client.methods.params.users.UserEmailParams;
@@ -31,7 +30,7 @@ public class SlackNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        SlackClient slackClient = getSlackClient(contest.getSlackToken());
+        SlackClient slackClient = SlackWebClientProvider.getSlackClient(contest.getSlackToken());
         postMessagePart(notification
                 .convertToSlackNotification(this::getSlackUserId, slackClient)
                 .setChannelId(getConversationId(userDetails.getEmail(), slackClient))
@@ -41,12 +40,11 @@ public class SlackNotificationService implements NotificationService {
     // Notify channel
     @Override
     public void notify(Notification notification, Contest contest) {
-        SlackClient slackClient = getSlackClient(contest.getSlackToken());
+        SlackClient slackClient = SlackWebClientProvider.getSlackClient(contest.getSlackToken());
         postMessagePart(notification
                 .convertToSlackNotification(this::getSlackUserId, slackClient)
                 .setChannelId(contest.getSlackChannel())
                 .build(), slackClient);
-
     }
 
     private void postMessagePart(ChatPostMessageParams chatPostMessageParams, SlackClient slackClient) {
@@ -71,14 +69,6 @@ public class SlackNotificationService implements NotificationService {
             LOGGER.warn("Could not find conversation for user with email {}.", email);
             return "";
         }
-    }
-
-    private static SlackWebClientLookupByEmail getSlackClient(String token) {
-        SlackClientRuntimeConfig runtimeConfig = SlackClientRuntimeConfig.builder()
-                .setTokenSupplier(() -> token)
-                .build();
-
-        return new SlackWebClientLookupByEmail(runtimeConfig);
     }
 
     private String getSlackUserId(String email, SlackClient slackClient) {
