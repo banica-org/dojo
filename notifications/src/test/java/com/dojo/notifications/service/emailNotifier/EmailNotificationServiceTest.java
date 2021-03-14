@@ -12,8 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.mail.internet.MimeMessage;
 
@@ -25,8 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 public class EmailNotificationServiceTest {
+
+    private final String CONVERTED_STRING_FOR_NOTIFICATIONS = "converted";
+    private final String EMAIL_FOR_USER = "xxxx@gmail.com";
+    private final String USERNAME_FOR_EMAILCONFIG = "Pesho";
 
     @Mock
     private UserDetails userDetails;
@@ -73,10 +77,10 @@ public class EmailNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         //Arrange
-        when(notification.convertToEmailNotification(mailContentBuilder)).thenReturn("converted");
-        when(userDetails.getEmail()).thenReturn("xxx@gmail.com");
+        when(notification.convertToEmailNotification(mailContentBuilder)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
+        when(userDetails.getEmail()).thenReturn(EMAIL_FOR_USER);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(emailConfig.getUsername()).thenReturn("Pesho");
+        when(emailConfig.getUsername()).thenReturn(USERNAME_FOR_EMAILCONFIG);
 
         //Act
         emailNotificationService.notify(userDetails, notification, contest);
@@ -92,11 +96,13 @@ public class EmailNotificationServiceTest {
     public void notifyChannelTest() {
         //Arrange
         List<String> emails = new LinkedList<>();
-        emails.add("email1");
-        when(notification.convertToEmailNotification(mailContentBuilder)).thenReturn("converted");
+        emails.add(EMAIL_FOR_USER);
+        int size = emails.size();
+
+        when(notification.convertToEmailNotification(mailContentBuilder)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
         when(contest.getSenseiEmails()).thenReturn(emails);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
-        when(emailConfig.getUsername()).thenReturn("Pesho");
+        when(emailConfig.getUsername()).thenReturn(USERNAME_FOR_EMAILCONFIG);
 
         //Act
         emailNotificationService.notify(notification, contest);
@@ -104,7 +110,7 @@ public class EmailNotificationServiceTest {
         //Assert
         verify(notification, times(1)).convertToEmailNotification(mailContentBuilder);
         verify(contest, times(1)).getSenseiEmails();
-        verify(emailSender, times(1)).createMimeMessage();
-        verify(emailConfig, times(1)).getUsername();
+        verify(emailSender, times(size)).createMimeMessage();
+        verify(emailConfig, times(size)).getUsername();
     }
 }
