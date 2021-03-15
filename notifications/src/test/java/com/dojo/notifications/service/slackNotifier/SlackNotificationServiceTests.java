@@ -5,11 +5,9 @@ import com.dojo.notifications.contest.Contest;
 import com.dojo.notifications.contest.enums.NotifierType;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.service.slackNotifier.SlackNotificationService;
 import com.hubspot.algebra.Result;
 import com.hubspot.slack.client.SlackClient;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
-import com.hubspot.slack.client.methods.params.conversations.ConversationOpenParams;
 import com.hubspot.slack.client.methods.params.users.UserEmailParams;
 import com.hubspot.slack.client.models.blocks.Divider;
 import com.hubspot.slack.client.models.conversations.Conversation;
@@ -25,11 +23,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,15 +54,15 @@ public class SlackNotificationServiceTests {
     @Mock
     private CompletableFuture<Result<UsersInfoResponse, SlackError>> userCompletableFuture;
     @Mock
-    Result<UsersInfoResponse, SlackError> userResult;
+    private Result<UsersInfoResponse, SlackError> userResult;
     @Mock
     private CompletableFuture<Result<ConversationsOpenResponse, SlackError>> convCompletableFuture;
     @Mock
-    Result<ConversationsOpenResponse, SlackError> convResult;
+    private Result<ConversationsOpenResponse, SlackError> convResult;
     @Mock
-    CompletableFuture<Result<ChatPostMessageResponse, SlackError>> postCompletableFuture;
+    private CompletableFuture<Result<ChatPostMessageResponse, SlackError>> postCompletableFuture;
     @Mock
-    Result<ChatPostMessageResponse, SlackError> postResult;
+    private Result<ChatPostMessageResponse, SlackError> postResult;
 
 
     @InjectMocks
@@ -76,14 +74,13 @@ public class SlackNotificationServiceTests {
         when(slackWebClientProvider.getSlackClient(TOKEN)).thenReturn(slackClient);
     }
 
-
     @Test
     public void getNotificationServiceTypeMappingTest() {
         assertEquals(slackNotificationService.getNotificationServiceTypeMapping(), NotifierType.SLACK);
     }
 
     @Test
-    public void notifyUserTest() {
+    public void notifyNoExceptionTest() {
         //Arrange
         when(userDetails.getEmail()).thenReturn(EMAIL);
         lookupUserSetUp();
@@ -102,10 +99,32 @@ public class SlackNotificationServiceTests {
     }
 
     @Test
-    public void notifyChannelTest() {
+    public void notifyUserExceptionTest() {
+        //Arrange
+        when(userDetails.getEmail()).thenReturn(EMAIL);
+        lookupUserSetUp();
+        doThrow(IllegalStateException.class).when(userResult).unwrapOrElseThrow();
+        openConversationSetUp();
+        doThrow(IllegalStateException.class).when(convResult).unwrapOrElseThrow();
+        postMessageSetUp();
+
+        //Act
+        slackNotificationService.notify(userDetails, notification, contest);
+
+        //Assert
+        verify(slackWebClientProvider, times(1)).getSlackClient(TOKEN);
+        verify(notification, times(1)).convertToSlackNotification(any(), any());
+        verify(slackClient, times(1)).lookupUserByEmail(any());
+        verify(slackClient, times(1)).openConversation(any());
+        verify(slackClient, times(1)).postMessage(any());
+    }
+
+    @Test
+    public void notifyChannelExceptionTest() {
         //Arrange
         when(contest.getSlackChannel()).thenReturn(CONVERSATION_ID);
         postMessageSetUp();
+        doThrow(IllegalStateException.class).when(postResult).unwrapOrElseThrow();
 
         //Act
         slackNotificationService.notify(notification, contest);
@@ -118,18 +137,15 @@ public class SlackNotificationServiceTests {
 
     private void postMessageSetUp() {
         ChatPostMessageParams.Builder builder = ChatPostMessageParams.builder();
+        builder.addBlocks(Divider.builder().build()).setChannelId(CONVERSATION_ID).build();
         when(notification.convertToSlackNotification(any(), any())).thenReturn(builder);
-        ChatPostMessageParams chatPostMessageParams = builder.addBlocks(Divider.builder().build()).setChannelId(CONVERSATION_ID).build();
-
-        when(slackClient.postMessage(chatPostMessageParams)).thenReturn(postCompletableFuture);
+        when(slackClient.postMessage(any())).thenReturn(postCompletableFuture);
         when(postCompletableFuture.join()).thenReturn(postResult);
     }
 
     private void openConversationSetUp() {
-        ConversationOpenParams conversationOpenParams = ConversationOpenParams.builder().addUsers(USER_ID).build();
-        when(slackClient.openConversation(conversationOpenParams)).thenReturn(convCompletableFuture);
+        when(slackClient.openConversation(any())).thenReturn(convCompletableFuture);
         when(convCompletableFuture.join()).thenReturn(convResult);
-
         Conversation conversation = Conversation.builder().setId(CONVERSATION_ID).build();
         ConversationsOpenResponse conversationsOpenResponse = ConversationsOpenResponse.builder().setConversation(conversation).setOk(true).build();
         when(convResult.unwrapOrElseThrow()).thenReturn(conversationsOpenResponse);
@@ -139,10 +155,8 @@ public class SlackNotificationServiceTests {
         UserEmailParams userEmailParams = UserEmailParams.builder().setEmail(EMAIL).build();
         when(slackClient.lookupUserByEmail(userEmailParams)).thenReturn(userCompletableFuture);
         when(userCompletableFuture.join()).thenReturn(userResult);
-
         SlackUser slackUser = SlackUser.builder().setId(USER_ID).build();
         UsersInfoResponse usersInfoResponse = UsersInfoResponse.builder().setUser(slackUser).setOk(true).build();
-
         when(userResult.unwrapOrElseThrow()).thenReturn(usersInfoResponse);
     }
 }
