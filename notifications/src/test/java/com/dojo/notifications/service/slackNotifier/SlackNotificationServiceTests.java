@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.slackNotifier;
 
 import com.dojo.notifications.client.SlackWebClientProvider;
 import com.dojo.notifications.contest.Contest;
