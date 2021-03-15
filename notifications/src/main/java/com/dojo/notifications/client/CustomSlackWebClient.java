@@ -1,6 +1,5 @@
 package com.dojo.notifications.client;
 
-import com.dojo.notifications.service.slackNotifier.SlackNotificationService;
 import com.hubspot.algebra.Result;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.slack.client.SlackClient;

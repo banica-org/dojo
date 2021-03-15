@@ -4,7 +4,8 @@ import com.hubspot.slack.client.SlackClient;
 import com.hubspot.slack.client.SlackClientRuntimeConfig;
 
 public class SlackWebClientProvider {
-    public static SlackClient getSlackClient(String token) {
+
+    public SlackClient getSlackClient(String token) {
         SlackClientRuntimeConfig runtimeConfig = SlackClientRuntimeConfig.builder()
                 .setTokenSupplier(() -> token)
                 .build();
