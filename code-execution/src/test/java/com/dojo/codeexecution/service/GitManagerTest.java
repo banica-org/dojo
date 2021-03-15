@@ -8,7 +8,7 @@ import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,10 +16,14 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class GitManagerTest {
+
+    String username = "dummy-user";
 
     @InjectMocks
     private GitManager gitManager;
@@ -34,10 +38,9 @@ public class GitManagerTest {
     private GHUser dummyUser;
 
     @Test
-    public void getRepositoryReturnsRepository() throws IOException {
+    public void getExistingRepositoryReturnsRepository() throws IOException {
         //Arrange
         String expected = "https://github.com/dummy-user/gamified-hiring-dummy-user";
-        String username = "dummy-user";
         URL repository = new URL(expected);
 
         //Act
@@ -47,23 +50,58 @@ public class GitManagerTest {
         when(gitHub.getMyself().getLogin()).thenReturn("https://github.com/dummy-user");
         when(gitHub.getRepository(expected).getHtmlUrl()).thenReturn(repository);
 
-        String actual = gitManager.getRepository(username);
+        String actual = gitManager.getExistingGitHubRepository(username).toString();
 
         //Assert
         assertEquals(expected, actual);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getExistingRepositoryReturnsNotFound() throws IOException {
+        gitManager.getExistingGitHubRepository(username);
     }
 
 
     @Test
-    public void getRepositoryReturnsNotFound() {
+    public void createGitHubRepository() throws IOException {
         //Arrange
-        String expected = "User not found!";
-        String username = "dummy-user";
+        String repositoryName = "gamified-hiring/dummy-user";
 
         //Act
-        String actual = gitManager.getRepository(username);
+        when(dummyUser.getLogin()).thenReturn(username);
+        List<GHUser> users = Collections.singletonList(dummyUser);
+        when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
 
         //Assert
-        assertEquals(expected, actual);
+        gitManager.createGitHubRepository(username);
+        verify(gitHub, times(1)).createRepository(repositoryName);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createGitHubRepositoryReturnsNotFound() throws IOException {
+        gitManager.createGitHubRepository(username);
+    }
+
+    @Test
+    public void hasUserExistingRepositoryReturnsTrue() throws IOException {
+        //Act
+        List<GHUser> users = Collections.singletonList(dummyUser);
+        when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
+        Boolean actual = gitManager.hasUserExistingRepository(username);
+
+        //Assert
+        assertEquals(true, actual);
+    }
+
+    @Test
+    public void hasUserExistingRepositoryReturnsFalse() throws IOException {
+        //Act
+        when(gitHub.searchUsers().q(username).list().toList()).thenThrow(IOException.class);
+
+        Boolean actual = gitManager.hasUserExistingRepository(username);
+        //Assert
+        assertEquals(false, actual);
+    }
+
 }

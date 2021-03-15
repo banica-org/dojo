@@ -34,56 +34,44 @@ public class GitManager {
         this.gitHub = gitHub;
     }
 
-    private boolean hasUserExistingRepository(GHUser user){
-        try{
-            gitHub.getRepository(getRepoNameWithOwner(user));
-        }catch(IOException e){
-            return false;
-        }
-        return true;
+    @Retryable
+    public URL getExistingGitHubRepository(String username) throws IOException {
+        return gitHub.getRepository(getRepositoryNameByOwner(username)).getHtmlUrl();
     }
 
     @Retryable
-    public String getRepository(String username) {
-        try{
-            GHUser ghUser = getGhUser(username);
-            return createRepository(ghUser).toString();
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            return "User not found!";
-        }
-    }
-
-    private URL createRepository(GHUser user) throws IOException {
-        if(hasUserExistingRepository(user)){
-            return gitHub.getRepository(getRepoNameWithOwner(user)).getHtmlUrl();
-        }
-        return createGitRepo(gitHub, user);
-    }
-
-    private String getRepoNameWithOwner(GHUser ghUser) throws IOException {
-        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + ghUser.getLogin();
-    }
-
-    private GHUser getGhUser(String username) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
-        if (users.size() == 1) {
-            return users.get(0);
-        }
-        throw new IllegalArgumentException("User not found!");
-    }
-
-    private URL createGitRepo(GitHub gitHub, GHUser user) throws IOException {
+    public URL createGitHubRepository(String username) throws IOException {
+        GHUser user = getGitHubUser(username);
         String repoName = REPO_PREFIX + "/" + user.getLogin();
 
         GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
 
         repo.createHook(WEB_HOOK_PREFIX, gitConfig.getWebhookConfig(),
-               Collections.singletonList(GHEvent.PUSH), true);
-
+                Collections.singletonList(GHEvent.PUSH), true);
         repo.addCollaborators(user);
 
         return repo.getHtmlUrl();
+    }
+
+    public boolean hasUserExistingRepository(String username) {
+        try {
+            gitHub.getRepository(getRepositoryNameByOwner(username));
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private String getRepositoryNameByOwner(String username) throws IOException {
+        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + getGitHubUser(username).getLogin();
+    }
+
+    private GHUser getGitHubUser(String username) throws IOException {
+        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
+        if (users.size() == 1) {
+            return users.get(0);
+        }
+        throw new IllegalArgumentException("User not found!");
     }
 
 }

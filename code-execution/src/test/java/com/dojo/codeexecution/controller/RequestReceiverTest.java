@@ -5,14 +5,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RequestReceiverTest {
 
     @InjectMocks
@@ -22,18 +25,38 @@ public class RequestReceiverTest {
     private GitManager gitManager;
 
     @Test
-    public void getRepoReturnsRepoName() {
+    public void getRepositoryReturnsRepository() throws IOException {
         //Arrange
-        String expected = "https://github.com/account/gamified-hiring-dummy-account";
+        URL expectedURL = new URL("https://github.com/account/gamified-hiring-dummy-account");
         String username = "dummy-account";
+        String expected = expectedURL.toString();
 
         //Act
-        when(gitManager.getRepository(username)).thenReturn(expected);
-        String actual = requestReceiver.getRepo(username);
+        when(gitManager.hasUserExistingRepository(username)).thenReturn(true);
+        when(gitManager.getExistingGitHubRepository(username)).thenReturn(expectedURL);
+        String actual = requestReceiver.getRepository(username);
 
         //Assert
         assertEquals(expected, actual);
-        verify(gitManager, times(1)).getRepository(username);
+        verify(gitManager, times(1)).getExistingGitHubRepository(username);
+        verify(gitManager, times(1)).hasUserExistingRepository(username);
     }
 
+    @Test
+    public void createRepositoryReturnsRepository() throws IOException {
+        //Arrange
+        URL expectedURL = new URL("https://github.com/account/gamified-hiring-dummy-account");
+        String username = "dummy-account";
+        String expected = expectedURL.toString();
+
+        //Act
+        when(gitManager.hasUserExistingRepository(username)).thenReturn(false);
+        when(gitManager.createGitHubRepository(username)).thenReturn(expectedURL);
+        String actual = requestReceiver.getRepository(username);
+
+        //Assert
+        assertEquals(expected, actual);
+        verify(gitManager, times(1)).hasUserExistingRepository(username);
+        verify(gitManager, times(1)).createGitHubRepository(username);
+    }
 }
