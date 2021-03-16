@@ -1,16 +1,17 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -19,63 +20,58 @@ import java.util.List;
 @Service
 public class GitManager {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
+
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
 
-    @Autowired
-    private GitConfigProperties gitConfig;
+    private final GitConfigProperties gitConfig;
+    private final GitHub gitHub;
 
-    private GitHub gitHub;
+    @Autowired
+    public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
+        this.gitConfig = gitConfig;
+        this.gitHub = gitHub;
+    }
 
     @Retryable
-    public URL getRepo(String email) throws IOException {
-        URL repoUrl;
-        GHUser ghUser = getGhUser(email);
-        String login = ghUser.getLogin();
-
-        try {
-            repoUrl = gitHub.getRepository(getRepoNameWithOwner(login)).getHtmlUrl();
-        } catch (IOException e) {
-            repoUrl = createGitRepo(gitHub, login, ghUser);
-        }
-
-        return repoUrl;
+    public URL getExistingGitHubRepository(String username) throws IOException {
+        return gitHub.getRepository(getRepositoryNameByOwner(username)).getHtmlUrl();
     }
 
-    private String getRepoNameWithOwner(String login) throws IOException {
-        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + login;
-    }
+    @Retryable
+    public URL createGitHubRepository(String username) throws IOException {
+        GHUser user = getGitHubUser(username);
+        String repoName = REPO_PREFIX + "/" + user.getLogin();
 
-    private GHUser getGhUser(String email) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(email).list().toList();
-        if (users.size() == 1) {
-            return users.get(0);
-        }
-        throw new IllegalArgumentException("User email not visible!");
-    }
-
-    private URL createGitRepo(GitHub github, String login, GHUser user) throws IOException {
-        String repoName = REPO_PREFIX + "/" + login;
-        GHRepository repo = github.createRepository(repoName).private_(true).create();
+        GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
 
         repo.createHook(WEB_HOOK_PREFIX, gitConfig.getWebhookConfig(),
                 Collections.singletonList(GHEvent.PUSH), true);
-
         repo.addCollaborators(user);
 
         return repo.getHtmlUrl();
     }
 
-    @PostConstruct
-    private void createGitHubInstance() {
-        if (gitHub == null) {
-            try {
-                gitHub = new GitHubBuilder().withOAuthToken(gitConfig.getRepoToken(), gitConfig.getUser()).build();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public boolean hasUserExistingRepository(String username) {
+        try {
+            gitHub.getRepository(getRepositoryNameByOwner(username));
+        } catch (IOException e) {
+            return false;
         }
+        return true;
     }
 
+    private String getRepositoryNameByOwner(String username) throws IOException {
+        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + getGitHubUser(username).getLogin();
+    }
+
+    private GHUser getGitHubUser(String username) throws IOException {
+        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
+        if (users.size() == 1) {
+            return users.get(0);
+        }
+        throw new IllegalArgumentException("User not found!");
+    }
 
 }
