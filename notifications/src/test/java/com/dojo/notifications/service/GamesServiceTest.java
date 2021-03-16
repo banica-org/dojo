@@ -20,6 +20,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,7 +60,7 @@ public class GamesServiceTest {
         gamesList = new GamesList();
         gamesList.setItems(Collections.singletonList(testGame));
 
-        addGamesInDb();
+        addGamesInGameRepo();
 
         contest = new Contest();
         contest.setContestId(ID);
@@ -67,24 +68,14 @@ public class GamesServiceTest {
     }
 
     @Test
-    public void getAllGamesNullTest() {
-        Collection<Game> actual = gamesService.getAllGames();
+    public void getAllGamesTest() {
         Collection<Game> expected = gamesList.getItems();
+        Collection<Game> actual = gamesService.getAllGames();
 
         verify(restTemplate, times(1))
                 .exchange(anyString(), any(), any(), eq(new ParameterizedTypeReference<GamesList>() {
                 }));
         assertEquals(expected.size(), actual.size());
-    }
-
-    @Test
-    public void getAllGamesNonNullTest() {
-        gamesService.getAllGames();
-        gamesService.getAllGames();
-
-        verify(restTemplate, times(1))
-                .exchange(anyString(), any(), any(), eq(new ParameterizedTypeReference<GamesList>() {
-                }));
     }
 
     @Test
@@ -97,14 +88,14 @@ public class GamesServiceTest {
         assertEquals(expected, actual);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void invalidateGamesCacheTest() {
-        gamesService.getAllGames();
         Game game = gamesService.getGameById(ID);
         assertNotNull(game);
 
         gamesService.invalidateGamesCache();
-        gamesService.getGameById(ID);
+        game = gamesService.getGameById(ID);
+        assertNull(game);
     }
 
     @Test
@@ -146,7 +137,7 @@ public class GamesServiceTest {
         verify(notificationManagingService, times(1)).stopNotifications(ID);
     }
 
-    private void addGamesInDb() {
+    private void addGamesInGameRepo() {
         when(restTemplate
                 .exchange(anyString(), any(), any(), eq(new ParameterizedTypeReference<GamesList>() {
                 })))
@@ -154,5 +145,7 @@ public class GamesServiceTest {
 
         ReflectionTestUtils.setField(gamesService, "restTemplate", restTemplate);
         ReflectionTestUtils.setField(gamesService, "gamesApi", "uri");
+
+        gamesService.getAllGames();
     }
 }

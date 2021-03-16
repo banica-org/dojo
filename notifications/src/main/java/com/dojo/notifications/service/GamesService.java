@@ -39,6 +39,9 @@ public class GamesService {
             ResponseEntity<GamesList> responseEntity = restTemplate.exchange(gamesApi,
                     HttpMethod.GET, null, new ParameterizedTypeReference<GamesList>() {
                     });
+            if (responseEntity.getBody() == null) {
+                return null;
+            }
             List<Game> games = responseEntity.getBody().getItems();
             gameRepo = new HashMap<>();
             games.forEach(game -> gameRepo.put(game.getId(), game));
@@ -51,6 +54,9 @@ public class GamesService {
     }
 
     public Game getGameById(String id) {
+        if (gameRepo == null || !gameRepo.containsKey(id)) {
+            return null;
+        }
         return gameRepo.get(id);
     }
 
