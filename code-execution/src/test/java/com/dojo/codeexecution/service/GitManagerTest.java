@@ -8,7 +8,6 @@ import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class GitManagerTest {
 
-    String username = "dummy-user";
+    private final String username = "dummy-user";
 
     @InjectMocks
     private GitManager gitManager;
