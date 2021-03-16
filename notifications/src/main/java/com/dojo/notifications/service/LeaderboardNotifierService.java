@@ -57,18 +57,22 @@ public class LeaderboardNotifierService {
         List<User> newLeaderboard = responseEntity.getBody();
         List<User> oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (oldLeaderboard != null && newLeaderboard != null && !newLeaderboard.equals(leaderboards.get(contest.getContestId())) ) {
-            LOGGER.info("There are changes in leaderboard!");
-
-            EventType changesEventType = determineEventType(newLeaderboard, contest);
-            if (changesEventType == EventType.POSITION_CHANGES) {
-                notifyPersonal(newLeaderboard, contest);
-            }
-            contest.getCommonNotificationsLevel().entrySet().stream()
-                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(changesEventType))
-                    .forEach(entry -> notifyCommon(newLeaderboard, contest, entry.getKey()));
+        if (oldLeaderboard != null && newLeaderboard != null && !newLeaderboard.equals(oldLeaderboard)) {
+            notifyAndApplyChanges(contest, newLeaderboard);
         }
         leaderboards.put(contest.getContestId(), newLeaderboard);
+    }
+
+    private void notifyAndApplyChanges(final Contest contest, List<User> newLeaderboard) {
+        LOGGER.info("There are changes in leaderboard!");
+
+        EventType changesEventType = determineEventType(newLeaderboard, contest);
+        if (changesEventType == EventType.POSITION_CHANGES) {
+            notifyPersonal(newLeaderboard, contest);
+        }
+        contest.getCommonNotificationsLevel().entrySet().stream()
+                .filter(entry -> entry.getValue().getIncludedEventTypes().contains(changesEventType))
+                .forEach(entry -> notifyCommon(newLeaderboard, contest, entry.getKey()));
     }
 
     private void notifyPersonal(List<User> newLeaderboard, Contest contest) {
