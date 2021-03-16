@@ -14,7 +14,7 @@ import com.hubspot.slack.client.models.blocks.objects.TextType;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @Getter
 public abstract class LeaderboardNotification implements Notification {
@@ -39,7 +39,7 @@ public abstract class LeaderboardNotification implements Notification {
     }
 
     @Override
-    public ChatPostMessageParams.Builder convertToSlackNotification(BiFunction<String, CustomSlackClient, String> getSlackUserId, CustomSlackClient slackClient) {
+    public ChatPostMessageParams.Builder convertToSlackNotification(Function<String, String> getSlackUserId, CustomSlackClient slackClient) {
         return ChatPostMessageParams.builder()
                 .addBlocks(
                         Divider.builder().build(),
@@ -60,7 +60,7 @@ public abstract class LeaderboardNotification implements Notification {
                         .build());
     }
 
-    abstract Text buildLeaderboardNames(BiFunction<String, CustomSlackClient, String> getSlackUserId, CustomSlackClient slackClient);
+    abstract Text buildLeaderboardNames(Function<String, String> getSlackUserId, CustomSlackClient slackClient);
 
     abstract Text buildLeaderboardScores();
 

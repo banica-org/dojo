@@ -29,10 +29,4 @@ public class SlackClientManagerTest {
     public void getSlackClientTest() {
         assertNotNull(slackClient);
     }
-
-    @Test
-    public void getSlackChannelTest() {
-        String actual = slackClientManager.getSlackChannelForUser(INVALID_EMAIL, slackClient);
-        assertEquals(INVALID_CONV_ID, actual);
-    }
 }

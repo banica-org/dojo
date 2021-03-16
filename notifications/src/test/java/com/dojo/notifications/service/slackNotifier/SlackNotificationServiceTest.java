@@ -16,8 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.function.Function;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +31,7 @@ public class SlackNotificationServiceTest {
     private final static String TOKEN = "token";
     private final static String CONVERSATION_ID = "id";
     private final static String EMAIL = "email@email.com";
+    private final static ChatPostMessageParams.Builder BUILDER = ChatPostMessageParams.builder();
 
     @Mock
     private UserDetails userDetails;
@@ -47,9 +51,8 @@ public class SlackNotificationServiceTest {
     public void setUp() {
         when(contest.getSlackToken()).thenReturn(TOKEN);
         when(slackClientManager.getSlackClient(TOKEN)).thenReturn(slackClient);
-
-        ChatPostMessageParams.Builder builder = ChatPostMessageParams.builder().addBlocks(Divider.builder().build());
-        when(notification.convertToSlackNotification(any(), any())).thenReturn(builder);
+        BUILDER.addBlocks(Divider.builder().build());
+        when(notification.convertToSlackNotification(any(Function.class), eq(slackClient))).thenReturn(BUILDER);
     }
 
     @Test
@@ -60,13 +63,14 @@ public class SlackNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         when(userDetails.getEmail()).thenReturn(EMAIL);
-        when(slackClientManager.getSlackChannelForUser(EMAIL, slackClient)).thenReturn(CONVERSATION_ID);
+        when(slackClient.getConversationId(EMAIL)).thenReturn(CONVERSATION_ID);
 
         slackNotificationService.notify(userDetails, notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(slackClientManager, times(1)).getSlackChannelForUser(EMAIL, slackClient);
-        verify(slackClient, times(1)).postMessage(any());
+        verify(slackClient, times(1)).getConversationId(EMAIL);
+        verify(notification, times(1)).convertToSlackNotification(any(Function.class), eq(slackClient));
+        verify(slackClient, times(1)).postMessage(BUILDER.build());
     }
 
     @Test
@@ -76,6 +80,7 @@ public class SlackNotificationServiceTest {
         slackNotificationService.notify(notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(slackClient, times(1)).postMessage(any());
+        verify(notification, times(1)).convertToSlackNotification(any(Function.class), eq(slackClient));
+        verify(slackClient, times(1)).postMessage(BUILDER.build());
     }
 }

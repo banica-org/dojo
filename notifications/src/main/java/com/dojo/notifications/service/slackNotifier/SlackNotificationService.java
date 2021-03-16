@@ -29,25 +29,27 @@ public class SlackNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        CustomSlackClient slackClient = slackClientManager.getSlackClient(contest.getSlackToken());
-        String slackChannel = slackClientManager.getSlackChannelForUser(userDetails.getEmail(), slackClient);
-        slackClient
-                .postMessage(convertToSlackNotification(notification, slackClient, slackChannel));
+        CustomSlackClient slackClient = getSlackClient(contest);
+        String slackChannel = slackClient.getConversationId(userDetails.getEmail());
+        slackClient.postMessage(convertToSlackNotification(notification, slackClient, slackChannel));
     }
 
     // Notify channel
     @Override
     public void notify(Notification notification, Contest contest) {
-        CustomSlackClient slackClient = slackClientManager.getSlackClient(contest.getSlackToken());
+        CustomSlackClient slackClient = getSlackClient(contest);
         String slackChannel = contest.getSlackChannel();
-        slackClient
-                .postMessage(convertToSlackNotification(notification, slackClient, slackChannel));
+        slackClient.postMessage(convertToSlackNotification(notification, slackClient, slackChannel));
     }
 
     private ChatPostMessageParams convertToSlackNotification(Notification notification, CustomSlackClient slackClient, String slackChannel) {
         return notification
-                .convertToSlackNotification(slackClientManager::getSlackChannelForUser, slackClient)
+                .convertToSlackNotification(slackClient::getConversationId, slackClient)
                 .setChannelId(slackChannel)
                 .build();
+    }
+
+    private CustomSlackClient getSlackClient(Contest contest) {
+        return slackClientManager.getSlackClient(contest.getSlackToken());
     }
 }

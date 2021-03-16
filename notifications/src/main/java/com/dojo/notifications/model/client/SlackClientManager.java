@@ -12,10 +12,4 @@ public class SlackClientManager {
                 .build();
         return new CustomSlackWebClient(runtimeConfig);
     }
-
-    public String getSlackChannelForUser(String email, CustomSlackClient slackClient) {
-        return slackClient.getConversationId(email);
-    }
-
-
 }
