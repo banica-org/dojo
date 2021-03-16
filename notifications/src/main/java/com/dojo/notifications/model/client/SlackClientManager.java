@@ -1,16 +1,21 @@
-package com.dojo.notifications.client;
+package com.dojo.notifications.model.client;
 
-import com.hubspot.slack.client.SlackClient;
 import com.hubspot.slack.client.SlackClientRuntimeConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SlackWebClientProvider {
+public class SlackClientManager {
 
-    public SlackClient getSlackClient(String token) {
+    public CustomSlackClient getSlackClient(String token) {
         SlackClientRuntimeConfig runtimeConfig = SlackClientRuntimeConfig.builder()
                 .setTokenSupplier(() -> token)
                 .build();
         return new CustomSlackWebClient(runtimeConfig);
     }
+
+    public String getSlackChannelForUser(String email, CustomSlackClient slackClient) {
+        return slackClient.getConversationId(email);
+    }
+
+
 }

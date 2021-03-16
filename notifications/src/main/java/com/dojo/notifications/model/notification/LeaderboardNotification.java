@@ -1,8 +1,8 @@
 package com.dojo.notifications.model.notification;
 
-import com.dojo.notifications.service.UserDetailsService;
+import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.user.User;
-import com.hubspot.slack.client.SlackClient;
+import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.models.Attachment;
 import com.hubspot.slack.client.models.actions.Action;
@@ -39,7 +39,7 @@ public abstract class LeaderboardNotification implements Notification {
     }
 
     @Override
-    public ChatPostMessageParams.Builder convertToSlackNotification(BiFunction<String, SlackClient, String> getSlackUserId, SlackClient slackClient) {
+    public ChatPostMessageParams.Builder convertToSlackNotification(BiFunction<String, CustomSlackClient, String> getSlackUserId, CustomSlackClient slackClient) {
         return ChatPostMessageParams.builder()
                 .addBlocks(
                         Divider.builder().build(),
@@ -60,7 +60,7 @@ public abstract class LeaderboardNotification implements Notification {
                         .build());
     }
 
-    abstract Text buildLeaderboardNames(BiFunction<String, SlackClient, String> getSlackUserId, SlackClient slackClient);
+    abstract Text buildLeaderboardNames(BiFunction<String, CustomSlackClient, String> getSlackUserId, CustomSlackClient slackClient);
 
     abstract Text buildLeaderboardScores();
 

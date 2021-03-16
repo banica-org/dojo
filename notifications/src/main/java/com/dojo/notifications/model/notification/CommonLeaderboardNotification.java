@@ -1,9 +1,9 @@
 package com.dojo.notifications.model.notification;
 
-import com.dojo.notifications.service.UserDetailsService;
+import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
-import com.hubspot.slack.client.SlackClient;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
@@ -22,7 +22,7 @@ public class CommonLeaderboardNotification extends LeaderboardNotification {
     }
 
     @Override
-    public final Text buildLeaderboardNames(BiFunction<String, SlackClient, String> getSlackUserId, SlackClient slackClient) {
+    public final Text buildLeaderboardNames(BiFunction<String, CustomSlackClient, String> getSlackUserId, CustomSlackClient slackClient) {
         StringBuilder names = new StringBuilder();
         leaderboard.forEach(user -> {
             String userId = getSlackUserId.apply(getUserDetailsService().getUserEmail(user.getUser().getId()), slackClient);

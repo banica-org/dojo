@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class GamesServiceTests {
+public class GamesServiceTest {
 
     private static final String ID = "game";
     private static final String TITLE = "game";
