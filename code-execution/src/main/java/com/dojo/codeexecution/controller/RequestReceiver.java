@@ -14,7 +14,7 @@ import java.io.IOException;
 @RestController
 public class RequestReceiver {
 
-    final static Logger logger = LoggerFactory.getLogger(RequestReceiver.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
 
     @Autowired
     private GitManager gitManager;

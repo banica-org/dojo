@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class GitManager {
 
-    final static Logger logger = LoggerFactory.getLogger(RequestReceiver.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
 
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
