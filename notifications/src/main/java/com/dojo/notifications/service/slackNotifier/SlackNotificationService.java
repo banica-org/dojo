@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class SlackNotificationService implements NotificationService {
 
     private final SlackClientManager slackClientManager;
+    private final SlackMessageBuilder slackMessageBuilder;
 
     @Autowired
-    public SlackNotificationService(SlackClientManager slackClientManager) {
+    public SlackNotificationService(SlackClientManager slackClientManager, SlackMessageBuilder slackMessageBuilder) {
         this.slackClientManager = slackClientManager;
+        this.slackMessageBuilder = slackMessageBuilder;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class SlackNotificationService implements NotificationService {
 
     private ChatPostMessageParams convertToSlackNotification(Notification notification, CustomSlackClient slackClient, String slackChannel) {
         return notification
-                .convertToSlackNotification(slackClient::getConversationId, slackClient)
+                .convertToSlackNotification(slackMessageBuilder, slackClient)
                 .setChannelId(slackChannel)
                 .build();
     }

@@ -11,7 +11,6 @@ import com.hubspot.slack.client.models.blocks.objects.TextType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class PersonalLeaderboardNotification extends LeaderboardNotification {
 
@@ -23,11 +22,11 @@ public class PersonalLeaderboardNotification extends LeaderboardNotification {
     }
 
     @Override
-    public final Text buildLeaderboardNames(Function<String, String> getSlackUserId, CustomSlackClient slackClient) {
+    public final Text buildLeaderboardNames(CustomSlackClient slackClient) {
         StringBuilder names = new StringBuilder();
 
         getLeaderboard().forEach(user -> {
-            String userId = getSlackUserId.apply(getUserDetailsService().getUserEmail(user.getUser().getId()));
+            String userId = slackClient.getSlackUserId(getUserDetailsService().getUserEmail(user.getUser().getId()));
             String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
             String name = (user.getUser().getId() == userDetails.getId()) ?
                     SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;

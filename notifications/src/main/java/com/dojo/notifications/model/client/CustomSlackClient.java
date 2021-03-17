@@ -4,4 +4,5 @@ import com.hubspot.slack.client.SlackClient;
 
 public interface CustomSlackClient extends SlackClient {
     String getConversationId(String userEmail);
+    String getSlackUserId(String email);
 }
