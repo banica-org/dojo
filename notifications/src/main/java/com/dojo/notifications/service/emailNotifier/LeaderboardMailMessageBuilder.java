@@ -1,7 +1,7 @@
 package com.dojo.notifications.service.emailNotifier;
 
 import org.springframework.stereotype.Component;
-import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 @Component
 public class LeaderboardMailMessageBuilder extends MailContentBuilder {
 
-    public LeaderboardMailMessageBuilder(TemplateEngine templateEngine) {
+    public LeaderboardMailMessageBuilder(ITemplateEngine templateEngine) {
         super(templateEngine);
     }
 

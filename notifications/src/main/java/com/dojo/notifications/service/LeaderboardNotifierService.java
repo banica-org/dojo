@@ -50,6 +50,7 @@ public class LeaderboardNotifierService {
         UriComponentsBuilder leaderboardApiBuilder = UriComponentsBuilder.fromHttpUrl(configuration.getLeaderboardApi())
                 .queryParam("eventId", contest.getContestId())
                 .queryParam("userMode", "spectator");
+
         ResponseEntity<List<User>> responseEntity = restTemplate.exchange(leaderboardApiBuilder.toUriString(),
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
                 });
@@ -58,12 +59,12 @@ public class LeaderboardNotifierService {
         List<User> oldLeaderboard = leaderboards.get(contest.getContestId());
 
         if (oldLeaderboard != null && newLeaderboard != null && !newLeaderboard.equals(oldLeaderboard)) {
-            notifyAndApplyChanges(contest, newLeaderboard);
+            notifyAboutChanges(contest, newLeaderboard);
         }
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
-    private void notifyAndApplyChanges(final Contest contest, List<User> newLeaderboard) {
+    public void notifyAboutChanges(final Contest contest, List<User> newLeaderboard) {
         LOGGER.info("There are changes in leaderboard!");
 
         EventType changesEventType = determineEventType(newLeaderboard, contest);
@@ -92,7 +93,8 @@ public class LeaderboardNotifierService {
     }
 
     private void notifyCommon(List<User> newLeaderboard, Contest contest, NotifierType notifierType) {
-        notificationServices.get(notifierType).notify(new CommonLeaderboardNotification(newLeaderboard, userDetailsService), contest);
+        notificationServices.get(notifierType)
+                .notify(new CommonLeaderboardNotification(newLeaderboard, userDetailsService), contest);
     }
 
     private EventType determineEventType(List<User> newLeaderboard, Contest contest) {
