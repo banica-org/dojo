@@ -16,11 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.function.Function;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +39,8 @@ public class SlackNotificationServiceTest {
     private CustomSlackClient slackClient;
     @Mock
     private SlackClientManager slackClientManager;
+    @Mock
+    private SlackMessageBuilder slackMessageBuilder;
 
     @InjectMocks
     private SlackNotificationService slackNotificationService;
@@ -52,7 +50,7 @@ public class SlackNotificationServiceTest {
         when(contest.getSlackToken()).thenReturn(TOKEN);
         when(slackClientManager.getSlackClient(TOKEN)).thenReturn(slackClient);
         BUILDER.addBlocks(Divider.builder().build());
-        when(notification.convertToSlackNotification(any(Function.class), eq(slackClient))).thenReturn(BUILDER);
+        when(notification.convertToSlackNotification(slackMessageBuilder, slackClient)).thenReturn(BUILDER);
     }
 
     @Test
@@ -69,7 +67,7 @@ public class SlackNotificationServiceTest {
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
         verify(slackClient, times(1)).getConversationId(EMAIL);
-        verify(notification, times(1)).convertToSlackNotification(any(Function.class), eq(slackClient));
+        verify(notification, times(1)).convertToSlackNotification(slackMessageBuilder, slackClient);
         verify(slackClient, times(1)).postMessage(BUILDER.build());
     }
 
@@ -80,7 +78,7 @@ public class SlackNotificationServiceTest {
         slackNotificationService.notify(notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(notification, times(1)).convertToSlackNotification(any(Function.class), eq(slackClient));
+        verify(notification, times(1)).convertToSlackNotification(slackMessageBuilder, slackClient);
         verify(slackClient, times(1)).postMessage(BUILDER.build());
     }
 }
