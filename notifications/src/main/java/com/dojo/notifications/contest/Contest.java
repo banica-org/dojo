@@ -31,7 +31,7 @@ public class Contest {
     }
 
     public String getSenseiEmailsAsString() {
-        return "";
+        return String.join(";", senseiEmails);
     }
 
     public void setSlackCommonNotifications(CommonNotificationsLevel level) {
