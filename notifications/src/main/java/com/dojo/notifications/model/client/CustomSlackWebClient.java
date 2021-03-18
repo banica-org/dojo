@@ -68,7 +68,7 @@ public class CustomSlackWebClient extends SlackWebClient implements CustomSlackC
         }
     }
 
-    private String getSlackUserId(String email) {
+    public String getSlackUserId(String email) {
         try {
             return getUser(email).getId();
         } catch (IllegalStateException e) {
