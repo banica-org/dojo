@@ -20,4 +20,5 @@ public class LeaderboardMailMessageBuilder extends MailContentBuilder {
 
         return getTemplateEngine().process("mailTemplate", context);
     }
+
 }
