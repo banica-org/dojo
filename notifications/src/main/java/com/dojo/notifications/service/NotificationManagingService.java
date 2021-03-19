@@ -31,7 +31,7 @@ public class NotificationManagingService {
     }
 
     public void startNotifications(final Contest contest){
-        ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() ->leaderboardService.getLeaderBoard(contest), INITIAL_DELAY, schedulePeriod, TimeUnit.SECONDS);
+        ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() ->leaderboardService.lookForLeaderboardChanges(contest), INITIAL_DELAY, schedulePeriod, TimeUnit.SECONDS);
         subscriptions.put(contest.getContestId(), future);
     }
 

@@ -29,24 +29,6 @@ public class EmailNotificationService implements NotificationService {
     @Autowired
     private MailContentBuilder mailContentBuilder;
 
-    private void sendEmail(String to, String data, Contest contest) {
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper;
-        try {
-            helper = new MimeMessageHelper(message, true);
-
-            helper.setFrom(emailConfig.getUsername());
-            helper.setTo(to);
-            helper.setSubject("Leaderboard change for " + contest.getTitle());
-            helper.setText(data, true);
-
-            emailSender.send(message);
-
-        } catch (MessagingException e) {
-            LOGGER.warn("Email could not be sent: {}", e.getCause().getMessage());
-        }
-    }
-
     @Override
     public NotifierType getNotificationServiceTypeMapping() {
         return NotifierType.EMAIL;
@@ -64,5 +46,23 @@ public class EmailNotificationService implements NotificationService {
     public void notify(Notification notification, Contest contest) {
         String data = notification.convertToEmailNotification(this.mailContentBuilder);
         contest.getSenseiEmails().forEach(email -> sendEmail(email, data, contest));
+    }
+
+    private void sendEmail(String to, String data, Contest contest) {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper;
+        try {
+            helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(emailConfig.getUsername());
+            helper.setTo(to);
+            helper.setSubject("Leaderboard change for " + contest.getTitle());
+            helper.setText(data, true);
+
+            emailSender.send(message);
+
+        } catch (MessagingException e) {
+            LOGGER.warn("Email could not be sent: {}", e.getCause().getMessage());
+        }
     }
 }
