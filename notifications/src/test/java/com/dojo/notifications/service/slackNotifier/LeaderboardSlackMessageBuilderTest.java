@@ -63,7 +63,6 @@ public class LeaderboardSlackMessageBuilderTest {
 
         when(userDetailsService.getUserEmail(USER_ID)).thenReturn(USER_EMAIL);
         when(slackClient.getSlackUserId(USER_EMAIL)).thenReturn(CONV_ID);
-        ReflectionTestUtils.setField(leaderboard, "userDetailsService", userDetailsService);
     }
 
     @Test
