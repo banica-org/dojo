@@ -5,8 +5,6 @@ import com.dojo.notifications.model.contest.enums.NotifierType;
 import lombok.Data;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Data
 public class Contest {
@@ -29,7 +27,7 @@ public class Contest {
     }
 
     public void setSenseiEmailsAsString(String emails) {
-        senseiEmails = Stream.of(emails.trim().split(";")).collect(Collectors.toSet());
+        senseiEmails = new HashSet<>(Arrays.asList(emails.split(";")));
     }
 
     public String getSenseiEmailsAsString() {

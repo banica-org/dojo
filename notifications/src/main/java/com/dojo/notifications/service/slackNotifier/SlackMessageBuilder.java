@@ -10,6 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 public abstract class SlackMessageBuilder {
 
-    public abstract ChatPostMessageParams generateSlackContent(UserDetails userDetails, Leaderboard leaderboard, UserDetailsService userDetailsService, CustomSlackClient slackClient, String slackChannel);
-    public abstract ChatPostMessageParams generateSlackContent(Leaderboard leaderboard, UserDetailsService userDetailsService, CustomSlackClient slackClient, String slackChannel);
+    public abstract ChatPostMessageParams generateSlackContent(UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel);
+    public abstract ChatPostMessageParams generateSlackContent(Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel);
 }

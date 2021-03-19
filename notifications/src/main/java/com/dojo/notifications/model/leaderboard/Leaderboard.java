@@ -24,33 +24,33 @@ public class Leaderboard {
         this.leaderboard = leaderboard;
     }
 
-    public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
-        AtomicInteger position = new AtomicInteger(1);
-        StringBuilder names = new StringBuilder();
-
-        leaderboard.forEach(user -> {
-            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
-            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
-            String name = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ?
-                    SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
-            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
-                    .append(". ")
-                    .append(name)
-                    .append("\n");
-        });
-        return Text.of(TextType.MARKDOWN, String.valueOf(names));
-    }
-
-    public Text buildLeaderboardScores(UserDetails userDetails) {
-        StringBuilder scores = new StringBuilder();
-
-        leaderboard.forEach(user -> {
-            String score = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
-                    : String.valueOf(user.getScore());
-            scores.append(score).append("\n");
-        });
-        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
-    }
+//    public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
+//        AtomicInteger position = new AtomicInteger(1);
+//        StringBuilder names = new StringBuilder();
+//
+//        leaderboard.forEach(user -> {
+//            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
+//            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
+//            String name = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ?
+//                    SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
+//            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
+//                    .append(". ")
+//                    .append(name)
+//                    .append("\n");
+//        });
+//        return Text.of(TextType.MARKDOWN, String.valueOf(names));
+//    }
+//
+//    public Text buildLeaderboardScores(UserDetails userDetails) {
+//        StringBuilder scores = new StringBuilder();
+//
+//        leaderboard.forEach(user -> {
+//            String score = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
+//                    : String.valueOf(user.getScore());
+//            scores.append(score).append("\n");
+//        });
+//        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
+//    }
 
     @Override
     public boolean equals(Object o) {

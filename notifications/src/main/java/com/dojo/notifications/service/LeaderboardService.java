@@ -1,11 +1,15 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.configuration.Configuration;
+import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.notification.SlackNotificationUtils;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
+import com.hubspot.slack.client.models.blocks.objects.Text;
+import com.hubspot.slack.client.models.blocks.objects.TextType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -15,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,9 +30,9 @@ public class LeaderboardService {
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public LeaderboardService(Configuration configuration, UserDetailsService userDetailsService, UserDetailsService userDetailsService1) {
+    public LeaderboardService(Configuration configuration, UserDetailsService userDetailsService) {
         this.configuration = configuration;
-        this.userDetailsService = userDetailsService1;
+        this.userDetailsService = userDetailsService;
         this.restTemplate = new RestTemplate();
     }
 
@@ -65,6 +70,34 @@ public class LeaderboardService {
                 .filter(i -> !oldLeaderboard.getLeaderboard().get(i).equals(newLeaderboard.getLeaderboard().get(i)))
                 .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getLeaderboard().get(i).getUser().getId()))
                 .collect(Collectors.toList());
+    }
+
+    public Text buildLeaderboardNames(Leaderboard leaderboard, UserDetails userDetails, CustomSlackClient slackClient) {
+        AtomicInteger position = new AtomicInteger(1);
+        StringBuilder names = new StringBuilder();
+
+        leaderboard.getLeaderboard().forEach(user -> {
+            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
+            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
+            String name = (userDetails != null && user.getUser().getId() == userDetails.getId()) ?
+                    SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
+            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
+                    .append(". ")
+                    .append(name)
+                    .append("\n");
+        });
+        return Text.of(TextType.MARKDOWN, String.valueOf(names));
+    }
+
+    public Text buildLeaderboardScores(Leaderboard leaderboard, UserDetails userDetails) {
+        StringBuilder scores = new StringBuilder();
+
+        leaderboard.getLeaderboard().forEach(user -> {
+            String score = (userDetails != null && user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
+                    : String.valueOf(user.getScore());
+            scores.append(score).append("\n");
+        });
+        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 
 }

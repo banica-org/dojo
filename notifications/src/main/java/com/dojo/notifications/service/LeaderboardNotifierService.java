@@ -21,18 +21,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class LeaderboardNotifierService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
-    private final LeaderboardService leaderboardService;
-    private final Map<String, Leaderboard> leaderboards;
 
+    private static final String NOTIFYING_MESSAGE = "There are changes in leaderboard!";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
+
+    private final LeaderboardService leaderboardService;
     private final Map<NotifierType, NotificationService> notificationServices;
-    private final UserDetailsService userDetailsService;
+    private final Map<String, Leaderboard> leaderboards;
 
     @Autowired
     public LeaderboardNotifierService(LeaderboardService leaderboardService,
-                                      Collection<NotificationService> notificationServices, UserDetailsService userDetailsService) {
+                                      Collection<NotificationService> notificationServices) {
         this.leaderboardService = leaderboardService;
-        this.userDetailsService = userDetailsService;
         this.leaderboards = new ConcurrentHashMap<>();
         this.notificationServices = notificationServices.stream()
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
@@ -50,7 +51,7 @@ public class LeaderboardNotifierService {
     }
 
     public void notifyAboutChanges(final Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
-        LOGGER.info("There are changes in leaderboard!");
+        LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType changesEventType = leaderboardService.determineEventType(newLeaderboard, oldLeaderboard);
 
@@ -70,14 +71,14 @@ public class LeaderboardNotifierService {
         userDetails.forEach(user -> {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new PersonalLeaderboardNotification(newLeaderboard, userDetailsService, user), contest);
+                        .notify(user, new PersonalLeaderboardNotification(newLeaderboard, user), contest);
             }
         });
     }
 
     private void notifyCommon(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType) {
         notificationServices.get(notifierType)
-                .notify(new CommonLeaderboardNotification(newLeaderboard, userDetailsService), contest);
+                .notify(new CommonLeaderboardNotification(newLeaderboard), contest);
     }
 
 }

@@ -42,9 +42,6 @@ public class LeaderboardNotifierServiceTest {
     private LeaderboardService leaderboardService;
 
     @Mock
-    private UserDetailsService userDetailsService;
-
-    @Mock
     private Contest contest;
 
     @Mock
@@ -58,7 +55,7 @@ public class LeaderboardNotifierServiceTest {
         when(contest.getContestId()).thenReturn(DUMMY_CONTEST_ID);
         when(notificationService.getNotificationServiceTypeMapping()).thenReturn(NotifierType.EMAIL);
 
-        leaderboardNotifierService = new LeaderboardNotifierService(leaderboardService, Collections.singletonList(notificationService), userDetailsService);
+        leaderboardNotifierService = new LeaderboardNotifierService(leaderboardService, Collections.singletonList(notificationService));
 
         Map<String, Leaderboard> leaderboards = new ConcurrentHashMap<>();
         leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);

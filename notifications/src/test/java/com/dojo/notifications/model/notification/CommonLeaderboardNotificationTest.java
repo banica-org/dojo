@@ -2,7 +2,6 @@ package com.dojo.notifications.model.notification;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.emailNotifier.LeaderboardMailMessageBuilder;
 import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
 import com.dojo.notifications.service.slackNotifier.LeaderboardSlackMessageBuilder;
@@ -32,8 +31,6 @@ public class CommonLeaderboardNotificationTest {
 
     @Mock
     private CustomSlackClient slackClient;
-    @Mock
-    private UserDetailsService userDetailsService;
 
     private ChatPostMessageParams chatPostMessageParams;
     private Leaderboard leaderboard;
@@ -47,7 +44,7 @@ public class CommonLeaderboardNotificationTest {
                 .setChannelId(CHANNEL)
                 .build();
         leaderboard = new Leaderboard(new ArrayList<>());
-        leaderboardNotification = new CommonLeaderboardNotification(leaderboard, userDetailsService);
+        leaderboardNotification = new CommonLeaderboardNotification(leaderboard);
     }
 
     @Test
@@ -64,11 +61,11 @@ public class CommonLeaderboardNotificationTest {
     @Test
     public void getAsSlackNotificationTest() {
         SlackMessageBuilder slackMessageBuilder = mock(LeaderboardSlackMessageBuilder.class);
-        when(slackMessageBuilder.generateSlackContent(leaderboard, userDetailsService, slackClient, CHANNEL))
+        when(slackMessageBuilder.generateSlackContent(leaderboard, slackClient, CHANNEL))
                 .thenReturn(chatPostMessageParams);
 
         leaderboardNotification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
 
-        verify(slackMessageBuilder, times(1)).generateSlackContent(leaderboard, userDetailsService, slackClient, CHANNEL);
+        verify(slackMessageBuilder, times(1)).generateSlackContent(leaderboard, slackClient, CHANNEL);
     }
 }
