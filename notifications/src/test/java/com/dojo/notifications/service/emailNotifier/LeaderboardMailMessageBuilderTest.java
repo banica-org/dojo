@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,18 +36,14 @@ public class LeaderboardMailMessageBuilderTest {
         //Arrange
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 20);
-        contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 14);
 
-        Context context = new Context();
-        contextParams.forEach(context::setVariable);
-
-        when(templateEngine.process(anyString(), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
+        when(templateEngine.process(eq("mailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
         //Act
         String actual = leaderboardMailMessageBuilder.generateMailContent(contextParams);
 
         //Assert
         Assert.assertEquals(EXPECTED_PROCESS_RETURN_TYPE, actual);
-        verify(templateEngine, times(1)).process(anyString(), any(Context.class));
+        verify(templateEngine, times(1)).process(eq("mailTemplate"), any(Context.class));
     }
 }
