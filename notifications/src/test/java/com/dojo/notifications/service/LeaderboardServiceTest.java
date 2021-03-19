@@ -2,8 +2,9 @@ package com.dojo.notifications.service;
 
 
 import com.dojo.notifications.configuration.Configuration;
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.enums.EventType;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.EventType;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -39,8 +40,8 @@ public class LeaderboardServiceTest {
     private final String CONTEST_ID = "149";
     private final User FIRST_USER = new User(new UserInfo(1, "FirstUser", "picture"), 100);
     private final User SECOND_USER = new User(new UserInfo(2, "SecondUser", "picture"), 120);
-    private final List<User> OLD_LEADERBOARD = Arrays.asList(FIRST_USER, SECOND_USER);
-    private final List<User> NEW_LEADERBOARD = Arrays.asList(SECOND_USER, FIRST_USER);
+    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_USER, SECOND_USER));
+    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_USER, FIRST_USER));
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
 
@@ -70,14 +71,14 @@ public class LeaderboardServiceTest {
         ParameterizedTypeReference<List<User>> obj = new ParameterizedTypeReference<List<User>>() {
         };
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), eq(obj)))
-                .thenReturn(new ResponseEntity<>(OLD_LEADERBOARD, HttpStatus.ACCEPTED));
+                .thenReturn(new ResponseEntity<>(OLD_LEADERBOARD.getLeaderboard(), HttpStatus.ACCEPTED));
         ReflectionTestUtils.setField(leaderboardService, "restTemplate", restTemplate);
 
         //Act
-        List<User> actual = leaderboardService.getNewLeaderboardSetup(contest);
+        Leaderboard actual = leaderboardService.getNewLeaderboardSetup(contest);
 
         //Assert
-        Assert.assertEquals(OLD_LEADERBOARD, actual);
+        Assert.assertEquals(OLD_LEADERBOARD.getLeaderboard(), actual.getLeaderboard());
 
         verify(contest, times(1)).getContestId();
         verify(configuration, times(1)).getLeaderboardApi();
@@ -99,7 +100,7 @@ public class LeaderboardServiceTest {
     public void determineEventTypeScoreChangeTest() {
         //Arrange
         User scoreChange = new User(new UserInfo(2, "SecondUser", "picture"), 420);
-        List<User> newLeaderboard = Arrays.asList(FIRST_USER, scoreChange);
+        Leaderboard newLeaderboard = new Leaderboard(Arrays.asList(FIRST_USER, scoreChange));
 
         //Act
         EventType actual = leaderboardService.determineEventType(newLeaderboard, OLD_LEADERBOARD);

@@ -1,7 +1,7 @@
 package com.dojo.notifications.model.notification;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
-import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.emailNotifier.LeaderboardMailMessageBuilder;
@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -41,8 +40,9 @@ public class PersonalLeaderboardNotificationTest {
     @Mock
     private UserDetailsService userDetailsService;
 
+
     private ChatPostMessageParams chatPostMessageParams;
-    private List<User> leaderboard;
+    private Leaderboard leaderboard;
 
     private LeaderboardNotification leaderboardNotification;
 
@@ -52,7 +52,7 @@ public class PersonalLeaderboardNotificationTest {
                 .addBlocks(Divider.builder().build())
                 .setChannelId(CHANNEL)
                 .build();
-        leaderboard = new ArrayList<>();
+        leaderboard = new Leaderboard(new ArrayList<>());
         leaderboardNotification = new PersonalLeaderboardNotification(leaderboard, userDetailsService, userDetails);
     }
 
@@ -70,11 +70,11 @@ public class PersonalLeaderboardNotificationTest {
     @Test
     public void getAsSlackNotificationTest() {
         SlackMessageBuilder slackMessageBuilder = mock(LeaderboardSlackMessageBuilder.class);
-        when(slackMessageBuilder.generateSlackContent(userDetails, leaderboard, slackClient, CHANNEL))
+        when(slackMessageBuilder.generateSlackContent(userDetails, leaderboard, userDetailsService, slackClient, CHANNEL))
                 .thenReturn(chatPostMessageParams);
 
         leaderboardNotification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
 
-        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetails, leaderboard, slackClient, CHANNEL);
+        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetails, leaderboard, userDetailsService, slackClient, CHANNEL);
     }
 }

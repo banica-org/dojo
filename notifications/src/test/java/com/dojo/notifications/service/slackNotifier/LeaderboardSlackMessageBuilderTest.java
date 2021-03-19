@@ -1,6 +1,7 @@
 package com.dojo.notifications.service.slackNotifier;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -39,7 +40,7 @@ public class LeaderboardSlackMessageBuilderTest {
     private static final int BLOCKS_EXPECTED_SIZE = 3;
     private static final int ATTACHMENTS_EXPECTED_SIZE = 1;
 
-    List<User> leaderboard;
+    private Leaderboard leaderboard;
 
     @Mock
     private CustomSlackClient slackClient;
@@ -56,19 +57,19 @@ public class LeaderboardSlackMessageBuilderTest {
     public void init() {
         UserInfo userInfo = new UserInfo(USER_ID, USER_NAME, null);
         User user = new User(userInfo, USER_SCORE);
-        leaderboard = Collections.singletonList(user);
+        leaderboard = new Leaderboard(Collections.singletonList(user));
 
         leaderboardSlackMessageBuilder = new LeaderboardSlackMessageBuilder();
 
         when(userDetailsService.getUserEmail(USER_ID)).thenReturn(USER_EMAIL);
         when(slackClient.getSlackUserId(USER_EMAIL)).thenReturn(CONV_ID);
-        ReflectionTestUtils.setField(leaderboardSlackMessageBuilder, "userDetailsService", userDetailsService);
+        ReflectionTestUtils.setField(leaderboard, "userDetailsService", userDetailsService);
     }
 
     @Test
     public void generatePersonalSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetails, leaderboard, slackClient, CHANNEL);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetails, leaderboard, userDetailsService, slackClient, CHANNEL);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -83,7 +84,7 @@ public class LeaderboardSlackMessageBuilderTest {
     @Test
     public void generateCommonSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(leaderboard, slackClient, CHANNEL);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(leaderboard, userDetailsService, slackClient, CHANNEL);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();

@@ -1,7 +1,7 @@
 package com.dojo.notifications.api;
 
 import com.dojo.notifications.service.GamesService;
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

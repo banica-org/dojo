@@ -1,8 +1,8 @@
 package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.Game;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.Game;
 import com.dojo.notifications.service.GamesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

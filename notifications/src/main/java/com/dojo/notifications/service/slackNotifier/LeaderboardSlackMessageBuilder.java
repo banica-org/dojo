@@ -4,6 +4,7 @@ import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.notification.SlackNotificationUtils;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.models.Attachment;
 import com.hubspot.slack.client.models.actions.Action;
@@ -33,16 +34,16 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     }
 
     @Override
-    public ChatPostMessageParams generateSlackContent(UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel) {
-        Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, slackClient);
+    public ChatPostMessageParams generateSlackContent(UserDetails userDetails, Leaderboard leaderboard, UserDetailsService userDetailsService, CustomSlackClient slackClient, String slackChannel) {
+        Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(userDetails);
 
         return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE);
     }
 
     @Override
-    public ChatPostMessageParams generateSlackContent(Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel) {
-        Text leaderboardNames = leaderboard.buildLeaderboardNames(COMMON, slackClient);
+    public ChatPostMessageParams generateSlackContent(Leaderboard leaderboard, UserDetailsService userDetailsService, CustomSlackClient slackClient, String slackChannel) {
+        Text leaderboardNames = leaderboard.buildLeaderboardNames(COMMON, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(COMMON);
 
         return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE);

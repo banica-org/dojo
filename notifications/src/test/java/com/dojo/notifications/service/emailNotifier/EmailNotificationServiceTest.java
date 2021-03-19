@@ -1,8 +1,8 @@
 package com.dojo.notifications.service.emailNotifier;
 
 import com.dojo.notifications.configuration.EmailConfig;
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
 import org.junit.Assert;

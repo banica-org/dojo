@@ -1,9 +1,10 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.enums.CommonNotificationsLevel;
-import com.dojo.notifications.contest.enums.EventType;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
+import com.dojo.notifications.model.contest.enums.EventType;
+import com.dojo.notifications.model.contest.enums.NotifierType;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -11,14 +12,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,8 +31,8 @@ public class LeaderboardNotifierServiceTest {
     private final String DUMMY_CONTEST_ID = "149";
     private final User FIRST_USER = new User(new UserInfo(1, "FirstUser", "picture"), 100);
     private final User SECOND_USER = new User(new UserInfo(2, "SecondUser", "picture"), 120);
-    private final List<User> OLD_LEADERBOARD = Arrays.asList(FIRST_USER, SECOND_USER);
-    private final List<User> NEW_LEADERBOARD = Arrays.asList(SECOND_USER, FIRST_USER);
+    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_USER, SECOND_USER));
+    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_USER, FIRST_USER));
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
     private final Map<NotifierType, CommonNotificationsLevel> leaderBoardNotificationsType = new ConcurrentHashMap<>();
@@ -44,10 +42,10 @@ public class LeaderboardNotifierServiceTest {
     private LeaderboardService leaderboardService;
 
     @Mock
-    private Contest contest;
+    private UserDetailsService userDetailsService;
 
     @Mock
-    private UserDetailsService userDetailsService;
+    private Contest contest;
 
     @Mock
     private NotificationService notificationService;
@@ -62,8 +60,8 @@ public class LeaderboardNotifierServiceTest {
 
         leaderboardNotifierService = new LeaderboardNotifierService(leaderboardService, Collections.singletonList(notificationService), userDetailsService);
 
-        Map<String, List<User>> leaderboards = new ConcurrentHashMap<>();
-        leaderboards.put("149", OLD_LEADERBOARD);
+        Map<String, Leaderboard> leaderboards = new ConcurrentHashMap<>();
+        leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);
         ReflectionTestUtils.setField(leaderboardNotifierService, "leaderboards", leaderboards);
 
         leaderBoardNotificationsType.put(NotifierType.EMAIL, CommonNotificationsLevel.ON_ANY_LEADERBOARD_CHANGE);

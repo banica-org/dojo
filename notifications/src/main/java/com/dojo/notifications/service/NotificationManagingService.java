@@ -1,6 +1,6 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

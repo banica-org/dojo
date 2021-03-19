@@ -8,9 +8,9 @@ import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
@@ -18,15 +18,13 @@ public class Leaderboard {
 
     private static final UserDetails COMMON = null;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-    private List<User> leaderboard;
+    private final List<User> leaderboard;
 
     public Leaderboard(List<User> leaderboard) {
         this.leaderboard = leaderboard;
     }
 
-    public Text buildLeaderboardNames(UserDetails userDetails, CustomSlackClient slackClient) {
+    public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
         AtomicInteger position = new AtomicInteger(1);
         StringBuilder names = new StringBuilder();
 
@@ -52,5 +50,18 @@ public class Leaderboard {
             scores.append(score).append("\n");
         });
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Leaderboard)) return false;
+        Leaderboard that = (Leaderboard) o;
+        return leaderboard.equals(that.leaderboard);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(leaderboard);
     }
 }
