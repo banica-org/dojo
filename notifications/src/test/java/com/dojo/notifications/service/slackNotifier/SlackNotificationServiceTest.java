@@ -11,7 +11,6 @@ import com.hubspot.slack.client.models.blocks.Divider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,15 +24,16 @@ import static org.mockito.Mockito.when;
 public class SlackNotificationServiceTest {
 
     private final static String TOKEN = "token";
-    private final static String CONVERSATION_ID = "id";
+    private final static String CHANNEL = "id";
     private final static String EMAIL = "email@email.com";
-    private final static ChatPostMessageParams.Builder BUILDER = ChatPostMessageParams.builder();
+
+    private ChatPostMessageParams chatPostMessageParams;
 
     @Mock
     private UserDetails userDetails;
     @Mock
     private Contest contest;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private Notification notification;
     @Mock
     private CustomSlackClient slackClient;
@@ -49,8 +49,7 @@ public class SlackNotificationServiceTest {
     public void setUp() {
         when(contest.getSlackToken()).thenReturn(TOKEN);
         when(slackClientManager.getSlackClient(TOKEN)).thenReturn(slackClient);
-        BUILDER.addBlocks(Divider.builder().build());
-        when(notification.convertToSlackNotification(slackMessageBuilder, slackClient)).thenReturn(BUILDER);
+        chatPostMessageParams = ChatPostMessageParams.builder().addBlocks(Divider.builder().build()).setChannelId(CHANNEL).build();
     }
 
     @Test
@@ -61,24 +60,26 @@ public class SlackNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         when(userDetails.getEmail()).thenReturn(EMAIL);
-        when(slackClient.getConversationId(EMAIL)).thenReturn(CONVERSATION_ID);
+        when(slackClient.getConversationId(EMAIL)).thenReturn(CHANNEL);
+        when(notification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
 
         slackNotificationService.notify(userDetails, notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
         verify(slackClient, times(1)).getConversationId(EMAIL);
-        verify(notification, times(1)).convertToSlackNotification(slackMessageBuilder, slackClient);
-        verify(slackClient, times(1)).postMessage(BUILDER.build());
+        verify(notification, times(1)).getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+        verify(slackClient, times(1)).postMessage(chatPostMessageParams);
     }
 
     @Test
     public void notifyChannelTest() {
-        when(contest.getSlackChannel()).thenReturn(CONVERSATION_ID);
+        when(contest.getSlackChannel()).thenReturn(CHANNEL);
+        when(notification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
 
         slackNotificationService.notify(notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(notification, times(1)).convertToSlackNotification(slackMessageBuilder, slackClient);
-        verify(slackClient, times(1)).postMessage(BUILDER.build());
+        verify(notification, times(1)).getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+        verify(slackClient, times(1)).postMessage(chatPostMessageParams);
     }
 }

@@ -4,8 +4,8 @@ import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
-import com.hubspot.slack.client.models.blocks.objects.Text;
-import com.hubspot.slack.client.models.blocks.objects.TextType;
+import com.dojo.notifications.service.slackNotifier.SlackMessageBuilder;
+import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,37 +13,17 @@ import java.util.Map;
 
 public class CommonLeaderboardNotification extends LeaderboardNotification {
 
-    private final List<User> leaderboard;
-
     public CommonLeaderboardNotification(List<User> leaderboard, UserDetailsService userDetailsService) {
-        super(leaderboard, userDetailsService, "Leaderboard update");
-        this.leaderboard = leaderboard;
+        super(leaderboard, userDetailsService);
     }
 
     @Override
-    public final Text buildLeaderboardNames(CustomSlackClient slackClient) {
-        StringBuilder names = new StringBuilder();
-        leaderboard.forEach(user -> {
-            String userId = slackClient.getSlackUserId(getUserDetailsService().getUserEmail(user.getUser().getId()));
-            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
-            names.append(SlackNotificationUtils.makeBold(getPositionAndIncrease()))
-                    .append(". ")
-                    .append(userId.isEmpty() ? user.getUser().getName() : nameWithLink)
-                    .append("\n");
-        });
-        return Text.of(TextType.MARKDOWN, String.valueOf(names));
+    public ChatPostMessageParams getAsSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient, String slackChannel) {
+        return slackMessageBuilder.generateSlackContent(leaderboard, slackClient, slackChannel);
     }
 
     @Override
-    public Text buildLeaderboardScores() {
-        StringBuilder scores = new StringBuilder();
-
-        leaderboard.forEach(user -> scores.append(user.getScore()).append("\n"));
-        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
-    }
-
-    @Override
-    public String convertToEmailNotification(MailContentBuilder mailContentBuilder) {
+    public String getAsEmailNotification(MailContentBuilder mailContentBuilder) {
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put("leaderboard", leaderboard);
         return mailContentBuilder.generateMailContent(contextParams);

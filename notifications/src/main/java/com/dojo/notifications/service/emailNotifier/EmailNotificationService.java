@@ -55,14 +55,14 @@ public class EmailNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        String data = notification.convertToEmailNotification(this.mailContentBuilder);
+        String data = notification.getAsEmailNotification(this.mailContentBuilder);
         sendEmail(userDetails.getEmail(), data, contest);
     }
 
     // Notify channel
     @Override
     public void notify(Notification notification, Contest contest) {
-        String data = notification.convertToEmailNotification(this.mailContentBuilder);
+        String data = notification.getAsEmailNotification(this.mailContentBuilder);
         contest.getSenseiEmails().forEach(email -> sendEmail(email, data, contest));
     }
 }

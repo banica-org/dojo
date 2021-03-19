@@ -1,6 +1,10 @@
 package com.dojo.notifications.service.slackNotifier;
 
+import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.notification.SlackNotificationUtils;
+import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.models.Attachment;
 import com.hubspot.slack.client.models.actions.Action;
@@ -9,10 +13,17 @@ import com.hubspot.slack.client.models.blocks.Divider;
 import com.hubspot.slack.client.models.blocks.Section;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
+
+    private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
+    private static final String COMMON_TITLE = "Leaderboard update";
 
     private static final String BUTTON_TEXT = "View Leaderboard in Dojorena";
     private static final String BUTTON_STYLE = "primary";
@@ -21,13 +32,85 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     private static final String USER = "*User*";
     private static final String SCORE = "*Score*";
 
-    public ChatPostMessageParams.Builder generateSlackContent(String title, Text leaderboardNames, Text leaderboardScores) {
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    public LeaderboardSlackMessageBuilder() {
+    }
+
+    @Override
+    public ChatPostMessageParams generateSlackContent(UserDetails userDetails, List<User> leaderboard, CustomSlackClient slackClient, String slackChannel) {
+        Text leaderboardNames = buildPersonalLeaderboardNames(userDetails, leaderboard, slackClient);
+        Text leaderboardScores = buildPersonalLeaderboardScores(userDetails, leaderboard);
+
+        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE);
+    }
+
+    @Override
+    public ChatPostMessageParams generateSlackContent(List<User> leaderboard, CustomSlackClient slackClient, String slackChannel) {
+        Text leaderboardNames = buildCommonLeaderboardNames(leaderboard, slackClient);
+        Text leaderboardScores = buildCommonLeaderboardScores(leaderboard);
+
+        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE);
+    }
+
+    private ChatPostMessageParams getChatPostMessageParams(String slackChannel, Text leaderboardNames, Text leaderboardScores, String personalTitle) {
         ChatPostMessageParams.Builder builder = ChatPostMessageParams.builder();
         addDivider(builder);
-        addUsersWithScores(builder, title, leaderboardNames, leaderboardScores);
+        addUsersWithScores(builder, personalTitle, leaderboardNames, leaderboardScores);
         addDivider(builder);
         addRedirectButton(builder);
-        return builder;
+        builder.setChannelId(slackChannel);
+        return builder.build();
+    }
+
+    private Text buildPersonalLeaderboardNames(UserDetails userDetails, List<User> leaderboard, CustomSlackClient slackClient) {
+        AtomicInteger position = new AtomicInteger(1);
+        StringBuilder names = new StringBuilder();
+
+        leaderboard.forEach(user -> {
+            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
+            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
+            String name = (user.getUser().getId() == userDetails.getId()) ?
+                    SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
+            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
+                    .append(". ")
+                    .append(name)
+                    .append("\n");
+        });
+        return Text.of(TextType.MARKDOWN, String.valueOf(names));
+    }
+
+    private Text buildPersonalLeaderboardScores(UserDetails userDetails, List<User> leaderboard) {
+        StringBuilder scores = new StringBuilder();
+
+        leaderboard.forEach(user -> {
+            String score = (user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
+                    : String.valueOf(user.getScore());
+            scores.append(score).append("\n");
+        });
+        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
+    }
+
+    public final Text buildCommonLeaderboardNames(List<User> leaderboard, CustomSlackClient slackClient) {
+        AtomicInteger position = new AtomicInteger(1);
+        StringBuilder names = new StringBuilder();
+        leaderboard.forEach(user -> {
+            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
+            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
+            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
+                    .append(". ")
+                    .append(userId.isEmpty() ? user.getUser().getName() : nameWithLink)
+                    .append("\n");
+        });
+        return Text.of(TextType.MARKDOWN, String.valueOf(names));
+    }
+
+    private Text buildCommonLeaderboardScores(List<User> leaderboard) {
+        StringBuilder scores = new StringBuilder();
+
+        leaderboard.forEach(user -> scores.append(user.getScore()).append("\n"));
+        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 
     private void addDivider(ChatPostMessageParams.Builder builder) {
@@ -54,4 +137,6 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
                         .build())
                 .build());
     }
+
+
 }
