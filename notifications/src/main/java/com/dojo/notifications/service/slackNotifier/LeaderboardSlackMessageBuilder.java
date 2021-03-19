@@ -32,6 +32,8 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     private static final String USER = "*User*";
     private static final String SCORE = "*Score*";
 
+    private static final UserDetails COMMON = null;
+
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -40,16 +42,16 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
 
     @Override
     public ChatPostMessageParams generateSlackContent(UserDetails userDetails, List<User> leaderboard, CustomSlackClient slackClient, String slackChannel) {
-        Text leaderboardNames = buildPersonalLeaderboardNames(userDetails, leaderboard, slackClient);
-        Text leaderboardScores = buildPersonalLeaderboardScores(userDetails, leaderboard);
+        Text leaderboardNames = buildLeaderboardNames(userDetails, leaderboard, slackClient);
+        Text leaderboardScores = buildLeaderboardScores(userDetails, leaderboard);
 
         return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE);
     }
 
     @Override
     public ChatPostMessageParams generateSlackContent(List<User> leaderboard, CustomSlackClient slackClient, String slackChannel) {
-        Text leaderboardNames = buildCommonLeaderboardNames(leaderboard, slackClient);
-        Text leaderboardScores = buildCommonLeaderboardScores(leaderboard);
+        Text leaderboardNames = buildLeaderboardNames(COMMON, leaderboard, slackClient);
+        Text leaderboardScores = buildLeaderboardScores(COMMON, leaderboard);
 
         return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE);
     }
@@ -64,14 +66,14 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
         return builder.build();
     }
 
-    private Text buildPersonalLeaderboardNames(UserDetails userDetails, List<User> leaderboard, CustomSlackClient slackClient) {
+    private Text buildLeaderboardNames(UserDetails userDetails, List<User> leaderboard, CustomSlackClient slackClient) {
         AtomicInteger position = new AtomicInteger(1);
         StringBuilder names = new StringBuilder();
 
         leaderboard.forEach(user -> {
             String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
             String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
-            String name = (user.getUser().getId() == userDetails.getId()) ?
+            String name = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ?
                     SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
             names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
                     .append(". ")
@@ -81,35 +83,14 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
         return Text.of(TextType.MARKDOWN, String.valueOf(names));
     }
 
-    private Text buildPersonalLeaderboardScores(UserDetails userDetails, List<User> leaderboard) {
+    private Text buildLeaderboardScores(UserDetails userDetails, List<User> leaderboard) {
         StringBuilder scores = new StringBuilder();
 
         leaderboard.forEach(user -> {
-            String score = (user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
+            String score = (userDetails != COMMON && user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
                     : String.valueOf(user.getScore());
             scores.append(score).append("\n");
         });
-        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
-    }
-
-    public final Text buildCommonLeaderboardNames(List<User> leaderboard, CustomSlackClient slackClient) {
-        AtomicInteger position = new AtomicInteger(1);
-        StringBuilder names = new StringBuilder();
-        leaderboard.forEach(user -> {
-            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
-            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
-            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
-                    .append(". ")
-                    .append(userId.isEmpty() ? user.getUser().getName() : nameWithLink)
-                    .append("\n");
-        });
-        return Text.of(TextType.MARKDOWN, String.valueOf(names));
-    }
-
-    private Text buildCommonLeaderboardScores(List<User> leaderboard) {
-        StringBuilder scores = new StringBuilder();
-
-        leaderboard.forEach(user -> scores.append(user.getScore()).append("\n"));
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 
