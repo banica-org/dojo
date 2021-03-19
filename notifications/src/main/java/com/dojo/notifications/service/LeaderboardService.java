@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,13 +47,13 @@ public class LeaderboardService {
 
     public EventType determineEventType(List<User> newLeaderboard, List<User> oldLeaderboard) {
 
-        if (IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getUser().getId() != (newLeaderboard.get(i).getUser().getId()))
-                .findAny().isPresent()) return EventType.POSITION_CHANGES;
+        if (checkForPositionChanges(newLeaderboard, oldLeaderboard)) {
+            return EventType.POSITION_CHANGES;
+        }
 
-        if (IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getScore() != (newLeaderboard.get(i).getScore()))
-                .findAny().isPresent()) return EventType.SCORE_CHANGES;
+        if (checkForScoreChanges(newLeaderboard, oldLeaderboard)) {
+            return EventType.SCORE_CHANGES;
+        }
 
         return EventType.OTHER_LEADERBOARD_CHANGE;
     }
@@ -64,6 +65,18 @@ public class LeaderboardService {
                 .filter(i -> !oldLeaderboard.get(i).equals(newLeaderboard.get(i)))
                 .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.get(i).getUser().getId()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean checkForPositionChanges(List<User> newLeaderboard, List<User> oldLeaderboard) {
+        return IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
+                .filter(i -> oldLeaderboard.get(i).getUser().getId() != (newLeaderboard.get(i).getUser().getId()))
+                .findAny().isPresent();
+    }
+
+    private boolean checkForScoreChanges(List<User> newLeaderboard, List<User> oldLeaderboard) {
+        return IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
+                .filter(i -> oldLeaderboard.get(i).getScore() != (newLeaderboard.get(i).getScore()))
+                .findAny().isPresent();
     }
 
 }
