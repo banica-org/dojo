@@ -17,8 +17,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.mail.internet.MimeMessage;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -95,7 +97,7 @@ public class EmailNotificationServiceTest {
     @Test
     public void notifyChannelTest() {
         //Arrange
-        List<String> emails = new LinkedList<>();
+        Set<String> emails = new HashSet<>();
         emails.add(EMAIL_FOR_USER);
         int size = emails.size();
 
