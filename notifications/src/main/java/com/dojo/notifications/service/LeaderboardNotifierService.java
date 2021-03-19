@@ -1,13 +1,14 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.configuration.Configuration;
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.notification.CommonLeaderboardNotification;
 import com.dojo.notifications.model.notification.PersonalLeaderboardNotification;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.contest.enums.EventType;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.enums.EventType;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class LeaderboardNotifierService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
     private final Configuration configuration;
     private final RestTemplate restTemplate;
-    private final Map<String, List<User>> leaderboards;
+    private final Map<String, Leaderboard> leaderboards;
 
     private final Map<NotifierType, NotificationService> notificationServices;
     private final UserDetailsService userDetailsService;
@@ -54,16 +55,16 @@ public class LeaderboardNotifierService {
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
                 });
 
-        List<User> newLeaderboard = responseEntity.getBody();
-        List<User> oldLeaderboard = leaderboards.get(contest.getContestId());
+        Leaderboard newLeaderboard = new Leaderboard(responseEntity.getBody());
+        Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (oldLeaderboard != null && newLeaderboard != null && !newLeaderboard.equals(oldLeaderboard)) {
+        if (oldLeaderboard != null && !newLeaderboard.equals(oldLeaderboard)) {
             notifyAndApplyChanges(contest, newLeaderboard);
         }
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
-    private void notifyAndApplyChanges(final Contest contest, List<User> newLeaderboard) {
+    private void notifyAndApplyChanges(final Contest contest, Leaderboard newLeaderboard) {
         LOGGER.info("There are changes in leaderboard!");
 
         EventType changesEventType = determineEventType(newLeaderboard, contest);
@@ -75,35 +76,35 @@ public class LeaderboardNotifierService {
                 .forEach(entry -> notifyCommon(newLeaderboard, contest, entry.getKey()));
     }
 
-    private void notifyPersonal(List<User> newLeaderboard, Contest contest) {
-        List<User> leaderboard = leaderboards.get(contest.getContestId());
+    private void notifyPersonal(Leaderboard newLeaderboard, Contest contest) {
+        Leaderboard leaderboard = leaderboards.get(contest.getContestId());
 
-        List<UserDetails> userDetails = IntStream.range(0, Math.min(newLeaderboard.size(), leaderboard.size()))
-                .filter(i -> !leaderboard.get(i).equals(newLeaderboard.get(i)))
-                .mapToObj(i -> userDetailsService.getUserDetails(leaderboard.get(i).getUser().getId()))
+        List<UserDetails> userDetails = IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), leaderboard.getLeaderboard().size()))
+                .filter(i -> !leaderboard.getLeaderboard().get(i).equals(newLeaderboard.getLeaderboard().get(i)))
+                .mapToObj(i -> userDetailsService.getUserDetails(leaderboard.getLeaderboard().get(i).getUser().getId()))
                 .collect(Collectors.toList());
 
         userDetails.forEach(user -> {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new PersonalLeaderboardNotification(newLeaderboard, userDetailsService, user), contest);
+                        .notify(user, new PersonalLeaderboardNotification(newLeaderboard, user), contest);
             }
         });
     }
 
-    private void notifyCommon(List<User> newLeaderboard, Contest contest, NotifierType notifierType) {
-        notificationServices.get(notifierType).notify(new CommonLeaderboardNotification(newLeaderboard, userDetailsService), contest);
+    private void notifyCommon(Leaderboard newLeaderboard, Contest contest, NotifierType notifierType) {
+        notificationServices.get(notifierType).notify(new CommonLeaderboardNotification(newLeaderboard), contest);
     }
 
-    private EventType determineEventType(List<User> newLeaderboard, Contest contest) {
-        List<User> oldLeaderboard = leaderboards.get(contest.getContestId());
+    private EventType determineEventType(Leaderboard newLeaderboard, Contest contest) {
+        Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getUser().getId() != (newLeaderboard.get(i).getUser().getId()))
+        if (IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), oldLeaderboard.getLeaderboard().size()))
+                .filter(i -> oldLeaderboard.getLeaderboard().get(i).getUser().getId() != (newLeaderboard.getLeaderboard().get(i).getUser().getId()))
                 .findAny().isPresent()) return EventType.POSITION_CHANGES;
 
-        if (IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getScore() != (newLeaderboard.get(i).getScore()))
+        if (IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), oldLeaderboard.getLeaderboard().size()))
+                .filter(i -> oldLeaderboard.getLeaderboard().get(i).getScore() != (newLeaderboard.getLeaderboard().get(i).getScore()))
                 .findAny().isPresent()) return EventType.SCORE_CHANGES;
 
         return EventType.OTHER_LEADERBOARD_CHANGE;

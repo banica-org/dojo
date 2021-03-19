@@ -1,6 +1,6 @@
-package com.dojo.notifications.contest;
+package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.contest.enums.CommonNotificationsLevel;
+import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

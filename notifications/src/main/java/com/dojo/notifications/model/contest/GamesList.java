@@ -1,4 +1,4 @@
-package com.dojo.notifications.contest;
+package com.dojo.notifications.model.contest;
 
 import lombok.Data;
 

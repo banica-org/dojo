@@ -1,18 +1,12 @@
 package com.dojo.notifications.model.notification;
 
-import com.dojo.notifications.model.user.User;
-import com.dojo.notifications.service.UserDetailsService;
-
-import java.util.List;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 
 public abstract class LeaderboardNotification implements Notification {
 
-    protected final List<User> leaderboard;
+    protected final Leaderboard leaderboard;
 
-    private final UserDetailsService userDetailsService;
-
-    public LeaderboardNotification(List<User> leaderboard, UserDetailsService userDetailsService) {
+    public LeaderboardNotification(Leaderboard leaderboard) {
         this.leaderboard = leaderboard;
-        this.userDetailsService = userDetailsService;
     }
 }

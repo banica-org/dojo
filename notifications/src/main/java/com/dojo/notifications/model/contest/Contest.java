@@ -1,7 +1,7 @@
-package com.dojo.notifications.contest;
+package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.contest.enums.CommonNotificationsLevel;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import lombok.Data;
 
 import java.util.*;
