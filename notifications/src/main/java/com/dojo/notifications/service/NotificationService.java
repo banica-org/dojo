@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
 

@@ -1,11 +1,11 @@
 package com.dojo.notifications.service.emailNotifier;
 
 import com.dojo.notifications.configuration.EmailConfig;
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.NotificationService;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +37,14 @@ public class EmailNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        String data = notification.convertToEmailNotification(this.mailContentBuilder);
+        String data = notification.getAsEmailNotification(this.mailContentBuilder);
         sendEmail(userDetails.getEmail(), data, contest);
     }
 
     // Notify channel
     @Override
     public void notify(Notification notification, Contest contest) {
-        String data = notification.convertToEmailNotification(this.mailContentBuilder);
+        String data = notification.getAsEmailNotification(this.mailContentBuilder);
         contest.getSenseiEmails().forEach(email -> sendEmail(email, data, contest));
     }
 

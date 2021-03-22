@@ -1,6 +1,6 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class NotificationManagingServiceTest {
     @Mock
     private LeaderboardNotifierService leaderboardNotifierService;
 
-    private  NotificationManagingService notificationManagingService;
+    private NotificationManagingService notificationManagingService;
 
     @Mock
     private Contest contest;

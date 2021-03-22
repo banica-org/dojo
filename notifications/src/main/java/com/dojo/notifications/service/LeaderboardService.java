@@ -1,9 +1,10 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.configuration.Configuration;
-import com.dojo.notifications.contest.Contest;
-import com.dojo.notifications.contest.enums.EventType;
-import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.EventType;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -27,56 +27,43 @@ public class LeaderboardService {
     @Autowired
     public LeaderboardService(Configuration configuration, UserDetailsService userDetailsService) {
         this.configuration = configuration;
-        this.restTemplate = new RestTemplate();
         this.userDetailsService = userDetailsService;
+        this.restTemplate = new RestTemplate();
     }
 
-    public List<User> getNewLeaderboardSetup(final Contest contest) {
+    public Leaderboard getNewLeaderboardSetup(final Contest contest) {
 
         UriComponentsBuilder leaderboardApiBuilder = UriComponentsBuilder.fromHttpUrl(configuration.getLeaderboardApi())
                 .queryParam("eventId", contest.getContestId())
                 .queryParam("userMode", "spectator");
 
-        ResponseEntity<List<User>> responseEntity = restTemplate.exchange(leaderboardApiBuilder.toUriString(),
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
+        ResponseEntity<List<Participant>> responseEntity = restTemplate.exchange(leaderboardApiBuilder.toUriString(),
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Participant>>() {
                 });
 
-        return responseEntity.getBody();
+        return new Leaderboard(responseEntity.getBody());
     }
 
 
-    public EventType determineEventType(List<User> newLeaderboard, List<User> oldLeaderboard) {
+    public EventType determineEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
-        if (checkForPositionChanges(newLeaderboard, oldLeaderboard)) {
-            return EventType.POSITION_CHANGES;
-        }
+        if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> oldLeaderboard.getUserIdByPosition(i) != newLeaderboard.getUserIdByPosition(i))
+                .findAny().isPresent()) return EventType.POSITION_CHANGES;
 
-        if (checkForScoreChanges(newLeaderboard, oldLeaderboard)) {
-            return EventType.SCORE_CHANGES;
-        }
+        if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> oldLeaderboard.getScoreByPosition(i) != newLeaderboard.getScoreByPosition(i))
+                .findAny().isPresent()) return EventType.SCORE_CHANGES;
 
         return EventType.OTHER_LEADERBOARD_CHANGE;
     }
 
 
-    public List<UserDetails> getUserDetails(List<User> newLeaderboard, List<User> oldLeaderboard) {
+    public List<UserDetails> getUserDetails(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
-        return IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> !oldLeaderboard.get(i).equals(newLeaderboard.get(i)))
-                .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.get(i).getUser().getId()))
+        return IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> !oldLeaderboard.getParticipantByPosition(i).equals(newLeaderboard.getParticipantByPosition(i)))
+                .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getUserIdByPosition(i)))
                 .collect(Collectors.toList());
     }
-
-    private boolean checkForPositionChanges(List<User> newLeaderboard, List<User> oldLeaderboard) {
-        return IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getUser().getId() != (newLeaderboard.get(i).getUser().getId()))
-                .findAny().isPresent();
-    }
-
-    private boolean checkForScoreChanges(List<User> newLeaderboard, List<User> oldLeaderboard) {
-        return IntStream.range(0, Math.min(newLeaderboard.size(), oldLeaderboard.size()))
-                .filter(i -> oldLeaderboard.get(i).getScore() != (newLeaderboard.get(i).getScore()))
-                .findAny().isPresent();
-    }
-
 }

@@ -124,19 +124,5 @@
     "country": "Bulagria",
     "position": "software engineer",
     "isInternal": true
-  },
-  "10": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
-    "email": "vasil.krastev99@gmail.com",
-    "name": "Vasil Krastev",
-    "id": 10,
-    "city": "Sofia",
-    "company": "Epam",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
   }
 }

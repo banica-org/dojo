@@ -7,7 +7,7 @@ import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 
 public interface Notification {
 
-    ChatPostMessageParams.Builder convertToSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient);
+    ChatPostMessageParams getAsSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient, String slackChannel);
 
-    String convertToEmailNotification(MailContentBuilder mailContentBuilder);
+    String getAsEmailNotification(MailContentBuilder mailContentBuilder);
 }
