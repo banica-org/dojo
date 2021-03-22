@@ -26,13 +26,15 @@ public class LeaderboardNotifierService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
 
+    private final UserDetailsService userDetailsService;
     private final LeaderboardService leaderboardService;
     private final Map<NotifierType, NotificationService> notificationServices;
     private final Map<String, Leaderboard> leaderboards;
 
     @Autowired
-    public LeaderboardNotifierService(LeaderboardService leaderboardService,
+    public LeaderboardNotifierService(UserDetailsService userDetailsService, LeaderboardService leaderboardService,
                                       Collection<NotificationService> notificationServices) {
+        this.userDetailsService = userDetailsService;
         this.leaderboardService = leaderboardService;
         this.leaderboards = new ConcurrentHashMap<>();
         this.notificationServices = notificationServices.stream()
@@ -71,14 +73,14 @@ public class LeaderboardNotifierService {
         userDetails.forEach(user -> {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new PersonalLeaderboardNotification(newLeaderboard, user), contest);
+                        .notify(user, new PersonalLeaderboardNotification(userDetailsService, newLeaderboard, user), contest);
             }
         });
     }
 
     private void notifyCommon(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType) {
         notificationServices.get(notifierType)
-                .notify(new CommonLeaderboardNotification(newLeaderboard), contest);
+                .notify(new CommonLeaderboardNotification(userDetailsService, newLeaderboard), contest);
     }
 
 }

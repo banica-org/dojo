@@ -1,15 +1,11 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.configuration.Configuration;
-import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.notification.SlackNotificationUtils;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
-import com.hubspot.slack.client.models.blocks.objects.Text;
-import com.hubspot.slack.client.models.blocks.objects.TextType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -19,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -70,37 +65,5 @@ public class LeaderboardService {
                 .filter(i -> !oldLeaderboard.getParticipantByPosition(i).equals(newLeaderboard.getParticipantByPosition(i)))
                 .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getUserIdByPosition(i)))
                 .collect(Collectors.toList());
-    }
-
-    public Text buildLeaderboardNames(Leaderboard leaderboard, UserDetails userDetails, CustomSlackClient slackClient) {
-
-        AtomicInteger position = new AtomicInteger(1);
-        StringBuilder names = new StringBuilder();
-
-        for (int i = 0; i < leaderboard.getParticipantsCount(); i++) {
-
-            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(leaderboard.getUserIdByPosition(i)));
-            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + leaderboard.getNameByPosition(i) + ">";
-            String name = (userDetails != null && leaderboard.getUserIdByPosition(i) == userDetails.getId()) ?
-                    SlackNotificationUtils.makeBold(leaderboard.getNameByPosition(i)) : userId.isEmpty() ? leaderboard.getNameByPosition(i) : nameWithLink;
-            names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
-                    .append(". ")
-                    .append(name)
-                    .append("\n");
-        }
-        return Text.of(TextType.MARKDOWN, String.valueOf(names));
-    }
-
-    public Text buildLeaderboardScores(Leaderboard leaderboard, UserDetails userDetails) {
-
-        StringBuilder scores = new StringBuilder();
-
-        for (int i = 0; i < leaderboard.getParticipantsCount(); i++) {
-
-            String score = (userDetails != null && leaderboard.getUserIdByPosition(i) == userDetails.getId()) ? SlackNotificationUtils.makeBold(leaderboard.getScoreByPosition(i))
-                    : String.valueOf(leaderboard.getScoreByPosition(i));
-            scores.append(score).append("\n");
-        }
-        return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 }
