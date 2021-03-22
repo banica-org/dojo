@@ -27,7 +27,7 @@ public class PersonalLeaderboardNotification extends LeaderboardNotification {
     @Override
     public String getAsEmailNotification(MailContentBuilder mailContentBuilder) {
         Map<String, Object> contextParams = new HashMap<>();
-        contextParams.put("leaderboard", leaderboard.getLeaderboard());
+        contextParams.put("leaderboard", leaderboard.getParticipants());
         contextParams.put("userDetails", userDetails);
         return mailContentBuilder.generateMailContent(contextParams);
     }

@@ -51,7 +51,8 @@ public class UserDetailsServiceTest {
         assertEquals(testUser, actual);
     }
 
-    @Test public void getUserEmailTest() {
+    @Test
+    public void getUserEmailTest() {
         String actual = userDetailsService.getUserEmail(USER_ID);
 
         assertEquals(USER_EMAIL, actual);
@@ -64,7 +65,8 @@ public class UserDetailsServiceTest {
 
         when(configuration.getUserDetailsApi()).thenReturn(INVALID_URL);
         String uriParameter = UriComponentsBuilder.fromHttpUrl(INVALID_URL).pathSegment(String.valueOf(USER_ID)).toUriString();
-        when(restTemplate.exchange(uriParameter, HttpMethod.GET, null, new ParameterizedTypeReference<UserDetails>() {}))
+        when(restTemplate.exchange(uriParameter, HttpMethod.GET, null, new ParameterizedTypeReference<UserDetails>() {
+        }))
                 .thenReturn(new ResponseEntity<>(testUser, HttpStatus.ACCEPTED));
     }
 

@@ -7,7 +7,6 @@ import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,10 +15,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.mail.internet.MimeMessage;
-
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.times;

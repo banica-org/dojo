@@ -24,14 +24,14 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
 
     private static final String BUTTON_TEXT = "View Leaderboard in Dojorena";
     private static final String BUTTON_STYLE = "primary";
-    //TODO Change this to real url
+    //TODO Change this to real url and add event id
     private static final String BUTTON_REDIRECT_URL = "http://localhost:8081/api/v1/codenjoy/leaderboard";
     private static final String USER = "*User*";
     private static final String SCORE = "*Score*";
 
     private static final UserDetails COMMON = null;
 
-    private LeaderboardService leaderboardService;
+    private final LeaderboardService leaderboardService;
 
     @Autowired
     public LeaderboardSlackMessageBuilder(LeaderboardService leaderboardService) {

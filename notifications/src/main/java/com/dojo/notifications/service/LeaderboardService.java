@@ -6,7 +6,7 @@ import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.notification.SlackNotificationUtils;
-import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
@@ -42,8 +42,8 @@ public class LeaderboardService {
                 .queryParam("eventId", contest.getContestId())
                 .queryParam("userMode", "spectator");
 
-        ResponseEntity<List<User>> responseEntity = restTemplate.exchange(leaderboardApiBuilder.toUriString(),
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>() {
+        ResponseEntity<List<Participant>> responseEntity = restTemplate.exchange(leaderboardApiBuilder.toUriString(),
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Participant>>() {
                 });
 
         return new Leaderboard(responseEntity.getBody());
@@ -52,12 +52,12 @@ public class LeaderboardService {
 
     public EventType determineEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
-        if (IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), oldLeaderboard.getLeaderboard().size()))
-                .filter(i -> oldLeaderboard.getLeaderboard().get(i).getUser().getId() != (newLeaderboard.getLeaderboard().get(i).getUser().getId()))
+        if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> oldLeaderboard.getUserIdByPosition(i) != newLeaderboard.getUserIdByPosition(i))
                 .findAny().isPresent()) return EventType.POSITION_CHANGES;
 
-        if (IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), oldLeaderboard.getLeaderboard().size()))
-                .filter(i -> oldLeaderboard.getLeaderboard().get(i).getScore() != (newLeaderboard.getLeaderboard().get(i).getScore()))
+        if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> oldLeaderboard.getScoreByPosition(i) != newLeaderboard.getScoreByPosition(i))
                 .findAny().isPresent()) return EventType.SCORE_CHANGES;
 
         return EventType.OTHER_LEADERBOARD_CHANGE;
@@ -66,38 +66,41 @@ public class LeaderboardService {
 
     public List<UserDetails> getUserDetails(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
-        return IntStream.range(0, Math.min(newLeaderboard.getLeaderboard().size(), oldLeaderboard.getLeaderboard().size()))
-                .filter(i -> !oldLeaderboard.getLeaderboard().get(i).equals(newLeaderboard.getLeaderboard().get(i)))
-                .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getLeaderboard().get(i).getUser().getId()))
+        return IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
+                .filter(i -> !oldLeaderboard.getParticipantByPosition(i).equals(newLeaderboard.getParticipantByPosition(i)))
+                .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getUserIdByPosition(i)))
                 .collect(Collectors.toList());
     }
 
     public Text buildLeaderboardNames(Leaderboard leaderboard, UserDetails userDetails, CustomSlackClient slackClient) {
+
         AtomicInteger position = new AtomicInteger(1);
         StringBuilder names = new StringBuilder();
 
-        leaderboard.getLeaderboard().forEach(user -> {
-            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(user.getUser().getId()));
-            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + user.getUser().getName() + ">";
-            String name = (userDetails != null && user.getUser().getId() == userDetails.getId()) ?
-                    SlackNotificationUtils.makeBold(user.getUser().getName()) : userId.isEmpty() ? user.getUser().getName() : nameWithLink;
+        for (int i = 0; i < leaderboard.getParticipantsCount(); i++) {
+
+            String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(leaderboard.getUserIdByPosition(i)));
+            String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + leaderboard.getNameByPosition(i) + ">";
+            String name = (userDetails != null && leaderboard.getUserIdByPosition(i) == userDetails.getId()) ?
+                    SlackNotificationUtils.makeBold(leaderboard.getNameByPosition(i)) : userId.isEmpty() ? leaderboard.getNameByPosition(i) : nameWithLink;
             names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
                     .append(". ")
                     .append(name)
                     .append("\n");
-        });
+        }
         return Text.of(TextType.MARKDOWN, String.valueOf(names));
     }
 
     public Text buildLeaderboardScores(Leaderboard leaderboard, UserDetails userDetails) {
+
         StringBuilder scores = new StringBuilder();
 
-        leaderboard.getLeaderboard().forEach(user -> {
-            String score = (userDetails != null && user.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(user.getScore())
-                    : String.valueOf(user.getScore());
+        for (int i = 0; i < leaderboard.getParticipantsCount(); i++) {
+
+            String score = (userDetails != null && leaderboard.getUserIdByPosition(i) == userDetails.getId()) ? SlackNotificationUtils.makeBold(leaderboard.getScoreByPosition(i))
+                    : String.valueOf(leaderboard.getScoreByPosition(i));
             scores.append(score).append("\n");
-        });
+        }
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
-
 }

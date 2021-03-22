@@ -14,7 +14,8 @@ public class ContestController {
     private GamesService gamesService;
 
     @PostMapping("/api/v1/contest")
-    public @ResponseBody ResponseEntity<Contest> subscribeForContest(@RequestBody Contest contest) {
+    public @ResponseBody
+    ResponseEntity<Contest> subscribeForContest(@RequestBody Contest contest) {
         if (contest != null && contest.getContestId() != null) { // if exists
             stopNotifications(contest.getContestId());
         }
@@ -23,12 +24,14 @@ public class ContestController {
     }
 
     @PutMapping("/api/v1/contest")
-    public @ResponseBody ResponseEntity<Contest> editContest(@RequestBody Contest contest) {
+    public @ResponseBody
+    ResponseEntity<Contest> editContest(@RequestBody Contest contest) {
         return subscribeForContest(contest);
     }
 
     @DeleteMapping("/api/v1/contest/{id}")
-    public @ResponseBody ResponseEntity<String> stopNotifications(@PathVariable String id) {
+    public @ResponseBody
+    ResponseEntity<String> stopNotifications(@PathVariable String id) {
         Contest contest = gamesService.getContestById(id);
         if (contest != null) {
             gamesService.stopContestById(contest.getContestId());
