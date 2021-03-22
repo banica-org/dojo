@@ -17,9 +17,10 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,12 +58,16 @@ public class PersonalLeaderboardNotificationTest {
 
     @Test
     public void getAsEmailNotificationTest() {
+        Map<String, Object> contextParams = new HashMap<>();
+        contextParams.put("leaderboard", leaderboard.getParticipants());
+        contextParams.put("userDetails", userDetails);
+
         MailContentBuilder mailContentBuilder = mock(LeaderboardMailMessageBuilder.class);
-        when(mailContentBuilder.generateMailContent(anyMap())).thenReturn(MESSAGE);
+        when(mailContentBuilder.generateMailContent(contextParams)).thenReturn(MESSAGE);
 
         String actual = leaderboardNotification.getAsEmailNotification(mailContentBuilder);
 
-        verify(mailContentBuilder, times(1)).generateMailContent(anyMap());
+        verify(mailContentBuilder, times(1)).generateMailContent(contextParams);
         assertEquals(actual, MESSAGE);
     }
 
