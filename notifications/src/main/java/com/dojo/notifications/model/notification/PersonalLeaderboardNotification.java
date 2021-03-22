@@ -8,7 +8,6 @@ import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
 import com.dojo.notifications.service.slackNotifier.SlackMessageBuilder;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class PersonalLeaderboardNotification extends LeaderboardNotification {
@@ -27,9 +26,10 @@ public class PersonalLeaderboardNotification extends LeaderboardNotification {
 
     @Override
     public String getAsEmailNotification(MailContentBuilder mailContentBuilder) {
-        Map<String, Object> contextParams = new HashMap<>();
-        contextParams.put("leaderboard", leaderboard.getParticipants());
+        Map<String, Object> contextParams = super.getContextParams();
         contextParams.put("userDetails", userDetails);
         return mailContentBuilder.generateMailContent(contextParams);
     }
+
+
 }
