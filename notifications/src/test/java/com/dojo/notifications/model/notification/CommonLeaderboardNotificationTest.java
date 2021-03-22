@@ -30,6 +30,7 @@ public class CommonLeaderboardNotificationTest {
 
     private static final String CHANNEL = "channel";
     private static final String MESSAGE = "Mail message";
+    private static final String LEADERBOARD_KEY = "leaderboard";
 
     @Mock
     private CustomSlackClient slackClient;
@@ -55,7 +56,7 @@ public class CommonLeaderboardNotificationTest {
     @Test
     public void getAsEmailNotificationTest() {
         Map<String, Object> contextParams = new HashMap<>();
-        contextParams.put("leaderboard", leaderboard.getParticipants());
+        contextParams.put(LEADERBOARD_KEY, leaderboard.getParticipants());
 
         MailContentBuilder mailContentBuilder = mock(LeaderboardMailMessageBuilder.class);
         when(mailContentBuilder.generateMailContent(contextParams)).thenReturn(MESSAGE);

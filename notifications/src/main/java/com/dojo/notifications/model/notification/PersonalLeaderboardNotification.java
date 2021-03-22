@@ -27,7 +27,7 @@ public class PersonalLeaderboardNotification extends LeaderboardNotification {
     @Override
     public String getAsEmailNotification(MailContentBuilder mailContentBuilder) {
         Map<String, Object> contextParams = super.getContextParams();
-        contextParams.put("userDetails", userDetails);
+        contextParams.put(USERDETAILS_KEY, userDetails);
         return mailContentBuilder.generateMailContent(contextParams);
     }
 
