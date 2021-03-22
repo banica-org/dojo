@@ -1,6 +1,6 @@
 package com.dojo.notifications.api;
 
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.GamesService;
 import org.junit.Test;
 import org.junit.runner.RunWith;

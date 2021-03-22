@@ -1,6 +1,6 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.contest.Contest;
+import com.dojo.notifications.model.contest.Contest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class NotificationManagingService {
 
     private static final int INITIAL_DELAY = 0;
     private final Map<String, ScheduledFuture<?>> subscriptions;
-    private final LeaderboardNotifierService leaderboardService;
+    private final LeaderboardNotifierService leaderboardNotifierService;
 
     @Value("${thread-pool-size}")
     private int poolSize;
@@ -24,14 +24,14 @@ public class NotificationManagingService {
     private final ScheduledExecutorService executorService;
 
     @Autowired
-    public NotificationManagingService(LeaderboardNotifierService leaderboardService) {
-        this.leaderboardService = leaderboardService;
+    public NotificationManagingService(LeaderboardNotifierService leaderboardNotifierService) {
+        this.leaderboardNotifierService = leaderboardNotifierService;
         this.subscriptions = new ConcurrentHashMap<>();
         this.executorService = Executors.newScheduledThreadPool(poolSize);
     }
 
     public void startNotifications(final Contest contest){
-        ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() ->leaderboardService.getLeaderBoard(contest), INITIAL_DELAY, schedulePeriod, TimeUnit.SECONDS);
+        ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() -> leaderboardNotifierService.lookForLeaderboardChanges(contest), INITIAL_DELAY, schedulePeriod, TimeUnit.SECONDS);
         subscriptions.put(contest.getContestId(), future);
     }
 

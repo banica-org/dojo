@@ -1,7 +1,7 @@
-package com.dojo.notifications.contest;
+package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.contest.enums.CommonNotificationsLevel;
-import com.dojo.notifications.contest.enums.NotifierType;
+import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import lombok.Data;
 
 import java.util.*;
@@ -13,13 +13,13 @@ public class Contest {
     private String title;
     private String slackToken;
     private String slackChannel;
-    private List<String> senseiEmails;
+    private Set<String> senseiEmails;
 
     private Map<NotifierType, CommonNotificationsLevel> commonNotificationsLevel;
     private Set<NotifierType> personalNotifiers;
 
     public Contest() {
-        senseiEmails = new LinkedList<>();
+        senseiEmails = new HashSet<>();
         commonNotificationsLevel = new HashMap<>();
         commonNotificationsLevel.put(NotifierType.SLACK, CommonNotificationsLevel.NO_NOTIFICATIONS);
         commonNotificationsLevel.put(NotifierType.EMAIL, CommonNotificationsLevel.NO_NOTIFICATIONS);
@@ -27,7 +27,7 @@ public class Contest {
     }
 
     public void setSenseiEmailsAsString(String emails) {
-        senseiEmails = Arrays.asList(emails.split(";"));
+        senseiEmails = new HashSet<>(Arrays.asList(emails.split(";")));
     }
 
     public String getSenseiEmailsAsString() {

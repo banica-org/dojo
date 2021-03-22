@@ -1,24 +1,25 @@
 package com.dojo.notifications.model.notification;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
-import com.dojo.notifications.model.user.User;
-import com.dojo.notifications.model.user.UserInfo;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.emailNotifier.LeaderboardMailMessageBuilder;
 import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
-import com.hubspot.slack.client.models.blocks.objects.Text;
-import com.hubspot.slack.client.models.blocks.objects.TextType;
+import com.dojo.notifications.service.slackNotifier.LeaderboardSlackMessageBuilder;
+import com.dojo.notifications.service.slackNotifier.SlackMessageBuilder;
+import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
+import com.hubspot.slack.client.models.blocks.Divider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,13 +28,9 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CommonLeaderboardNotificationTest {
 
-    private static final long ID = 1;
-    private static final String SLACK_ID = "Id";
-    private static final String NAME = "John";
-    private static final String EMAIL = "John@email";
-    private static final long SCORE = 100;
+    private static final String CHANNEL = "channel";
     private static final String MESSAGE = "Mail message";
-
+    private static final String LEADERBOARD_KEY = "leaderboard";
 
     @Mock
     private CustomSlackClient slackClient;
@@ -41,48 +38,43 @@ public class CommonLeaderboardNotificationTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    private List<User> leaderboard;
+    private ChatPostMessageParams chatPostMessageParams;
+    private Leaderboard leaderboard;
+
     private LeaderboardNotification leaderboardNotification;
 
     @Before
     public void init() {
-        UserInfo userInfo = new UserInfo(ID, NAME, null);
-        User user = new User(userInfo, SCORE);
-
-        leaderboard = Collections.singletonList(user);
-        leaderboardNotification = new CommonLeaderboardNotification(leaderboard, userDetailsService);
+        chatPostMessageParams = ChatPostMessageParams.builder()
+                .addBlocks(Divider.builder().build())
+                .setChannelId(CHANNEL)
+                .build();
+        leaderboard = new Leaderboard(new ArrayList<>());
+        leaderboardNotification = new CommonLeaderboardNotification(userDetailsService, leaderboard);
     }
 
     @Test
-    public void buildLeaderboardNamesTest() {
-        when(userDetailsService.getUserEmail(ID)).thenReturn(EMAIL);
-        when(slackClient.getSlackUserId(EMAIL)).thenReturn(SLACK_ID);
+    public void getAsEmailNotificationTest() {
+        Map<String, Object> contextParams = new HashMap<>();
+        contextParams.put(LEADERBOARD_KEY, leaderboard.getParticipants());
 
-        leaderboardNotification.buildLeaderboardNames(slackClient);
-
-        verify(userDetailsService, times(1)).getUserEmail(ID);
-        verify(slackClient, times(1)).getSlackUserId(EMAIL);
-    }
-
-    @Test
-    public void buildLeaderboardScoresTest() {
-        StringBuilder scores = new StringBuilder();
-        leaderboard.forEach(user -> scores.append(user.getScore()).append("\n"));
-        Text expected = Text.of(TextType.MARKDOWN, String.valueOf(scores));
-
-        Text actual = leaderboardNotification.buildLeaderboardScores();
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void convertToEmailNotificationTest() {
         MailContentBuilder mailContentBuilder = mock(LeaderboardMailMessageBuilder.class);
-        when(mailContentBuilder.generateMailContent(anyMap())).thenReturn(MESSAGE);
+        when(mailContentBuilder.generateMailContent(contextParams)).thenReturn(MESSAGE);
 
-        String actual = leaderboardNotification.convertToEmailNotification(mailContentBuilder);
+        String actual = leaderboardNotification.getAsEmailNotification(mailContentBuilder);
 
-        verify(mailContentBuilder, times(1)).generateMailContent(anyMap());
+        verify(mailContentBuilder, times(1)).generateMailContent(contextParams);
         assertEquals(actual, MESSAGE);
+    }
+
+    @Test
+    public void getAsSlackNotificationTest() {
+        SlackMessageBuilder slackMessageBuilder = mock(LeaderboardSlackMessageBuilder.class);
+        when(slackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, CHANNEL))
+                .thenReturn(chatPostMessageParams);
+
+        leaderboardNotification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+
+        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetailsService, leaderboard, slackClient, CHANNEL);
     }
 }

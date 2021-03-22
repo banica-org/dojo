@@ -1,42 +1,27 @@
 package com.dojo.notifications.model.notification;
 
-import com.dojo.notifications.model.client.CustomSlackClient;
-import com.dojo.notifications.model.user.User;
+import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.service.UserDetailsService;
-import com.dojo.notifications.service.slackNotifier.SlackMessageBuilder;
-import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
-import com.hubspot.slack.client.models.blocks.objects.Text;
-import lombok.Getter;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-@Getter
 public abstract class LeaderboardNotification implements Notification {
 
-    private final List<User> leaderboard;
+    protected static final String LEADERBOARD_KEY = "leaderboard";
+    protected static final String USERDETAILS_KEY = "userDetails";
 
-    private final String title;
+    protected final UserDetailsService userDetailsService;
+    protected final Leaderboard leaderboard;
 
-    private int positionCounter = 1;
-
-    private final UserDetailsService userDetailsService;
-
-    public LeaderboardNotification(List<User> leaderboard, UserDetailsService userDetailsService, String title) {
-        this.leaderboard = leaderboard;
+    public LeaderboardNotification(UserDetailsService userDetailsService, Leaderboard leaderboard) {
         this.userDetailsService = userDetailsService;
-        this.title = title;
+        this.leaderboard = leaderboard;
     }
 
-    @Override
-    public ChatPostMessageParams.Builder convertToSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient) {
-        return slackMessageBuilder.generateSlackContent(title, buildLeaderboardNames(slackClient), buildLeaderboardScores());
-    }
-
-    abstract Text buildLeaderboardNames(CustomSlackClient slackClient);
-
-    abstract Text buildLeaderboardScores();
-
-    public int getPositionAndIncrease() {
-        return positionCounter++;
+    protected Map<String, Object> getContextParams() {
+        Map<String, Object> contextParams = new HashMap<>();
+        contextParams.put(LEADERBOARD_KEY, leaderboard.getParticipants());
+        return contextParams;
     }
 }

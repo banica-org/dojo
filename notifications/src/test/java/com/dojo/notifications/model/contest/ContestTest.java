@@ -1,13 +1,13 @@
-package com.dojo.notifications.contest;
+package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.contest.enums.CommonNotificationsLevel;
+import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,16 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ContestTest {
 
     private static final String EMAIL = "sensei@email.com";
+    private static final String OTHER_EMAIL = "sensei1@email.com";
 
     private Contest contest;
-    private List<String> senseiEmails;
+    private Set<String> senseiEmails;
 
     @Before
     public void init() {
         contest = new Contest();
-        senseiEmails = new ArrayList<>();
+        senseiEmails = new HashSet<>();
         senseiEmails.add(EMAIL);
-        senseiEmails.add(EMAIL);
+        senseiEmails.add(OTHER_EMAIL);
     }
 
     @Test
@@ -43,7 +44,7 @@ public class ContestTest {
     public void setSenseiEmailsAsStringTest() {
         contest.setSenseiEmailsAsString(String.join(";", senseiEmails));
 
-        List<String> actual = contest.getSenseiEmails();
+        Set<String> actual = contest.getSenseiEmails();
 
         assertEquals(senseiEmails, actual);
     }
