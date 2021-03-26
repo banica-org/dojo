@@ -1,4 +1,4 @@
-package com.dojo.notifications.contest.enums;
+package com.dojo.notifications.model.contest.enums;
 
 import lombok.Getter;
 
