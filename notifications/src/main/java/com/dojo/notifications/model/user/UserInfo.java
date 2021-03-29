@@ -10,7 +10,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfo {
-    private long id;
+    private String id;
     private String name;
 
     @Override
@@ -18,7 +18,7 @@ public class UserInfo {
         if (this == o) return true;
         if (!(o instanceof UserInfo)) return false;
         UserInfo userInfo = (UserInfo) o;
-        return id == userInfo.id &&
+        return id.equals(userInfo.id) &&
                 name.equals(userInfo.name);
     }
 
