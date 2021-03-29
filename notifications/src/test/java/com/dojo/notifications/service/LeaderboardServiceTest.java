@@ -38,8 +38,8 @@ public class LeaderboardServiceTest {
 
     private final String DUMMY_URL = "http://localhost:8081/api/v1/codenjoy/leaderboard";
     private final String CONTEST_ID = "149";
-    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo(1, "FirstUser", "picture"), 100);
-    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo(2, "SecondUser", "picture"), 120);
+    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo(1, "FirstUser"), 100);
+    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo(2, "SecondUser"), 120);
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT));
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
@@ -99,7 +99,7 @@ public class LeaderboardServiceTest {
     @Test
     public void determineEventTypeScoreChangeTest() {
         //Arrange
-        Participant scoreChange = new Participant(new UserInfo(2, "SecondUser", "picture"), 420);
+        Participant scoreChange = new Participant(new UserInfo(2, "SecondUser"), 420);
         Leaderboard newLeaderboard = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, scoreChange));
 
         //Act

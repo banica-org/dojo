@@ -54,7 +54,7 @@ public class LeaderboardSlackMessageBuilderTest {
 
     @Before
     public void init() {
-        UserInfo userInfo = new UserInfo(USER_ID, USER_NAME, null);
+        UserInfo userInfo = new UserInfo(USER_ID, USER_NAME);
         Participant participant = new Participant(userInfo, USER_SCORE);
         leaderboard = new Leaderboard(Collections.singletonList(participant));
 
