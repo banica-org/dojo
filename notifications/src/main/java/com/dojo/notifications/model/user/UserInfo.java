@@ -12,7 +12,6 @@ import java.util.Objects;
 public class UserInfo {
     private long id;
     private String name;
-    private String picture;
 
     @Override
     public boolean equals(Object o) {
