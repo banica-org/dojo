@@ -8,11 +8,9 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -23,10 +21,10 @@ public class NotificationManagingServiceTest {
     private static final int SCHEDULE_PERIOD = 5;
     private static final String CONTEST_ID = "id";
 
-    private Map<String, ScheduledFuture<?>> subscriptions;
+    private List<String> subscriptions;
 
     @Mock
-    private LeaderboardNotifierService leaderboardNotifierService;
+    private NotificationClient notificationClient;
 
     private NotificationManagingService notificationManagingService;
 
@@ -35,13 +33,13 @@ public class NotificationManagingServiceTest {
 
     @Before
     public void init() {
-        notificationManagingService = new NotificationManagingService(leaderboardNotifierService);
+        notificationManagingService = new NotificationManagingService(notificationClient);
         ReflectionTestUtils.setField(notificationManagingService, "poolSize", POOL_SIZE);
         ReflectionTestUtils.setField(notificationManagingService, "schedulePeriod", SCHEDULE_PERIOD);
 
         when(contest.getContestId()).thenReturn(CONTEST_ID);
 
-        subscriptions = (Map<String, ScheduledFuture<?>>) ReflectionTestUtils.getField(notificationManagingService, "subscriptions");
+        subscriptions = (List<String>) ReflectionTestUtils.getField(notificationManagingService, "subscriptions");
     }
 
     @Test
@@ -49,7 +47,7 @@ public class NotificationManagingServiceTest {
         notificationManagingService.startNotifications(contest);
 
         assertEquals(1, subscriptions.size());
-        assertNotNull(subscriptions.get(CONTEST_ID));
+        assertTrue(subscriptions.contains(CONTEST_ID));
     }
 
     @Test

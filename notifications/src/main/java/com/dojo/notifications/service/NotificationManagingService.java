@@ -6,16 +6,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class NotificationManagingService {
 
-    private static final int INITIAL_DELAY = 0;
-    private final Map<String, ScheduledFuture<?>> subscriptions;
-    private final LeaderboardNotifierService leaderboardNotifierService;
+    private final List<String> subscriptions;
+    private final NotificationClient notificationClient;
 
     @Value("${thread-pool-size}")
     private int poolSize;
@@ -23,23 +24,23 @@ public class NotificationManagingService {
     private int schedulePeriod;
     private final ScheduledExecutorService executorService;
 
+
     @Autowired
-    public NotificationManagingService(LeaderboardNotifierService leaderboardNotifierService) {
-        this.leaderboardNotifierService = leaderboardNotifierService;
-        this.subscriptions = new ConcurrentHashMap<>();
+    public NotificationManagingService(NotificationClient notificationClient) {
+        this.notificationClient = notificationClient;
+        this.subscriptions = new ArrayList<>();
         this.executorService = Executors.newScheduledThreadPool(poolSize);
     }
 
     public void startNotifications(final Contest contest){
-        ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() -> leaderboardNotifierService.lookForLeaderboardChanges(contest), INITIAL_DELAY, schedulePeriod, TimeUnit.SECONDS);
-        subscriptions.put(contest.getContestId(), future);
+        notificationClient.startLeaderboardNotifications(contest);
+        subscriptions.add(contest.getContestId());
+
     }
 
     public void stopNotifications(final String contestId){
-        Optional.ofNullable(subscriptions.get(contestId)).ifPresent(future -> {
-            future.cancel(false);
-            subscriptions.remove(contestId);
-        });
+        notificationClient.stopLeaderboardNotifications(contestId);
+        subscriptions.remove(contestId);
     }
 
     @PreDestroy
