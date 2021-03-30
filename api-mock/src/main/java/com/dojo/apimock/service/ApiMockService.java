@@ -18,28 +18,19 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 public class ApiMockService extends ApiMockServiceGrpc.ApiMockServiceImplBase {
 
-    private static final int INITIAL_DELAY = 0;
-    private static final int SCHEDULE_PERIOD = 5;
-    private static final int POOL_SIZE = 1;
-
     private final LeaderBoardProvider leaderBoardProvider;
-    private final ScheduledExecutorService executorService;
 
     private final List<String> subscriptions;
 
     @Autowired
     public ApiMockService(LeaderBoardProvider leaderBoardProvider) {
         this.leaderBoardProvider = leaderBoardProvider;
-        this.executorService = Executors.newScheduledThreadPool(POOL_SIZE);
         this.subscriptions = new ArrayList<>();
     }
 
@@ -60,9 +51,10 @@ public class ApiMockService extends ApiMockServiceGrpc.ApiMockServiceImplBase {
     }
 
     private LeaderboardResponse getNextLeaderboard(int requestNumber, String contestId) {
-        List<LinkedHashMap<String, Object>> objects = leaderBoardProvider.generateLeaderBoard(requestNumber, contestId);
+        List<LinkedHashMap<String, Object>> leaderboard = generateLeaderboard(requestNumber, contestId);
+
         return LeaderboardResponse.newBuilder()
-                .addAllParticipant(objects.stream().map(obj ->{
+                .addAllParticipant(leaderboard.stream().map(obj -> {
                     String id = (String) obj.get("id");
                     String name = (String) obj.get("name");
                     long score = new Long((Integer) obj.get("score"));
@@ -93,5 +85,16 @@ public class ApiMockService extends ApiMockServiceGrpc.ApiMockServiceImplBase {
 
         responseObserver.onNext(StartResponse.newBuilder().build());
         responseObserver.onCompleted();
+    }
+
+    private List<LinkedHashMap<String, Object>> generateLeaderboard(int requestNumber, String contestId) {
+        List<Object> objects = leaderBoardProvider.generateLeaderBoard(requestNumber, contestId);
+
+        List<LinkedHashMap<String, Object>> leaderboard = new ArrayList<>();
+        objects.forEach(obj -> {
+            LinkedHashMap<String, Object> participant = (LinkedHashMap<String, Object>) obj;
+            leaderboard.add(participant);
+        });
+        return leaderboard;
     }
 }
