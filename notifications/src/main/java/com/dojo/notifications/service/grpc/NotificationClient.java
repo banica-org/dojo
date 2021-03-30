@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.grpc;
 
 import com.dojo.apimock.ApiMockServiceGrpc;
 import com.dojo.apimock.LeaderboardRequest;
