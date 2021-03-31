@@ -2,7 +2,7 @@ package com.dojo.messages;
 
 import org.junit.jupiter.api.Test;
 
-class DummyClassTests {
+class MainTests {
 
     @Test
     void contextLoads() {

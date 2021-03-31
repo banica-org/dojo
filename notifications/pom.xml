@@ -74,6 +74,11 @@
             <version>${flink.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.dojo</groupId>
+            <artifactId>messages</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

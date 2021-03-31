@@ -14,19 +14,17 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpMethod;
-
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -38,8 +36,8 @@ public class LeaderboardServiceTest {
 
     private final String DUMMY_URL = "http://localhost:8081/api/v1/codenjoy/leaderboard";
     private final String CONTEST_ID = "149";
-    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo(1, "FirstUser", "picture"), 100);
-    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo(2, "SecondUser", "picture"), 120);
+    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
+    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT));
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
@@ -99,7 +97,7 @@ public class LeaderboardServiceTest {
     @Test
     public void determineEventTypeScoreChangeTest() {
         //Arrange
-        Participant scoreChange = new Participant(new UserInfo(2, "SecondUser", "picture"), 420);
+        Participant scoreChange = new Participant(new UserInfo("2", "SecondUser"), 420);
         Leaderboard newLeaderboard = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, scoreChange));
 
         //Act
@@ -124,19 +122,19 @@ public class LeaderboardServiceTest {
     @Test
     public void getUserDetailsTest() {
         //Arrange
-        FIRST_USER_DETAILS.setId(1);
-        SECOND_USER_DETAILS.setId(2);
+        FIRST_USER_DETAILS.setId("1");
+        SECOND_USER_DETAILS.setId("2");
         List<UserDetails> expected = Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS);
 
-        when(userDetailsService.getUserDetails(1)).thenReturn(FIRST_USER_DETAILS);
-        when(userDetailsService.getUserDetails(2)).thenReturn(SECOND_USER_DETAILS);
+        when(userDetailsService.getUserDetails("1")).thenReturn(FIRST_USER_DETAILS);
+        when(userDetailsService.getUserDetails("2")).thenReturn(SECOND_USER_DETAILS);
 
         //Act
         List<UserDetails> actual = leaderboardService.getUserDetails(NEW_LEADERBOARD, OLD_LEADERBOARD);
 
         //Assert
         Assert.assertEquals(expected, actual);
-        verify(userDetailsService, times(2)).getUserDetails(anyLong());
+        verify(userDetailsService, times(2)).getUserDetails(anyString());
     }
 
 }

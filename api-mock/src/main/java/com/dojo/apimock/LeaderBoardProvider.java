@@ -22,7 +22,7 @@ public class LeaderBoardProvider {
     @Value("classpath:static/users-responses.json")
     private Resource usersResponse;
 
-    private Map<String,List<List<Object>>> scenarios;
+    private Map<String, List<List<Object>>> scenarios;
     private Object games;
     private Map<String, Object> users;
 
@@ -30,18 +30,21 @@ public class LeaderBoardProvider {
 
     @PostConstruct
     private void load() throws IOException {
-        this.scenarios = new ObjectMapper().readValue(resourceFile.getFile(), new TypeReference<Map<String,List<List<Object>>>>(){});
-        this.games = new ObjectMapper().readValue(gamesResponse.getFile(), new TypeReference<Object>(){});
-        this.users = new ObjectMapper().readValue(usersResponse.getFile(), new TypeReference<Map<String, Object>>(){});
+        this.scenarios = new ObjectMapper().readValue(resourceFile.getFile(), new TypeReference<Map<String, List<List<Object>>>>() {
+        });
+        this.games = new ObjectMapper().readValue(gamesResponse.getFile(), new TypeReference<Object>() {
+        });
+        this.users = new ObjectMapper().readValue(usersResponse.getFile(), new TypeReference<Map<String, Object>>() {
+        });
     }
 
-    public List<Object> generateLeaderBoard(final int requestNumber, final String eventId){
-        if (!scenarios.containsKey(eventId)){
-            return Collections.singletonList("Invalid event id!");
+    public List<Object> generateLeaderBoard(final int requestNumber, final String eventId) {
+        if (!scenarios.containsKey(eventId)) {
+            return null;
         }
         List<List<Object>> eventLeaderboards = scenarios.get(eventId);
-        int scenarioId = requestNumber < eventLeaderboards.size() ? requestNumber : eventLeaderboards.size()-1;
-        List<Object> scenario =  eventLeaderboards.get(scenarioId);
+        int scenarioId = requestNumber < eventLeaderboards.size() ? requestNumber : eventLeaderboards.size() - 1;
+        List<Object> scenario = eventLeaderboards.get(scenarioId);
         LOGGER.info("Scenario {} retrieved for event {} in request {}: {}", scenarioId, eventId, requestNumber, scenario);
         return scenario;
     }

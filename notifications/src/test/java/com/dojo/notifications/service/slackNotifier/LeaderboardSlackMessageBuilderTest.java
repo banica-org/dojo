@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class LeaderboardSlackMessageBuilderTest {
 
-    private static final long USER_ID = 1;
+    private static final String USER_ID = "1";
     private static final String USER_NAME = "John";
     private static final String USER_EMAIL = "John@email";
     private static final long USER_SCORE = 100;
@@ -54,7 +54,7 @@ public class LeaderboardSlackMessageBuilderTest {
 
     @Before
     public void init() {
-        UserInfo userInfo = new UserInfo(USER_ID, USER_NAME, null);
+        UserInfo userInfo = new UserInfo(USER_ID, USER_NAME);
         Participant participant = new Participant(userInfo, USER_SCORE);
         leaderboard = new Leaderboard(Collections.singletonList(participant));
 

@@ -18,7 +18,7 @@ public class UserDetailsService {
 
     private final Configuration configuration;
     private final RestTemplate restTemplate;
-    private final Map<Long, UserDetails> userDetailsCache;
+    private final Map<String, UserDetails> userDetailsCache;
 
     @Autowired
     public UserDetailsService(Configuration configuration) {
@@ -27,7 +27,7 @@ public class UserDetailsService {
         this.userDetailsCache = new ConcurrentHashMap<>();
     }
 
-    public UserDetails getUserDetails(long userId) {
+    public UserDetails getUserDetails(String userId) {
         UserDetails userDetails = userDetailsCache.get(userId);
         if (userDetails == null) {
             ResponseEntity<UserDetails> userDetailsResponse = restTemplate.exchange(
@@ -42,7 +42,7 @@ public class UserDetailsService {
         return userDetails;
     }
 
-    public String getUserEmail(long userId) {
+    public String getUserEmail(String userId) {
         UserDetails userDetails = getUserDetails(userId);
         return userDetails != null ? userDetails.getEmail() : null;
     }
