@@ -4,7 +4,9 @@ import com.dojo.apimock.ApiMockServiceGrpc;
 import com.dojo.apimock.LeaderboardRequest;
 import com.dojo.apimock.LeaderboardResponse;
 import com.dojo.apimock.StartRequest;
+import com.dojo.apimock.StartResponse;
 import com.dojo.apimock.StopRequest;
+import com.dojo.apimock.StopResponse;
 import com.dojo.notifications.model.contest.Contest;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -38,7 +40,9 @@ public class NotificationClient {
         final StopRequest request = StopRequest.newBuilder()
                 .setContestId(contestId)
                 .build();
-        LOGGER.info("Notifications stopped for contest {} {}", contestId, blockingStub.stopNotifications(request));
+
+        StopResponse response = blockingStub.stopNotifications(request);
+        LOGGER.info("Notifications stopped for contest {} {}", contestId, response);
     }
 
     private void getNotifications(String contestId) {
@@ -69,6 +73,7 @@ public class NotificationClient {
                 .setContestId(contestId)
                 .build();
 
-        LOGGER.info("Notifications started for contest {} {}", contestId, blockingStub.startNotifications(startRequest));
+        StartResponse response = blockingStub.startNotifications(startRequest);
+        LOGGER.info("Notifications started for contest {} {}", contestId, response);
     }
 }
