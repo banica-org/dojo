@@ -33,6 +33,8 @@ public class LeaderboardService {
 
     public Leaderboard getNewLeaderboardSetup(final Contest contest) {
 
+        //TODO get leaderboard via GRPC and remove Configuration class
+
         UriComponentsBuilder leaderboardApiBuilder = UriComponentsBuilder.fromHttpUrl(configuration.getLeaderboardApi())
                 .queryParam("eventId", contest.getContestId())
                 .queryParam("userMode", "spectator");
@@ -48,7 +50,7 @@ public class LeaderboardService {
     public EventType determineEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
         if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
-                .filter(i -> oldLeaderboard.getUserIdByPosition(i) != newLeaderboard.getUserIdByPosition(i))
+                .filter(i -> !oldLeaderboard.getUserIdByPosition(i).equals(newLeaderboard.getUserIdByPosition(i)))
                 .findAny().isPresent()) return EventType.POSITION_CHANGES;
 
         if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))

@@ -40,7 +40,7 @@ message StartResponse{
 
 }
 
-service ApiMockService{
+service ApiMockLeaderboardService{
   rpc getLeaderboard(LeaderboardRequest) returns (stream LeaderboardResponse);
   rpc stopNotifications(StopRequest) returns (StopResponse);
   rpc startNotifications(StartRequest) returns (StartResponse);

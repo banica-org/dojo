@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package notifications;
+
+option java_package = "com.dojo.apimock";
+option java_multiple_files = true;
+
+message UserDetailsRequest{
+  string id = 1;
+}
+
+message UserDetailsResponse{
+  string id = 1;
+  string email = 2;
+}
+
+service ApiMockUserDetailsService{
+  rpc getUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
+}
