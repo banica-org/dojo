@@ -27,7 +27,7 @@ public class Leaderboard {
         return this.participants.size();
     }
 
-    public long getUserIdByPosition(int position) {
+    public String getUserIdByPosition(int position) {
         return this.participants.get(position).getUser().getId();
     }
 
@@ -50,7 +50,7 @@ public class Leaderboard {
         participants.forEach(participant -> {
             String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(participant.getUser().getId()));
             String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + participant.getUser().getName() + ">";
-            String name = (userDetails != COMMON && participant.getUser().getId() == userDetails.getId()) ?
+            String name = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ?
                     SlackNotificationUtils.makeBold(participant.getUser().getName()) : userId.isEmpty() ? participant.getUser().getName() : nameWithLink;
             names.append(SlackNotificationUtils.makeBold(position.getAndIncrement()))
                     .append(". ")
@@ -64,7 +64,7 @@ public class Leaderboard {
         StringBuilder scores = new StringBuilder();
 
         participants.forEach(participant -> {
-            String score = (userDetails != COMMON && participant.getUser().getId() == userDetails.getId()) ? SlackNotificationUtils.makeBold(participant.getScore())
+            String score = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ? SlackNotificationUtils.makeBold(participant.getScore())
                     : String.valueOf(participant.getScore());
             scores.append(score).append("\n");
         });
