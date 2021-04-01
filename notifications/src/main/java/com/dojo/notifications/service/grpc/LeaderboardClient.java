@@ -60,6 +60,15 @@ public class LeaderboardClient {
         LOGGER.info(NOTIFICATION_STOPPED_MESSAGE, contestId, response);
     }
 
+    private void subscribeForNotifications(String contestId) {
+        final StartRequest startRequest = StartRequest.newBuilder()
+                .setContestId(contestId)
+                .build();
+
+        StartResponse response = leaderboardServiceBlockingStub.startNotifications(startRequest);
+        LOGGER.info(NOTIFICATIONS_STARTED_MESSAGE, contestId, response);
+    }
+
     private void getNotifications(Contest contest) {
         final LeaderboardRequest leaderboardRequest = LeaderboardRequest.newBuilder()
                 .setContestId(contest.getContestId())
@@ -68,18 +77,7 @@ public class LeaderboardClient {
         leaderboardServiceStub.getLeaderboard(leaderboardRequest, new StreamObserver<LeaderboardResponse>() {
             @Override
             public void onNext(LeaderboardResponse leaderboardResponse) {
-                List<Participant> participants = new ArrayList<>();
-
-                leaderboardResponse.getParticipantList().forEach(participantResponse -> {
-                    Participant participant = new Participant();
-                    UserInfo userInfo = new UserInfo();
-                    userInfo.setId(participantResponse.getUser().getId());
-                    userInfo.setName(participantResponse.getUser().getName());
-                    participant.setUser(userInfo);
-                    participant.setScore(participantResponse.getScore());
-
-                    participants.add(participant);
-                });
+                List<Participant> participants = getParticipants(leaderboardResponse);
 
                 leaderboardNotifierService.lookForLeaderboardChanges(contest, new Leaderboard(participants));
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
@@ -97,12 +95,19 @@ public class LeaderboardClient {
         });
     }
 
-    private void subscribeForNotifications(String contestId) {
-        final StartRequest startRequest = StartRequest.newBuilder()
-                .setContestId(contestId)
-                .build();
+    private List<Participant> getParticipants(LeaderboardResponse leaderboardResponse) {
+        List<Participant> participants = new ArrayList<>();
 
-        StartResponse response = leaderboardServiceBlockingStub.startNotifications(startRequest);
-        LOGGER.info(NOTIFICATIONS_STARTED_MESSAGE, contestId, response);
+        leaderboardResponse.getParticipantList().forEach(participantResponse -> {
+            Participant participant = new Participant();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setId(participantResponse.getUser().getId());
+            userInfo.setName(participantResponse.getUser().getName());
+            participant.setUser(userInfo);
+            participant.setScore(participantResponse.getScore());
+
+            participants.add(participant);
+        });
+        return participants;
     }
 }
