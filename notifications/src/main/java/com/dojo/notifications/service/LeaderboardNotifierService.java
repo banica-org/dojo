@@ -41,8 +41,8 @@ public class LeaderboardNotifierService {
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
     }
 
-    public void lookForLeaderboardChanges(final Contest contest) {
-        Leaderboard newLeaderboard = leaderboardService.getNewLeaderboardSetup(contest);
+    public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
+
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
         if (oldLeaderboard != null && newLeaderboard != null && !newLeaderboard.equals(oldLeaderboard)) {

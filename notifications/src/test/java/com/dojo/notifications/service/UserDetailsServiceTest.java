@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.service.grpc.NotificationClient;
+import com.dojo.notifications.service.grpc.UserDetailsClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,13 +20,13 @@ public class UserDetailsServiceTest {
     private UserDetails testUser;
 
     @Mock
-    private NotificationClient notificationClient;
+    private UserDetailsClient userDetailsClient;
 
     private UserDetailsService userDetailsService;
 
     @Before
     public void init() {
-        userDetailsService = new UserDetailsService(notificationClient);
+        userDetailsService = new UserDetailsService(userDetailsClient);
 
         addUser();
     }
@@ -50,7 +50,7 @@ public class UserDetailsServiceTest {
         testUser.setId(USER_ID);
         testUser.setEmail(USER_EMAIL);
 
-        when(notificationClient.getUserDetails(USER_ID)).thenReturn(testUser);
+        when(userDetailsClient.getUserDetails(USER_ID)).thenReturn(testUser);
     }
 
 }
