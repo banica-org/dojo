@@ -8,6 +8,7 @@ import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
+import com.dojo.notifications.repo.SelectRequestRepo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,8 @@ public class LeaderboardNotifierServiceTest {
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
     private final Map<NotifierType, CommonNotificationsLevel> leaderBoardNotificationsType = new ConcurrentHashMap<>();
 
+    @Mock
+    private SelectRequestRepo selectRequestRepo;
 
     @Mock
     private LeaderboardService leaderboardService;
@@ -58,7 +61,7 @@ public class LeaderboardNotifierServiceTest {
         when(contest.getContestId()).thenReturn(DUMMY_CONTEST_ID);
         when(notificationService.getNotificationServiceTypeMapping()).thenReturn(NotifierType.EMAIL);
 
-        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, Collections.singletonList(notificationService));
+        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, new SelectRequestService(selectRequestRepo), Collections.singletonList(notificationService));
 
         Map<String, Leaderboard> leaderboards = new ConcurrentHashMap<>();
         leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);

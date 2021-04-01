@@ -9,9 +9,11 @@ import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Leaderboard {
 
@@ -69,6 +71,18 @@ public class Leaderboard {
             scores.append(score).append("\n");
         });
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
+    }
+
+
+    public List<Participant> sort() {
+        return this.getParticipants()
+                .stream()
+                .sorted(new Comparator<Participant>() {
+                    @Override
+                    public int compare(Participant o1, Participant o2) {
+                        return (int) (o2.getScore() - o1.getScore());
+                    }
+                }).collect(Collectors.toList());
     }
 
 
