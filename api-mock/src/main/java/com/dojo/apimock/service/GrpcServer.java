@@ -28,7 +28,8 @@ public class GrpcServer {
     @Autowired
     public GrpcServer(@Value("${executor.pool.size}") final int applicationExecutorPoolSize,
                       @Value("${grpc.server.port}") final int port,
-                      final ApiMockService apiMockService) {
+                      final ApiMockLeaderboardService apiMockLeaderboardService,
+                      final ApiMockUserDetailsService apiMockUserDetailsService) {
 
         applicationExecutor = Executors.newFixedThreadPool(applicationExecutorPoolSize);
 
@@ -36,7 +37,8 @@ public class GrpcServer {
                 .executor(applicationExecutor)
                 .keepAliveTime(1, TimeUnit.MINUTES)
                 .permitKeepAliveTime(1, TimeUnit.MINUTES)
-                .addService(apiMockService)
+                .addService(apiMockLeaderboardService)
+                .addService(apiMockUserDetailsService)
                 .build();
     }
 

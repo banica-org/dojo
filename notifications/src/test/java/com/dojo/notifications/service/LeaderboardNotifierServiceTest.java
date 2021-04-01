@@ -72,31 +72,26 @@ public class LeaderboardNotifierServiceTest {
 
     @Test
     public void noChangesLeaderBoardTest() {
-        //Arrange
-        when(leaderboardService.getNewLeaderboardSetup(contest)).thenReturn(OLD_LEADERBOARD);
 
         //Act
-        leaderboardNotifierService.lookForLeaderboardChanges(contest);
+        leaderboardNotifierService.lookForLeaderboardChanges(contest, OLD_LEADERBOARD);
 
         //Assert
-        verify(leaderboardService, times(1)).getNewLeaderboardSetup(contest);
         verify(contest, times(2)).getContestId();
     }
 
     @Test
     public void notifyPersonalChangesTest() {
         //Arrange
-        when(leaderboardService.getNewLeaderboardSetup(contest)).thenReturn(NEW_LEADERBOARD);
         when(leaderboardService.determineEventType(NEW_LEADERBOARD, OLD_LEADERBOARD)).thenReturn(EventType.POSITION_CHANGES);
         when(leaderboardService.getUserDetails(NEW_LEADERBOARD, OLD_LEADERBOARD)).thenReturn(Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS));
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
         //Act
-        leaderboardNotifierService.lookForLeaderboardChanges(contest);
+        leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
 
         //Assert
-        verify(leaderboardService, times(1)).getNewLeaderboardSetup(contest);
         verify(leaderboardService, times(1)).determineEventType(NEW_LEADERBOARD, OLD_LEADERBOARD);
         verify(leaderboardService, times(1)).getUserDetails(NEW_LEADERBOARD, OLD_LEADERBOARD);
         verify(contest, times(2)).getContestId();
@@ -109,16 +104,14 @@ public class LeaderboardNotifierServiceTest {
     @Test
     public void notifyCommonChangesTest() {
         //Arrange
-        when(leaderboardService.getNewLeaderboardSetup(contest)).thenReturn(NEW_LEADERBOARD);
         when(leaderboardService.determineEventType(NEW_LEADERBOARD, OLD_LEADERBOARD)).thenReturn(EventType.SCORE_CHANGES);
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
         //Act
-        leaderboardNotifierService.lookForLeaderboardChanges(contest);
+        leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
 
         //Assert
-        verify(leaderboardService, times(1)).getNewLeaderboardSetup(contest);
         verify(leaderboardService, times(1)).determineEventType(NEW_LEADERBOARD, OLD_LEADERBOARD);
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
