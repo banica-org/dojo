@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="SELECT_REQUESTS")
+@Table(name = "SELECT_REQUESTS")
 public class SelectRequest {
 
     @Id
@@ -26,8 +26,8 @@ public class SelectRequest {
     @Column(name = "QUERY")
     String QUERY;
 
-    @Column(name = "NOTIFICATION_TYPE")
-    String NOTIFICATION_TYPE;
+    @Column(name = "EVENT_TYPE")
+    String EVENT_TYPE;
 
     @Column(name = "MESSAGE")
     String MESSAGE;

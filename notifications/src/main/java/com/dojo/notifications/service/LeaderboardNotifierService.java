@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 public class LeaderboardNotifierService {
 
     private static final String NOTIFYING_MESSAGE = "There are changes in leaderboard!";
+    private final String NEW_LEADERBOARD_NAME = "NewLeaderboard";
+    private final String OLD_LEADERBOARD_NAME = "OldLeaderboard";
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
 
@@ -55,11 +58,11 @@ public class LeaderboardNotifierService {
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
     }
 
-    public DataStream<Tuple3<Long, String, Long>> convertToDataStreamFromTuple(StreamExecutionEnvironment env, List<Participant> participants) {
-        List<Tuple3<Long, String, Long>> tupleLeaderboard = new ArrayList<>();
+    public DataStream<Tuple3<String, String, Long>> convertToDataStreamFromTuple(StreamExecutionEnvironment env, List<Participant> participants) {
+        List<Tuple3<String, String, Long>> tupleLeaderboard = new ArrayList<>();
 
         participants.forEach(participant -> {
-            Tuple3<Long, String, Long> oneRow = new Tuple3<>();
+            Tuple3<String, String, Long> oneRow = new Tuple3<>();
             oneRow.f0 = participant.getUser().getId();
             oneRow.f1 = participant.getUser().getName();
             oneRow.f2 = participant.getScore();
@@ -80,16 +83,16 @@ public class LeaderboardNotifierService {
         List<Participant> participants = new ArrayList<>();
         rowsNew.forEachRemaining(row -> {
             Participant p = new Participant();
-            p.setUser(new UserInfo((long) row.getField(0), (String) row.getField(1), null));
+            p.setUser(new UserInfo((String) row.getField(0), (String) row.getField(1)));
             p.setScore((long) row.getField(2));
             participants.add(p);
         });
         return participants;
     }
 
+
     public void getGRPCLeaderboardChanges(Contest contest, List<Participant> updated, List<Participant> old) {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
         EnvironmentSettings settings = EnvironmentSettings
                 .newInstance()
                 .useBlinkPlanner()
@@ -97,36 +100,47 @@ public class LeaderboardNotifierService {
                 .build();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env, settings);
 
-        DataStream<Tuple3<Long, String, Long>> updatedL = convertToDataStreamFromTuple(env, updated);
-        DataStream<Tuple3<Long, String, Long>> oldL = old.size() == 0 ? updatedL : convertToDataStreamFromTuple(env, old);
+        DataStream<Tuple3<String, String, Long>> updatedL = convertToDataStreamFromTuple(env, updated);
+        DataStream<Tuple3<String, String, Long>> oldL = old.size() == 0 ? updatedL : convertToDataStreamFromTuple(env, old);
 
-        tableEnv.createTemporaryView("NewLeaderboard", updatedL);
-        tableEnv.createTemporaryView("OldLeaderboard", oldL);
+        tableEnv.createTemporaryView(NEW_LEADERBOARD_NAME, updatedL);
+        tableEnv.createTemporaryView(OLD_LEADERBOARD_NAME, oldL);
 
         List<SelectRequest> queries = selectRequestService.getRequests();
 
         queries.forEach(selectRequest -> {
 
-            TableResult newLeaderboard = executeQuery(selectRequest.getQUERY(), "NewLeaderboard", tableEnv);
-            TableResult oldLeaderboard = executeQuery(selectRequest.getQUERY(), "OldLeaderboard", tableEnv);
+            TableResult newLeaderboard = executeQuery(selectRequest.getQUERY(), NEW_LEADERBOARD_NAME, tableEnv);
+            TableResult oldLeaderboard = executeQuery(selectRequest.getQUERY(), OLD_LEADERBOARD_NAME, tableEnv);
 
 
             List<Participant> participantsNew = convertTableResultToList(newLeaderboard);
             List<Participant> participantsOld = convertTableResultToList(oldLeaderboard);
 
-
             if (!participantsNew.equals(participantsOld)) {
-                Leaderboard notifyPeople = new Leaderboard(participantsNew);
-                Leaderboard oldLeaderboardN = new Leaderboard(participantsOld);
-//                notifyAboutChanges(contest,notifyPeople,oldLeaderboardN);
-                notifyAboutChanges(contest,notifyPeople,oldLeaderboardN);
+                notifyAbout(contest, participantsNew, participantsOld, selectRequest);
             }
         });
 
     }
 
-    public void lookForLeaderboardChanges(final Contest contest) {
-        Leaderboard newLeaderboard = leaderboardService.getNewLeaderboardSetup(contest);
+    public void notifyAbout(Contest contest, List<Participant> participantsNew, List<Participant> participantsOld, SelectRequest selectRequest) {
+        if (!participantsNew.equals(participantsOld)) {
+
+            Leaderboard notifyPeople = new Leaderboard(participantsNew);
+            Leaderboard oldLeaderboardN = new Leaderboard(participantsOld);
+            EventType e = EventType.valueOf(selectRequest.getEVENT_TYPE());
+            EventType actual = leaderboardService.determineEventType(notifyPeople, oldLeaderboardN);
+
+            if (e.equals(actual)) {
+                notifyPersonal(contest, notifyPeople, oldLeaderboardN);
+            }
+
+            notifyAboutChanges(contest, notifyPeople, oldLeaderboardN, e);
+        }
+    }
+
+    public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
         List<Participant> participants = newLeaderboard.sort();
@@ -143,17 +157,17 @@ public class LeaderboardNotifierService {
         leaderboards.put(contest.getContestId(), new Leaderboard(participants));
     }
 
-    public void notifyAboutChanges(final Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
+    public void notifyAboutChanges(final Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard, EventType type) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType changesEventType = leaderboardService.determineEventType(newLeaderboard, oldLeaderboard);
-
-        if (changesEventType == EventType.POSITION_CHANGES) {
-            notifyPersonal(contest, newLeaderboard, oldLeaderboard);
-        }
+//
+//        if (type == EventType.POSITION_CHANGES) {
+//            notifyPersonal(contest, newLeaderboard, oldLeaderboard);
+//        }
 
         contest.getCommonNotificationsLevel().entrySet().stream()
-                .filter(entry -> entry.getValue().getIncludedEventTypes().contains(changesEventType))
+                .filter(entry -> entry.getValue().getIncludedEventTypes().contains(type))
                 .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey()));
     }
 
