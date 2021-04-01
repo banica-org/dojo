@@ -13,7 +13,6 @@
 
     <properties>
         <docker-java.version>3.2.7</docker-java.version>
-        <docker-java-transport.version>3.2.7</docker-java-transport.version>
     </properties>
 
     <dependencies>
@@ -40,7 +39,7 @@
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-transport-httpclient5</artifactId>
-            <version>${docker-java-transport.version}</version>
+            <version>${docker-java.version}</version>
         </dependency>
 
         <dependency>
