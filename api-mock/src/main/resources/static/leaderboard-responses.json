@@ -1430,24 +1430,6 @@
           "technologies": [
             "Java"
           ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 747
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
           "email": "kaloyan_dutsolov@epam.com",
           "name": "Kaloyan Dutsolov",
           "id": 9,
@@ -1459,6 +1441,24 @@
         },
         "codenjoyId": "dojorena2",
         "score": 1000
+      },
+      {
+        "user": {
+          "picture": "/cdn/null",
+          "technologies": [
+            "Java"
+          ],
+          "email": "elitsa_marinova@epam.com",
+          "name": "Elitsa Marinova",
+          "id": 8,
+          "city": "Sofia",
+          "company": "EPAM",
+          "country": "Bulagria",
+          "position": "software engineer",
+          "isInternal": true
+        },
+        "codenjoyId": "dojorena1",
+        "score": 747
       }
     ],
     [
@@ -1497,336 +1497,6 @@
         },
         "codenjoyId": "dojorena1",
         "score": 1322
-      }
-    ],
-    [
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 1433
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 1322
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 33
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 44
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 55
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 66
-      }
-    ],
-    [
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 12345
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 1322
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 33
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 44
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 55
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 66
-      }
-    ],
-    [
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 12345
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 1322
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 33
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 44
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "kaloyan_dutsolov@epam.com",
-          "name": "Kaloyan Dutsolov",
-          "id": 9,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena2",
-        "score": 55
-      },
-      {
-        "user": {
-          "picture": "/cdn/null",
-          "technologies": [
-            "Java"
-          ],
-          "email": "elitsa_marinova@epam.com",
-          "name": "Elitsa Marinova",
-          "id": 8,
-          "city": "Sofia",
-          "company": "EPAM",
-          "country": "Bulagria",
-          "position": "software engineer",
-          "isInternal": true
-        },
-        "codenjoyId": "dojorena1",
-        "score": 54321
       }
     ]
   ]

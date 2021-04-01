@@ -42,5 +42,6 @@ public class Configuration {
     public void setUserDetailsApi(String userDetailsApi) {
         this.userDetailsApi = userDetailsApi;
     }
+
 }
 

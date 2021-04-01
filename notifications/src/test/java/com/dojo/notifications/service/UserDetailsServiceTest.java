@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class UserDetailsServiceTest {
 
-    private static final long USER_ID = 1L;
+    private static final String USER_ID = "1";
     private static final String USER_EMAIL = "email@email";
     private static final String INVALID_URL = "http://localhost/invalid";
 
@@ -64,7 +64,7 @@ public class UserDetailsServiceTest {
         testUser.setEmail(USER_EMAIL);
 
         when(configuration.getUserDetailsApi()).thenReturn(INVALID_URL);
-        String uriParameter = UriComponentsBuilder.fromHttpUrl(INVALID_URL).pathSegment(String.valueOf(USER_ID)).toUriString();
+        String uriParameter = UriComponentsBuilder.fromHttpUrl(INVALID_URL).pathSegment(USER_ID).toUriString();
         when(restTemplate.exchange(uriParameter, HttpMethod.GET, null, new ParameterizedTypeReference<UserDetails>() {
         }))
                 .thenReturn(new ResponseEntity<>(testUser, HttpStatus.ACCEPTED));

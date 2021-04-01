@@ -1,128 +1,37 @@
 {
   "1": {
-      "picture": "https://static.cdn.epam.com/avatar/b83ebee53461b69d99fa5386ad29a173.jpg",
-      "technologies": [
-        "Java"
-      ],
-      "email": "zlatina_mihaylova@epam.com",
-      "name": "Zlatina Mihaylova",
-      "id": 1,
-      "city": "Sofia",
-      "company": "SU",
-      "country": "Bulagria",
-      "position": "software engineer",
-      "isInternal": false
-    },
+    "email": "denis_kirilov@epam.com",
+    "name": "Denis Kirilov",
+    "id": "DenisK"
+  },
   "2": {
-    "picture": "https://media-exp1.licdn.com/dms/image/C4D03AQHrNyoCWgEivw/profile-displayphoto-shrink_100_100/0?e=1613001600&v=beta&t=piJ0cTC0ssrk3fdSGwpJNQpCYbXV8I5cmo-jivu8DsU",
-    "technologies": [
-      "JavaScript"
-    ],
-    "email": "Stefan_Rangelov@epam.com",
-    "name": "Stefan Rangelov",
-    "id": 2,
-    "city": "Sofia",
-    "company": "EPAM",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
+    "email": "georgi_ivanov1@epam.com",
+    "name": "Georgi Ivanov",
+    "id": "GerogiI"
   },
   "3": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "JavaScript"
-    ],
-    "email": "Ivan_Georgiev@epam.com",
-    "name": "Ivan Georgiev",
-    "id": 3,
-    "city": "Sofia",
-    "company": "Google",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": false
+    "email": "stefan_georgiev@epam.com",
+    "name": "Stefan Georgiev",
+    "id": "StefanG"
   },
   "4": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
-    "email": "AmelieBurke@armyspy.com",
-    "name": "Amelie Burke",
-    "id": 4,
-    "city": "Sofia",
-    "company": "Google",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": false
+    "email": "slavina_klisarska@epam.com",
+    "name": "Slavina Klisarska",
+    "id": "SlavinaK"
   },
   "5": {
-    "picture": "https://static.cdn.epam.com/avatar/7705df438db47730fb0ae5c2089f65dd.jpg",
-    "technologies": [
-      "Java"
-    ],
-    "email": "Iliyan_Mihov@epam.com",
-    "name": "Iliyan Mihov",
-    "id": 5,
-    "city": "Sofia",
-    "company": "EPAM",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
-  },
-  "6": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
-    "email": "DanielGallagher@tesla.com",
-    "name": "Daniel Gallagher",
-    "id": 6,
-    "city": "Sofia",
-    "company": "Tesla",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": false
-  },
-  "7": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
     "email": "Vladimir_Iliev@epam.com",
     "name": "Vladimir Iliev",
-    "id": 7,
-    "city": "Sofia",
-    "company": "Epam",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
+    "id": "VladimirI"
   },
-  "8": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
+  "6": {
     "email": "elitsa_marinova@epam.com",
     "name": "Elitsa Marinova",
-    "id": 8,
-    "city": "Sofia",
-    "company": "Epam",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
+    "id": "ElitsaM"
   },
-  "9": {
-    "picture": "/cdn/null",
-    "technologies": [
-      "Java"
-    ],
+  "7": {
     "email": "kaloyan_dutsolov@epam.com",
     "name": "Kaloyan Dutsolov",
-    "id": 9,
-    "city": "Sofia",
-    "company": "Epam",
-    "country": "Bulagria",
-    "position": "software engineer",
-    "isInternal": true
+    "id": "KaloyanD"
   }
 }

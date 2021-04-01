@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 public class LeaderboardNotifierServiceTest {
 
     private final String DUMMY_CONTEST_ID = "149";
-    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo(1, "FirstUser", "picture"), 100);
-    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo(2, "SecondUser", "picture"), 120);
+    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
+    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT));
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
