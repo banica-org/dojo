@@ -99,15 +99,11 @@ public class LeaderboardClient {
         List<Participant> participants = new ArrayList<>();
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> {
-            Participant participant = new Participant();
-            UserInfo userInfo = new UserInfo();
-            userInfo.setId(participantResponse.getUser().getId());
-            userInfo.setName(participantResponse.getUser().getName());
-            participant.setUser(userInfo);
-            participant.setScore(participantResponse.getScore());
-
+            UserInfo userInfo = new UserInfo(participantResponse.getUser().getId(), participantResponse.getUser().getName());
+            Participant participant = new Participant(userInfo, participantResponse.getScore());
             participants.add(participant);
         });
+
         return participants;
     }
 }
