@@ -1,6 +1,7 @@
 package com.dojo.notifications.configuration;
 
-import com.dojo.apimock.ApiMockServiceGrpc;
+import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
+import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +25,17 @@ public class GrpcConfig {
     }
 
     @Bean
-    public ApiMockServiceGrpc.ApiMockServiceBlockingStub getApiMockBlockingStub() {
-        return ApiMockServiceGrpc.newBlockingStub(this.managedChannel);
+    public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub getLeaderboardBlockingStub() {
+        return ApiMockLeaderboardServiceGrpc.newBlockingStub(this.managedChannel);
     }
 
     @Bean
-    public ApiMockServiceGrpc.ApiMockServiceStub getApiMockStub() {
-        return ApiMockServiceGrpc.newStub(this.managedChannel);
+    public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub getLeaderboardStub() {
+        return ApiMockLeaderboardServiceGrpc.newStub(this.managedChannel);
+    }
+
+    @Bean
+    public ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub getUserDetailsBlockingStub() {
+        return ApiMockUserDetailsServiceGrpc.newBlockingStub(this.managedChannel);
     }
 }

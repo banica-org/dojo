@@ -1,59 +1,26 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.grpc.NotificationClient;
+import com.dojo.notifications.service.grpc.LeaderboardClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class NotificationManagingService {
 
-    private final List<String> subscriptions;
-    private final NotificationClient notificationClient;
-
-    @Value("${thread-pool-size}")
-    private int poolSize;
-    @Value("${thread-pool-schedule-period-seconds}")
-    private int schedulePeriod;
-    private final ScheduledExecutorService executorService;
+    private final LeaderboardClient leaderboardClient;
 
 
     @Autowired
-    public NotificationManagingService(NotificationClient notificationClient) {
-        this.notificationClient = notificationClient;
-        this.subscriptions = new ArrayList<>();
-        this.executorService = Executors.newScheduledThreadPool(poolSize);
+    public NotificationManagingService(LeaderboardClient leaderboardClient) {
+        this.leaderboardClient = leaderboardClient;
     }
 
-    public void startNotifications(final Contest contest){
-        notificationClient.startLeaderboardNotifications(contest);
-        subscriptions.add(contest.getContestId());
-
+    public void startNotifications(final Contest contest) {
+        leaderboardClient.startLeaderboardNotifications(contest);
     }
 
-    public void stopNotifications(final String contestId){
-        notificationClient.stopLeaderboardNotifications(contestId);
-        subscriptions.remove(contestId);
+    public void stopNotifications(final String contestId) {
+        leaderboardClient.stopLeaderboardNotifications(contestId);
     }
-
-    @PreDestroy
-    private void destroy() {
-        if (executorService != null) {
-            executorService.shutdown();
-            try {
-                executorService.awaitTermination(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }
