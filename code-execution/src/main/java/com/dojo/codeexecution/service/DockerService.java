@@ -99,6 +99,9 @@ public class DockerService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                if (logs == null){
+                    logs = new ArrayList<>();
+                }
                 deleteContainer(containerId);
                 logs.forEach(System.out::println);
                 super.onNext(object);
