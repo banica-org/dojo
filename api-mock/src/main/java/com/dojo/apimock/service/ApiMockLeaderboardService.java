@@ -1,7 +1,7 @@
 package com.dojo.apimock.service;
 
 
-import com.dojo.apimock.ApiMockServiceGrpc;
+import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
 import com.dojo.apimock.LeaderBoardProvider;
 import com.dojo.apimock.LeaderboardRequest;
 import com.dojo.apimock.LeaderboardResponse;
@@ -22,14 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class ApiMockService extends ApiMockServiceGrpc.ApiMockServiceImplBase {
+public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceImplBase {
 
     private final LeaderBoardProvider leaderBoardProvider;
 
     private final List<String> subscriptions;
 
     @Autowired
-    public ApiMockService(LeaderBoardProvider leaderBoardProvider) {
+    public ApiMockLeaderboardService(LeaderBoardProvider leaderBoardProvider) {
         this.leaderBoardProvider = leaderBoardProvider;
         this.subscriptions = new ArrayList<>();
     }
