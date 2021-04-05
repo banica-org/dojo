@@ -314,7 +314,7 @@
       {
         "name": "Kaloyan Dutsolov",
         "id": "KaloyanD",
-        "score": 1000
+        "score": 444
       },
       {
         "name": "Elitsa Marinova",
@@ -326,12 +326,34 @@
       {
         "name": "Kaloyan Dutsolov",
         "id": "KaloyanD",
-        "score": 1433
+        "score": 1001
       },
       {
         "name": "Elitsa Marinova",
         "id": "ElitsaM",
         "score": 1322
+      }
+    ],
+    [
+      {
+        "name": "Kaloyan Dutsolov",
+        "id": "KaloyanD",
+        "score": 1401
+      },
+      {
+        "name": "Elitsa Marinova",
+        "id": "ElitsaM",
+        "score": 1322
+      },
+      {
+        "name": "Georgi Ivanov",
+        "id": "GerogiI",
+        "score": 999
+      },
+      {
+        "name": "Denis Kirilov",
+        "id": "DenisK",
+        "score": 555
       }
     ]
   ]

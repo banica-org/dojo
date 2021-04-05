@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,9 +26,9 @@ public class LeaderboardServiceTest {
 
     private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
+    private final Participant BETTER_FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 400);
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
-    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT));
-    private final UserDetails FIRST_USER_DETAILS = new UserDetails();
+    private final Leaderboard POSITION_CHANGED_LEADERBOARD = new Leaderboard(Arrays.asList(SECOND_PARTICIPANT, BETTER_FIRST_PARTICIPANT));    private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
 
     @Mock
@@ -40,11 +40,12 @@ public class LeaderboardServiceTest {
     @Test
     public void determineEventTypePositionChangeTest() {
 
+
         //Act
-        EventType actual = leaderboardService.determineEventType(NEW_LEADERBOARD, OLD_LEADERBOARD);
+        boolean actual = leaderboardService.determineEventType(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD, EventType.POSITION_CHANGES);
 
         //Assert
-        Assert.assertEquals(EventType.POSITION_CHANGES, actual);
+        Assert.assertTrue(actual);
     }
 
     @Test
@@ -54,10 +55,10 @@ public class LeaderboardServiceTest {
         Leaderboard newLeaderboard = new Leaderboard(Arrays.asList(FIRST_PARTICIPANT, scoreChange));
 
         //Act
-        EventType actual = leaderboardService.determineEventType(newLeaderboard, OLD_LEADERBOARD);
+        boolean actual = leaderboardService.determineEventType(newLeaderboard, OLD_LEADERBOARD, EventType.SCORE_CHANGES);
 
         //Assert
-        Assert.assertEquals(EventType.SCORE_CHANGES, actual);
+        Assert.assertTrue(actual);
     }
 
     @Test
@@ -65,10 +66,10 @@ public class LeaderboardServiceTest {
         //Arrange
 
         //Act
-        EventType actual = leaderboardService.determineEventType(OLD_LEADERBOARD, OLD_LEADERBOARD);
+        boolean actual = leaderboardService.determineEventType(OLD_LEADERBOARD, OLD_LEADERBOARD, EventType.OTHER_LEADERBOARD_CHANGE);
 
         //Assert
-        Assert.assertEquals(EventType.OTHER_LEADERBOARD_CHANGE, actual);
+        Assert.assertTrue(actual);
     }
 
 
@@ -79,15 +80,15 @@ public class LeaderboardServiceTest {
         SECOND_USER_DETAILS.setId("2");
         List<UserDetails> expected = Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS);
 
-        when(userDetailsService.getUserDetails("1")).thenReturn(FIRST_USER_DETAILS);
-        when(userDetailsService.getUserDetails("2")).thenReturn(SECOND_USER_DETAILS);
+        when(userDetailsService.getUserDetails(OLD_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
+        when(userDetailsService.getUserDetails(OLD_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
 
         //Act
-        List<UserDetails> actual = leaderboardService.getUserDetails(NEW_LEADERBOARD, OLD_LEADERBOARD);
+        List<UserDetails> actual = leaderboardService.getUserDetails(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD);
 
         //Assert
         Assert.assertEquals(expected, actual);
-        verify(userDetailsService, times(2)).getUserDetails(anyString());
+        verify(userDetailsService, times(2)).getUserDetails(any());
     }
 
 }

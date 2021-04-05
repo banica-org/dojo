@@ -19,24 +19,24 @@ public class LeaderboardService {
         this.userDetailsService = userDetailsService;
     }
 
-    public EventType determineEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
+    public boolean determineEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard, EventType eventType) {
 
         if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
                 .filter(i -> !oldLeaderboard.getUserIdByPosition(i).equals(newLeaderboard.getUserIdByPosition(i)))
-                .findAny().isPresent()) return EventType.POSITION_CHANGES;
+                .findAny().isPresent() && eventType.equals(EventType.POSITION_CHANGES)) return true;
 
         if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
                 .filter(i -> oldLeaderboard.getScoreByPosition(i) != newLeaderboard.getScoreByPosition(i))
-                .findAny().isPresent()) return EventType.SCORE_CHANGES;
+                .findAny().isPresent() && eventType.equals(EventType.SCORE_CHANGES)) return true;
 
-        return EventType.OTHER_LEADERBOARD_CHANGE;
+        return eventType.equals(EventType.OTHER_LEADERBOARD_CHANGE);
     }
 
 
     public List<UserDetails> getUserDetails(Leaderboard newLeaderboard, Leaderboard oldLeaderboard) {
 
         return IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
-                .filter(i -> !oldLeaderboard.getParticipantByPosition(i).equals(newLeaderboard.getParticipantByPosition(i)))
+                .filter(i -> !oldLeaderboard.getUserIdByPosition(i).equals(newLeaderboard.getUserIdByPosition(i)))
                 .mapToObj(i -> userDetailsService.getUserDetails(oldLeaderboard.getUserIdByPosition(i)))
                 .collect(Collectors.toList());
     }

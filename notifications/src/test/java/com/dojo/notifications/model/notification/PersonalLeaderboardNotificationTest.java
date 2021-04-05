@@ -33,6 +33,7 @@ public class PersonalLeaderboardNotificationTest {
     private static final String MESSAGE = "Mail message";
     private static final String LEADERBOARD_KEY = "leaderboard";
     private static final String USERDETAILS_KEY = "userDetails";
+    private static final String REQUEST_MESSAGE = "Test";
 
     @Mock
     private CustomSlackClient slackClient;
@@ -55,7 +56,7 @@ public class PersonalLeaderboardNotificationTest {
                 .setChannelId(CHANNEL)
                 .build();
         leaderboard = new Leaderboard(new ArrayList<>());
-        leaderboardNotification = new PersonalLeaderboardNotification(userDetailsService, leaderboard, userDetails);
+        leaderboardNotification = new PersonalLeaderboardNotification(userDetailsService, leaderboard, userDetails, REQUEST_MESSAGE);
     }
 
     @Test
@@ -70,17 +71,17 @@ public class PersonalLeaderboardNotificationTest {
         String actual = leaderboardNotification.getAsEmailNotification(mailContentBuilder);
 
         verify(mailContentBuilder, times(1)).generateMailContent(contextParams);
-        assertEquals(actual, MESSAGE);
+        assertEquals(actual, contextParams);
     }
 
     @Test
     public void getAsSlackNotificationTest() {
         SlackMessageBuilder slackMessageBuilder = mock(LeaderboardSlackMessageBuilder.class);
-        when(slackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL))
+        when(slackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE))
                 .thenReturn(chatPostMessageParams);
 
         leaderboardNotification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
 
-        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL);
+        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, REQUEST_MESSAGE);
     }
 }

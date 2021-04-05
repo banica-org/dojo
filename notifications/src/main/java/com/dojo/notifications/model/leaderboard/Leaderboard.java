@@ -30,26 +30,22 @@ public class Leaderboard {
     }
 
     public String getUserIdByPosition(int position) {
-        return this.participants.get(position).getUser().getId();
+        return this.getParticipants().get(position).getUser().getId();
     }
 
     public long getScoreByPosition(int position) {
-        return this.participants.get(position).getScore();
-    }
-
-    public Participant getParticipantByPosition(int position) {
-        return this.participants.get(position);
+        return this.getParticipants().get(position).getScore();
     }
 
     public List<Participant> getParticipants() {
-        return Collections.unmodifiableList(this.participants);
+        return Collections.unmodifiableList(this.getSortedParticipants());
     }
 
     public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
         AtomicInteger position = new AtomicInteger(1);
         StringBuilder names = new StringBuilder();
 
-        participants.forEach(participant -> {
+        getParticipants().forEach(participant -> {
             String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(participant.getUser().getId()));
             String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + participant.getUser().getName() + ">";
             String name = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ?
@@ -65,7 +61,7 @@ public class Leaderboard {
     public Text buildLeaderboardScores(UserDetails userDetails) {
         StringBuilder scores = new StringBuilder();
 
-        participants.forEach(participant -> {
+        getParticipants().forEach(participant -> {
             String score = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ? SlackNotificationUtils.makeBold(participant.getScore())
                     : String.valueOf(participant.getScore());
             scores.append(score).append("\n");
@@ -74,8 +70,8 @@ public class Leaderboard {
     }
 
 
-    public List<Participant> sort() {
-        return this.getParticipants()
+    public List<Participant> getSortedParticipants() {
+        return this.participants
                 .stream()
                 .sorted(new Comparator<Participant>() {
                     @Override

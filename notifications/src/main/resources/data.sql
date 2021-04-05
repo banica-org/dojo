@@ -1,1 +1,0 @@
-INSERT INTO SELECT_REQUESTS(QUERY,EVENT_TYPE,MESSAGE,QUANTIFIER) VALUES ('SELECT * FROM %s FETCH NEXT 5 ROWS ONLY', 'POSITION_CHANGES','There are position changes to the top 5 people in the leaderboard','All');
