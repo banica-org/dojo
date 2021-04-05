@@ -6,6 +6,7 @@ import com.dojo.apimock.UserDetailsResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.mockito.Mockito.mock;
@@ -19,13 +20,14 @@ public class UserDetailsClientTest {
     private static final String USER_ID = "id";
     private static final String EMAIL = "email";
 
+    @Mock
+    private ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
+
     private UserDetailsClient userDetailsClient;
-    private ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub blockingStub;
 
     @Before
     public void init() {
-        blockingStub = mock(ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub.class);
-        userDetailsClient = new UserDetailsClient(blockingStub);
+        userDetailsClient = new UserDetailsClient(userDetailsServiceBlockingStub);
     }
 
     @Test
@@ -36,11 +38,11 @@ public class UserDetailsClientTest {
         when(response.getId()).thenReturn(USER_ID);
         when(response.getEmail()).thenReturn(EMAIL);
 
-        when(blockingStub.getUserDetails(request)).thenReturn(response);
+        when(userDetailsServiceBlockingStub.getUserDetails(request)).thenReturn(response);
 
         userDetailsClient.getUserDetails(USER_ID);
 
-        verify(blockingStub, times(1)).getUserDetails(request);
+        verify(userDetailsServiceBlockingStub, times(1)).getUserDetails(request);
         verify(response, times(1)).getId();
         verify(response, times(1)).getEmail();
     }

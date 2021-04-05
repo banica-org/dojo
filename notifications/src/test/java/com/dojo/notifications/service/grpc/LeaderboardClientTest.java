@@ -3,12 +3,14 @@ package com.dojo.notifications.service.grpc;
 import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
 import com.dojo.apimock.LeaderboardRequest;
 import com.dojo.apimock.StartRequest;
+import com.dojo.apimock.StopRequest;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,21 +25,21 @@ public class LeaderboardClientTest {
 
     private static final String CONTEST_ID = "id";
 
+    @Mock
     private Contest contest;
 
-    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub blockingStub;
-    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub stub;
+    @Mock
+    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub leaderboardServiceBlockingStub;
+    @Mock
+    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub leaderboardServiceStub;
 
     private LeaderboardClient leaderboardClient;
 
     @Before
     public void init() {
-        contest = mock(Contest.class);
-        LeaderboardNotifierService leaderboardNotifierService = mock(LeaderboardNotifierService.class);
-        blockingStub = mock(ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub.class);
-        stub = mock(ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub.class);
 
-        this.leaderboardClient = new LeaderboardClient(leaderboardNotifierService, blockingStub, stub);
+        LeaderboardNotifierService leaderboardNotifierService = mock(LeaderboardNotifierService.class);
+        this.leaderboardClient = new LeaderboardClient(leaderboardNotifierService, leaderboardServiceBlockingStub, leaderboardServiceStub);
 
         when(contest.getContestId()).thenReturn(CONTEST_ID);
     }
@@ -51,14 +53,16 @@ public class LeaderboardClientTest {
         leaderboardClient.startLeaderboardNotifications(contest);
 
         verify(contest, times(2)).getContestId();
-        verify(blockingStub, times(1)).startNotifications(request);
-        verify(stub, times(1)).getLeaderboard(eq(leaderboardRequest), any(StreamObserver.class));
+        verify(leaderboardServiceBlockingStub, times(1)).startNotifications(request);
+        verify(leaderboardServiceStub, times(1)).getLeaderboard(eq(leaderboardRequest), any(StreamObserver.class));
     }
 
     @Test
     public void stopLeaderboardNotificationsTest() {
+        StopRequest request = StopRequest.newBuilder().setContestId(CONTEST_ID).build();
+
         leaderboardClient.stopLeaderboardNotifications(CONTEST_ID);
 
-        verify(blockingStub, times(1)).stopNotifications(any());
+        verify(leaderboardServiceBlockingStub, times(1)).stopNotifications(request);
     }
 }
