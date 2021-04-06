@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 
 public final class GrpcChannel {
 
@@ -17,7 +18,7 @@ public final class GrpcChannel {
         LOGGER.info("Managed channel started on address {}:{}...", host, port);
         this.managedChannel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext()
-                .directExecutor()
+                .keepAliveTime(2, TimeUnit.MINUTES)
                 .build();
     }
 
