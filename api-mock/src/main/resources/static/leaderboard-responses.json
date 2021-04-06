@@ -336,18 +336,18 @@
     ],
     [
       {
-        "name": "Kaloyan Dutsolov",
-        "id": "KaloyanD",
-        "score": 1401
-      },
-      {
         "name": "Elitsa Marinova",
         "id": "ElitsaM",
         "score": 1322
       },
       {
+        "name": "Kaloyan Dutsolov",
+        "id": "KaloyanD",
+        "score": 1401
+      },
+      {
         "name": "Georgi Ivanov",
-        "id": "GerogiI",
+        "id": "GeorgiI",
         "score": 999
       },
       {

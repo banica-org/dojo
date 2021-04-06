@@ -1,5 +1,7 @@
 package com.dojo.notifications.service;
 
+import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -13,18 +15,19 @@ import org.apache.flink.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 @Service
 public class FlinkTableService {
-
 
     public static final int USER_ID_POSITION = 0;
     private static final int USER_NAME_POSITION = 1;
     public static final int USER_SCORE_POSITION = 2;
 
 
-    public List<Participant> executeSingleQuery(List<Participant> participants, String tableName, String query) {
+    public Leaderboard executeSingleQuery(TreeSet<Participant> participants, String tableName, String query) {
 
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings
@@ -41,11 +44,10 @@ public class FlinkTableService {
         TableResult tableLeaderboard = tableEnvironment.sqlQuery(queryFormatted).execute();
         tableEnvironment.dropTemporaryView(tableName);
 
-        return convertTableResultToList(tableLeaderboard);
+        return new Leaderboard(convertTableResultToList(tableLeaderboard));
     }
 
-
-    private DataStream<Tuple3<String, String, Long>> convertToTuple3DataStream(StreamExecutionEnvironment env, List<Participant> participants) {
+    private DataStream<Tuple3<String, String, Long>> convertToTuple3DataStream(StreamExecutionEnvironment env, TreeSet<Participant> participants) {
         List<Tuple3<String, String, Long>> tupleLeaderboard = new ArrayList<>();
 
         participants.forEach(participant -> {
@@ -59,10 +61,10 @@ public class FlinkTableService {
         return env.fromCollection(tupleLeaderboard);
     }
 
-    private List<Participant> convertTableResultToList(TableResult leaderboard) {
-        CloseableIterator<Row> rowsNew = leaderboard.collect();
+    private TreeSet<Participant> convertTableResultToList(TableResult leaderboard) {
+        Iterator<Row> rowsNew = leaderboard.collect();
 
-        List<Participant> participants = new ArrayList<>();
+        TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
 
         rowsNew.forEachRemaining(row -> {
             UserInfo userInfo = new UserInfo((String) row.getField(USER_ID_POSITION), (String) row.getField(USER_NAME_POSITION));

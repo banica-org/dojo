@@ -2,6 +2,7 @@ package com.dojo.notifications.service.slackNotifier;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -15,8 +16,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +58,9 @@ public class LeaderboardSlackMessageBuilderTest {
     public void init() {
         UserInfo userInfo = new UserInfo(USER_ID, USER_NAME);
         Participant participant = new Participant(userInfo, USER_SCORE);
-        leaderboard = new Leaderboard(Collections.singletonList(participant));
+        TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
+        participants.add(participant);
+        leaderboard = new Leaderboard(participants);
 
         leaderboardSlackMessageBuilder = new LeaderboardSlackMessageBuilder();
 

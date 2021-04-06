@@ -8,20 +8,17 @@ import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class Leaderboard {
 
     private static final UserDetails COMMON = null;
 
-    private final List<Participant> participants;
+    private final TreeSet<Participant> participants;
 
-    public Leaderboard(List<Participant> participants) {
+    public Leaderboard(TreeSet<Participant> participants) {
         this.participants = participants;
     }
 
@@ -30,15 +27,27 @@ public class Leaderboard {
     }
 
     public String getUserIdByPosition(int position) {
-        return this.getParticipants().get(position).getUser().getId();
+        for (Participant p : participants) {
+            if (position == 0) {
+                return p.getUser().getId();
+            }
+            position--;
+        }
+        return "No such position";
     }
 
     public long getScoreByPosition(int position) {
-        return this.getParticipants().get(position).getScore();
+        for (Participant p : participants) {
+            if (position == 0) {
+                return p.getScore();
+            }
+            position--;
+        }
+        return -1;
     }
 
-    public List<Participant> getParticipants() {
-        return Collections.unmodifiableList(this.getSortedParticipants());
+    public TreeSet<Participant> getParticipants() {
+        return this.participants;
     }
 
     public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
@@ -68,19 +77,6 @@ public class Leaderboard {
         });
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
-
-
-    public List<Participant> getSortedParticipants() {
-        return this.participants
-                .stream()
-                .sorted(new Comparator<Participant>() {
-                    @Override
-                    public int compare(Participant o1, Participant o2) {
-                        return (int) (o2.getScore() - o1.getScore());
-                    }
-                }).collect(Collectors.toList());
-    }
-
 
     @Override
     public boolean equals(Object o) {

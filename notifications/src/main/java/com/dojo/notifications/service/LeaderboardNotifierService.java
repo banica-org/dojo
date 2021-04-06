@@ -6,6 +6,7 @@ import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.notification.CommonLeaderboardNotification;
 import com.dojo.notifications.model.notification.PersonalLeaderboardNotification;
+import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,7 +28,6 @@ public class LeaderboardNotifierService {
     private static final String NOTIFYING_MESSAGE = "There are changes in leaderboard!";
     private static final String NEW_LEADERBOARD_NAME = "NewLeaderboard";
     private static final String OLD_LEADERBOARD_NAME = "OldLeaderboard";
-
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
 
@@ -53,52 +54,48 @@ public class LeaderboardNotifierService {
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        List<Participant> newParticipants = newLeaderboard.getSortedParticipants();
-        List<Participant> oldParticipants = oldLeaderboard == null ? null : oldLeaderboard.getParticipants();
-
         if (oldLeaderboard != null
-                && !oldParticipants.isEmpty()
-                && !newParticipants.isEmpty()
-                && !newParticipants.equals(oldParticipants)) {
+                && newLeaderboard != null
+                && !oldLeaderboard.getParticipants().isEmpty()
+                && !oldLeaderboard.equals(newLeaderboard)) {
+
+            TreeSet<Participant> newParticipants = newLeaderboard.getParticipants();
+            TreeSet<Participant> oldParticipants = oldLeaderboard.getParticipants();
 
             try {
-                selectRequestService.getRequests().forEach(selectRequest -> {
+                for (SelectRequest request : selectRequestService.getRequests()) {
 
-                            List<Participant> oldQueriedLeaderboard = flinkTableService.executeSingleQuery(oldParticipants, OLD_LEADERBOARD_NAME, selectRequest.getQUERY());
+                    Leaderboard oldQueriedLeaderboard = flinkTableService.executeSingleQuery(oldParticipants, OLD_LEADERBOARD_NAME, request.getQuery());
 
-                            List<Participant> newQueriedLeaderboard = flinkTableService.executeSingleQuery(newParticipants, NEW_LEADERBOARD_NAME, selectRequest.getQUERY());
+                    Leaderboard newQueriedLeaderboard = flinkTableService.executeSingleQuery(newParticipants, NEW_LEADERBOARD_NAME, request.getQuery());
 
-                            if (newQueriedLeaderboard.size() != 0) {
-                                notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, selectRequest.getEVENT_TYPE(), selectRequest.getMESSAGE());
-                            }
-                        }
-                );
+                    if (newQueriedLeaderboard.getParticipants().size() != 0) {
+                        notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, request.getEventType(), request.getMessage());
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        leaderboards.put(contest.getContestId(), new Leaderboard(newParticipants));
+        leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
 
-    public void notifyAbout(Contest contest, List<Participant> oldParticipants, List<Participant> newParticipants, String eventType, String queryMessage) {
+    public void notifyAbout(Contest contest, Leaderboard oldQueriedLeaderboard, Leaderboard newQueriedLeaderboard, String eventType, String queryMessage) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
-        Leaderboard notifyPeople = new Leaderboard(newParticipants);
-        Leaderboard oldLeaderboardN = new Leaderboard(oldParticipants);
-
         EventType eventTypeQuery = EventType.valueOf(eventType);
-        boolean actual = leaderboardService.determineEventType(notifyPeople,oldLeaderboardN, eventTypeQuery);
+        boolean actual = leaderboardService.isItTheWantedEventType(newQueriedLeaderboard, oldQueriedLeaderboard, eventTypeQuery);
 
         if (actual) {
-            if(eventTypeQuery.equals(EventType.POSITION_CHANGES)) {
-                notifyPersonal(contest, notifyPeople, oldLeaderboardN, queryMessage);
+            if (eventTypeQuery.equals(EventType.POSITION_CHANGES)) {
+                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, queryMessage);
             }
 
             contest.getCommonNotificationsLevel().entrySet().stream()
                     .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifyCommon(contest, notifyPeople, entry.getKey(), queryMessage));
+                    .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), queryMessage));
         }
 
     }
@@ -107,12 +104,12 @@ public class LeaderboardNotifierService {
 
         List<UserDetails> userDetails = leaderboardService.getUserDetails(newLeaderboard, oldLeaderboard);
 
-        userDetails.forEach(user -> {
+        for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
                         .notify(user, new PersonalLeaderboardNotification(userDetailsService, newLeaderboard, user, queryMessage), contest);
             }
-        });
+        }
     }
 
     private void notifyCommon(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {

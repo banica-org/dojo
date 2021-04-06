@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -50,7 +51,7 @@ public class CommonLeaderboardNotificationTest {
                 .addBlocks(Divider.builder().build())
                 .setChannelId(CHANNEL)
                 .build();
-        leaderboard = new Leaderboard(new ArrayList<>());
+        leaderboard = new Leaderboard(new TreeSet<>());
         leaderboardNotification = new CommonLeaderboardNotification(userDetailsService, leaderboard, MESSAGE);
     }
 

@@ -21,17 +21,17 @@ public class SelectRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    int ID;
+    int id;
 
     @Column(name = "QUERY")
-    String QUERY;
+    String query;
 
     @Column(name = "EVENT_TYPE")
-    String EVENT_TYPE;
+    String eventType;
 
     @Column(name = "MESSAGE")
-    String MESSAGE;
+    String message;
 
     @Column(name = "QUANTIFIER")
-    String QUANTIFIER;
+    String quantifier;
 }

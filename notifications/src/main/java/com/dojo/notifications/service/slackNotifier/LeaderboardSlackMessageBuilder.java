@@ -66,13 +66,12 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     }
 
     private void addUsersWithScores(ChatPostMessageParams.Builder builder, String title, Text leaderboardNames, Text leaderboardScores) {
-        builder.addBlocks(
-                Section.of(Text.of(TextType.MARKDOWN, SlackNotificationUtils.makeBold(title)))
-                        .withFields(
-                                Text.of(TextType.MARKDOWN, USER),
-                                Text.of(TextType.MARKDOWN, SCORE),
-                                leaderboardNames,
-                                leaderboardScores));
+        builder.addBlocks(Section.of(Text.of(TextType.MARKDOWN, SlackNotificationUtils.makeBold(title)))
+                .withFields(
+                        Text.of(TextType.MARKDOWN, USER),
+                        Text.of(TextType.MARKDOWN, SCORE),
+                        leaderboardNames,
+                        leaderboardScores));
     }
 
     private void addRedirectButton(ChatPostMessageParams.Builder builder) {
