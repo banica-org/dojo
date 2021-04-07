@@ -63,8 +63,8 @@
             <div class="container">
                 <div class="row border">
                     <div class="col">
-                        <div class="form-option">
-                            <select class="form-control">
+                        <div class="form-group">
+                            <select class="form-control" th:field="*{slackCommonNotifications}">
                                 <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}" inputmode="">
                                     <label class="form-option-label" for="newParticipantSlack">On any leaderboard change</label>
                                 </option>
