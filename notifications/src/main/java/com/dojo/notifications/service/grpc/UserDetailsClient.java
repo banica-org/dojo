@@ -1,8 +1,8 @@
 package com.dojo.notifications.service.grpc;
 
-import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
-import com.dojo.apimock.UserDetailsRequest;
-import com.dojo.apimock.UserDetailsResponse;
+import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.UserDetailsResponse;
+import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.notifications.model.user.UserDetails;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
@@ -15,12 +15,13 @@ public class UserDetailsClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsClient.class);
 
-    private final ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
+    private final UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
 
     @Autowired
-    public UserDetailsClient(ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub userDetailsServiceBlockingStub) {
+    public UserDetailsClient(UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub) {
         this.userDetailsServiceBlockingStub = userDetailsServiceBlockingStub;
     }
+
 
     public UserDetails getUserDetails(String userId) {
         UserDetailsRequest request = UserDetailsRequest.newBuilder().setId(userId).build();

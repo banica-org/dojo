@@ -12,25 +12,25 @@
 <body>
 
     <div class="container">
-        <h2 style="text-align:center">Notification for game</h2>
+        <h2 style="text-align:center">Notification for event</h2>
         <br>
         <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
             <div class="form-group">
                 <label for="contestId">Game:</label>
                 <th:block th:if="*{contestId}">
                     <select class="form-control" id="contestId" th:field="*{contestId}" disabled>
-                        <option th:each="game : ${games}"
-                                th:value="${game.id}"
-                                th:utext="${game.title}"></option>
+                        <option th:each="event : ${events}"
+                                th:value="${event.roomName}"
+                                th:utext="${event.gameName}"></option>
                     </select>
                     <input type="hidden" th:field="*{contestId}">
                 </th:block>
                 <th:block th:unless="*{contestId}">
                     <div class="input-group">
                         <select class="form-control" id="contestId" th:field="*{contestId}" aria-describedby="g-addon">
-                            <option th:each="game : ${games}"
-                                    th:value="${game.id}"
-                                    th:utext="${game.title}"></option>
+                            <option th:each="event : ${events}"
+                                    th:value="${event.roomName}"
+                                    th:utext="${event.gameName}"></option>
                         </select>
                         <a class="input-group-addon" id="g-addon" title="Refresh games list" href="/games/refresh">
                             <i class="fa fa-refresh"></i>

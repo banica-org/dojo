@@ -2,8 +2,8 @@ package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.Game;
-import com.dojo.notifications.service.GamesService;
+import com.dojo.notifications.model.contest.Event;
+import com.dojo.notifications.service.EventService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,7 @@ public class WebUIControllerTest {
     private Model model;
 
     @Mock
-    private GamesService gamesService;
+    private EventService eventService;
     @Mock
     private ContestController contestController;
 
@@ -45,29 +45,29 @@ public class WebUIControllerTest {
         contest = new Contest();
         contest.setContestId(CONTEST_ID);
 
-        when(gamesService.getAllGames()).thenReturn(Collections.emptyList());
-        when(gamesService.getAllContests()).thenReturn(Collections.emptyList());
+        when(eventService.getAllEvents()).thenReturn(Collections.emptyList());
+        when(eventService.getAllContests()).thenReturn(Collections.emptyList());
     }
 
     @Test
     public void newContestTest() {
-        Game game = mock(Game.class);
-        when(game.getTitle()).thenReturn(CONTEST_TITLE);
-        when(gamesService.getGameById(CONTEST_ID)).thenReturn(game);
+        Event event = mock(Event.class);
+        when(event.getGameName()).thenReturn(CONTEST_TITLE);
+        when(eventService.getEventByRoomName(CONTEST_ID)).thenReturn(event);
 
         webUIController.newContest(contest, model);
 
-        verify(gamesService, times(1)).getGameById(CONTEST_ID);
+        verify(eventService, times(1)).getEventByRoomName(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);
     }
 
     @Test
     public void editContestTest() {
-        when(gamesService.getContestById(CONTEST_ID)).thenReturn(contest);
+        when(eventService.getContestById(CONTEST_ID)).thenReturn(contest);
 
         webUIController.editContest(CONTEST_ID, model);
 
-        verify(gamesService, times(1)).getContestById(CONTEST_ID);
+        verify(eventService, times(1)).getContestById(CONTEST_ID);
         verify(model, times(1)).addAttribute(anyString(), eq(contest));
         verify(model, times(2)).addAttribute(anyString(), eq(Collections.emptyList()));
     }
@@ -81,8 +81,8 @@ public class WebUIControllerTest {
 
     @Test
     public void gamesRefreshTest() {
-        webUIController.gamesRefresh(model);
+        webUIController.eventsRefresh(model);
 
-        verify(gamesService, times(1)).invalidateGamesCache();
+        verify(eventService, times(1)).invalidateEventsCache();
     }
 }

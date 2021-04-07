@@ -1,16 +1,16 @@
 package com.dojo.apimock.service;
 
 
-import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
+import com.codenjoy.dojo.LeaderboardRequest;
+import com.codenjoy.dojo.LeaderboardResponse;
+import com.codenjoy.dojo.LeaderboardServiceGrpc;
+import com.codenjoy.dojo.Participant;
+import com.codenjoy.dojo.StartRequest;
+import com.codenjoy.dojo.StartResponse;
+import com.codenjoy.dojo.StopRequest;
+import com.codenjoy.dojo.StopResponse;
+import com.codenjoy.dojo.UserInfo;
 import com.dojo.apimock.LeaderBoardProvider;
-import com.dojo.apimock.LeaderboardRequest;
-import com.dojo.apimock.LeaderboardResponse;
-import com.dojo.apimock.Participant;
-import com.dojo.apimock.StartRequest;
-import com.dojo.apimock.StartResponse;
-import com.dojo.apimock.StopRequest;
-import com.dojo.apimock.StopResponse;
-import com.dojo.apimock.UserInfo;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceImplBase {
+public class LeaderboardService extends LeaderboardServiceGrpc.LeaderboardServiceImplBase {
 
     private final LeaderBoardProvider leaderBoardProvider;
 
     private final List<String> subscriptions;
 
     @Autowired
-    public ApiMockLeaderboardService(LeaderBoardProvider leaderBoardProvider) {
+    public LeaderboardService(LeaderBoardProvider leaderBoardProvider) {
         this.leaderBoardProvider = leaderBoardProvider;
         this.subscriptions = new ArrayList<>();
     }

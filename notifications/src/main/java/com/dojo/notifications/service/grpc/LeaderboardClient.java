@@ -1,12 +1,12 @@
 package com.dojo.notifications.service.grpc;
 
-import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
-import com.dojo.apimock.LeaderboardRequest;
-import com.dojo.apimock.LeaderboardResponse;
-import com.dojo.apimock.StartRequest;
-import com.dojo.apimock.StartResponse;
-import com.dojo.apimock.StopRequest;
-import com.dojo.apimock.StopResponse;
+import com.codenjoy.dojo.LeaderboardRequest;
+import com.codenjoy.dojo.LeaderboardResponse;
+import com.codenjoy.dojo.LeaderboardServiceGrpc;
+import com.codenjoy.dojo.StartRequest;
+import com.codenjoy.dojo.StartResponse;
+import com.codenjoy.dojo.StopRequest;
+import com.codenjoy.dojo.StopResponse;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
@@ -34,13 +34,12 @@ public class LeaderboardClient {
 
     private final LeaderboardNotifierService leaderboardNotifierService;
 
-    private final ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub leaderboardServiceBlockingStub;
-    private final ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub leaderboardServiceStub;
+    private final LeaderboardServiceGrpc.LeaderboardServiceBlockingStub leaderboardServiceBlockingStub;
+    private final LeaderboardServiceGrpc.LeaderboardServiceStub leaderboardServiceStub;
 
     @Autowired
-    public LeaderboardClient(LeaderboardNotifierService leaderboardNotifierService, ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub leaderboardServiceBlockingStub, ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub leaderboardServiceStub) {
+    public LeaderboardClient(LeaderboardNotifierService leaderboardNotifierService, LeaderboardServiceGrpc.LeaderboardServiceBlockingStub leaderboardServiceBlockingStub, LeaderboardServiceGrpc.LeaderboardServiceStub leaderboardServiceStub) {
         this.leaderboardNotifierService = leaderboardNotifierService;
-
         this.leaderboardServiceBlockingStub = leaderboardServiceBlockingStub;
         this.leaderboardServiceStub = leaderboardServiceStub;
     }

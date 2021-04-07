@@ -1,9 +1,9 @@
 package com.dojo.notifications.service.grpc;
 
-import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
-import com.dojo.apimock.LeaderboardRequest;
-import com.dojo.apimock.StartRequest;
-import com.dojo.apimock.StopRequest;
+import com.codenjoy.dojo.LeaderboardRequest;
+import com.codenjoy.dojo.LeaderboardServiceGrpc;
+import com.codenjoy.dojo.StartRequest;
+import com.codenjoy.dojo.StopRequest;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
@@ -29,9 +29,9 @@ public class LeaderboardClientTest {
     private Contest contest;
 
     @Mock
-    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub leaderboardServiceBlockingStub;
+    private LeaderboardServiceGrpc.LeaderboardServiceBlockingStub leaderboardServiceBlockingStub;
     @Mock
-    private ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub leaderboardServiceStub;
+    private LeaderboardServiceGrpc.LeaderboardServiceStub leaderboardServiceStub;
 
     private LeaderboardClient leaderboardClient;
 

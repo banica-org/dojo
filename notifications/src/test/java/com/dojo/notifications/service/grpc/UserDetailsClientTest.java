@@ -1,8 +1,8 @@
 package com.dojo.notifications.service.grpc;
 
-import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
-import com.dojo.apimock.UserDetailsRequest;
-import com.dojo.apimock.UserDetailsResponse;
+import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.UserDetailsResponse;
+import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ public class UserDetailsClientTest {
     private static final String EMAIL = "email";
 
     @Mock
-    private ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
+    private UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
 
     private UserDetailsClient userDetailsClient;
 
