@@ -4,6 +4,7 @@ import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
 import com.dojo.apimock.UserDetailsRequest;
 import com.dojo.apimock.UserDetailsResponse;
 import com.dojo.notifications.model.user.UserDetails;
+import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,16 @@ public class UserDetailsClient {
 
     public UserDetails getUserDetails(String userId) {
         UserDetailsRequest request = UserDetailsRequest.newBuilder().setId(userId).build();
-        UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetails(request);
+        try {
+            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetails(request);
+            UserDetails userDetails = new UserDetails();
+            userDetails.setId(response.getId());
+            userDetails.setEmail(response.getEmail());
 
-        UserDetails userDetails = new UserDetails();
-        userDetails.setId(response.getId());
-        userDetails.setEmail(response.getEmail());
-
-        return userDetails;
+            return userDetails;
+        } catch (StatusRuntimeException e) {
+            LOGGER.error("Cannot find user with id: {}", userId);
+            return null;
+        }
     }
 }
