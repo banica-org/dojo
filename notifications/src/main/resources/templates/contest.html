@@ -63,29 +63,21 @@
             <div class="container">
                 <div class="row border">
                     <div class="col">
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_ANY_LEADERBOARD_CHANGE" class="form-check-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}">
-                                <label class="form-check-label" for="newParticipantSlack">On any leaderboard change</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_CHANGED_SCORE" class="form-check-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">
-                                <label class="form-check-label" for="changeInScoresSlack">On change in scores</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_CHANGED_POSITION" class="form-check-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">
-                                <label class="form-check-label" for="changeInPositionsSlack">On change in positions</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="NO_NOTIFICATIONS" class="form-check-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">
-                                <label class="form-check-label" for="newParticipantSlack">No notifications</label>
-                            </div>
+                        <div class="form-option">
+                            <select class="form-control">
+                                <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}" inputmode="">
+                                    <label class="form-option-label" for="newParticipantSlack">On any leaderboard change</label>
+                                </option>
+                                <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">
+                                    <label class="form-option-label" for="changeInScoresSlack">On change in scores</label>
+                                </option>
+                                <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">
+                                    <label class="form-option-label" for="changeInPositionsSlack">On change in positions</label>
+                                </option>
+                                <option value="NO_NOTIFICATIONS" class="form-option-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">
+                                    <label class="form-option-label" for="noNotificationsSlack">No notifications</label>
+                                </option>
+                            </select>
                         </div>
                     </div>
                 </div>
