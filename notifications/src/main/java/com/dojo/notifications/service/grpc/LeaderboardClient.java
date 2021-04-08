@@ -3,8 +3,6 @@ package com.dojo.notifications.service.grpc;
 import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardResponse;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
-import com.codenjoy.dojo.StartRequest;
-import com.codenjoy.dojo.StartResponse;
 import com.codenjoy.dojo.StopRequest;
 import com.codenjoy.dojo.StopResponse;
 import com.dojo.notifications.model.contest.Contest;
@@ -25,7 +23,7 @@ import java.util.List;
 public class LeaderboardClient {
 
     private static final String RESPONSE_MESSAGE = "Response: {}";
-    private static final String NOTIFICATIONS_STARTED_MESSAGE = "Notifications started for contest {} {}";
+    private static final String NOTIFICATIONS_STARTED_MESSAGE = "Notifications started for contest {}";
     private static final String NOTIFICATION_STOPPED_MESSAGE = "Notifications stopped for contest {} {}";
     private static final String ERROR_MESSAGE = "Unable to request {}";
     private static final String COMPLETED_MESSAGE = "Completed.";
@@ -46,39 +44,32 @@ public class LeaderboardClient {
 
     public void startLeaderboardNotifications(Contest contest) {
         String contestId = contest.getContestId();
-        subscribeForNotifications(contestId);
-        getNotifications(contest);
-    }
+        LOGGER.info(NOTIFICATIONS_STARTED_MESSAGE, contestId);
 
-    public void stopLeaderboardNotifications(String contestId) {
-        final StopRequest request = StopRequest.newBuilder()
-                .setContestId(contestId)
-                .build();
+//TODO not looking good
+        final boolean[] isReceived = {false};
 
-        StopResponse response = leaderboardServiceBlockingStub.stopNotifications(request);
-        LOGGER.info(NOTIFICATION_STOPPED_MESSAGE, contestId, response);
-    }
-
-    private void subscribeForNotifications(String contestId) {
-        final StartRequest startRequest = StartRequest.newBuilder()
-                .setContestId(contestId)
-                .build();
-
-        StartResponse response = leaderboardServiceBlockingStub.startNotifications(startRequest);
-        LOGGER.info(NOTIFICATIONS_STARTED_MESSAGE, contestId, response);
-    }
-
-    private void getNotifications(Contest contest) {
         final LeaderboardRequest leaderboardRequest = LeaderboardRequest.newBuilder()
-                .setContestId(contest.getContestId())
+                .setContestId(contestId)
                 .build();
 
         leaderboardServiceStub.getLeaderboard(leaderboardRequest, new StreamObserver<LeaderboardResponse>() {
+
+
             @Override
             public void onNext(LeaderboardResponse leaderboardResponse) {
                 List<Participant> participants = getParticipants(leaderboardResponse);
 
-                leaderboardNotifierService.lookForLeaderboardChanges(contest, new Leaderboard(participants));
+                //TODO first time whole leaderboard, after that only updates
+                if (!isReceived[0]) {
+
+      //              leaderboardNotifierService.getLeaderboard(contest, new Leaderboard(participants));
+                    isReceived[0] = true;
+
+                } else {
+                    leaderboardNotifierService.lookForLeaderboardChanges(contest, new Leaderboard(participants));
+                }
+
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
             }
 
@@ -94,11 +85,20 @@ public class LeaderboardClient {
         });
     }
 
+    public void stopLeaderboardNotifications(String contestId) {
+        final StopRequest request = StopRequest.newBuilder()
+                .setContestId(contestId)
+                .build();
+
+        StopResponse response = leaderboardServiceBlockingStub.stopNotifications(request);
+        LOGGER.info(NOTIFICATION_STOPPED_MESSAGE, contestId, response);
+    }
+
     private List<Participant> getParticipants(LeaderboardResponse leaderboardResponse) {
         List<Participant> participants = new ArrayList<>();
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> {
-            UserInfo userInfo = new UserInfo(participantResponse.getUser().getId(), participantResponse.getUser().getName());
+            UserInfo userInfo = new UserInfo(participantResponse.getId(), participantResponse.getName());
             Participant participant = new Participant(userInfo, participantResponse.getScore());
             participants.add(participant);
         });
