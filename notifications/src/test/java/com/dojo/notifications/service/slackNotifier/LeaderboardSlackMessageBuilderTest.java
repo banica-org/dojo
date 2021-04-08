@@ -15,8 +15,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +29,7 @@ public class LeaderboardSlackMessageBuilderTest {
     private static final String USER_NAME = "John";
     private static final String USER_EMAIL = "John@email";
     private static final long USER_SCORE = 100;
+    private static final String MESSAGE = "Test";
 
     private static final String CHANNEL = "Channel";
     private static final String CONV_ID = "Conversation";
@@ -36,7 +37,7 @@ public class LeaderboardSlackMessageBuilderTest {
     private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
     private static final String COMMON_TITLE = "Leaderboard update";
 
-    private static final int BLOCKS_EXPECTED_SIZE = 3;
+    private static final int BLOCKS_EXPECTED_SIZE = 4;
     private static final int ATTACHMENTS_EXPECTED_SIZE = 1;
 
     private Leaderboard leaderboard;
@@ -56,9 +57,10 @@ public class LeaderboardSlackMessageBuilderTest {
     public void init() {
         UserInfo userInfo = new UserInfo(USER_ID, USER_NAME);
         Participant participant = new Participant(userInfo, USER_SCORE);
-        leaderboard = new Leaderboard(Collections.singletonList(participant));
+        TreeSet<Participant> participants = new TreeSet<>();
+        participants.add(participant);
+        leaderboard = new Leaderboard(participants);
 
-        //LeaderboardService leaderboardService = new LeaderboardService(configuration, userDetailsService);
         leaderboardSlackMessageBuilder = new LeaderboardSlackMessageBuilder();
 
         when(userDetailsService.getUserEmail(USER_ID)).thenReturn(USER_EMAIL);
@@ -68,7 +70,7 @@ public class LeaderboardSlackMessageBuilderTest {
     @Test
     public void generatePersonalSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -76,15 +78,15 @@ public class LeaderboardSlackMessageBuilderTest {
         assertEquals(ATTACHMENTS_EXPECTED_SIZE, attachments.size());
         assertEquals(BLOCKS_EXPECTED_SIZE, blocks.size());
 
-        assertTrue(blocks.get(1).toString().contains(USER_NAME));
-        assertTrue(blocks.get(1).toString().contains(String.valueOf(USER_SCORE)));
-        assertTrue(blocks.get(1).toString().contains(PERSONAL_TITLE));
+        assertTrue(blocks.get(2).toString().contains(USER_NAME));
+        assertTrue(blocks.get(2).toString().contains(String.valueOf(USER_SCORE)));
+        assertTrue(blocks.get(2).toString().contains(PERSONAL_TITLE));
     }
 
     @Test
     public void generateCommonSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, CHANNEL);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -92,8 +94,8 @@ public class LeaderboardSlackMessageBuilderTest {
         assertEquals(ATTACHMENTS_EXPECTED_SIZE, attachments.size());
         assertEquals(BLOCKS_EXPECTED_SIZE, blocks.size());
 
-        assertTrue(blocks.get(1).toString().contains(USER_NAME));
-        assertTrue(blocks.get(1).toString().contains(String.valueOf(USER_SCORE)));
-        assertTrue(blocks.get(1).toString().contains(COMMON_TITLE));
+        assertTrue(blocks.get(2).toString().contains(USER_NAME));
+        assertTrue(blocks.get(2).toString().contains(String.valueOf(USER_SCORE)));
+        assertTrue(blocks.get(2).toString().contains(COMMON_TITLE));
     }
 }
