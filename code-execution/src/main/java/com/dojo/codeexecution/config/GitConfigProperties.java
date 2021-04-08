@@ -17,6 +17,7 @@ public class GitConfigProperties {
     private String user;
     private String tokenCreateRepo;
     private String parentRepository;
+    private String webhookAddress;
     private Map<String, String> webhookConfig;
 
     public String getRepoToken() {
@@ -53,6 +54,14 @@ public class GitConfigProperties {
 
     public void setWebhookConfig(Map<String, String> webhookConfig) {
         this.webhookConfig = webhookConfig;
+    }
+
+    public String getWebhookAddress() {
+        return webhookAddress;
+    }
+
+    public void setWebhookAddress(String webhookAddress) {
+        this.webhookAddress = webhookAddress;
     }
 
     public String getParentRepository() {

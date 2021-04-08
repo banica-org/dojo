@@ -125,6 +125,7 @@ public class GitManagerTest {
         verify(gitHub, times(1)).getRepository(username);
         verify(ghRepository, times(1)).getHooks();
         verify(gitConfig, times(1)).getWebhookConfig();
+        verify(gitConfig, times(1)).getWebhookAddress();
     }
 
     @Test
@@ -141,5 +142,6 @@ public class GitManagerTest {
         verify(gitHub, times(1)).getRepository(username);
         verify(ghRepository, times(1)).getHooks();
         verify(gitConfig, times(1)).getWebhookConfig();
+        verify(gitConfig, times(1)).getWebhookAddress();
     }
 }
