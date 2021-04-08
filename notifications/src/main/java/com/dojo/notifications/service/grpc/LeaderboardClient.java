@@ -9,7 +9,6 @@ import com.dojo.apimock.StopRequest;
 import com.dojo.apimock.StopResponse;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
 import com.dojo.notifications.service.LeaderboardNotifierService;
@@ -18,10 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.reflect.generics.tree.Tree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 @Component
@@ -80,7 +77,7 @@ public class LeaderboardClient {
         leaderboardServiceStub.getLeaderboard(leaderboardRequest, new StreamObserver<LeaderboardResponse>() {
             @Override
             public void onNext(LeaderboardResponse leaderboardResponse) {
-                TreeSet<Participant> participants = getParticipants(leaderboardResponse);
+                Set<Participant> participants = getParticipants(leaderboardResponse);
 
                 leaderboardNotifierService.lookForLeaderboardChanges(contest, new Leaderboard(participants));
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
@@ -99,7 +96,8 @@ public class LeaderboardClient {
     }
 
     private TreeSet<Participant> getParticipants(LeaderboardResponse leaderboardResponse) {
-        TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
+        TreeSet<Participant> participants = new TreeSet<>();
+
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> {
             UserInfo userInfo = new UserInfo(participantResponse.getUser().getId(), participantResponse.getUser().getName());

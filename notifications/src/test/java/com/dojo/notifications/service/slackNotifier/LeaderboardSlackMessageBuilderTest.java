@@ -2,7 +2,6 @@ package com.dojo.notifications.service.slackNotifier;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -58,7 +57,7 @@ public class LeaderboardSlackMessageBuilderTest {
     public void init() {
         UserInfo userInfo = new UserInfo(USER_ID, USER_NAME);
         Participant participant = new Participant(userInfo, USER_SCORE);
-        TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
+        TreeSet<Participant> participants = new TreeSet<>();
         participants.add(participant);
         leaderboard = new Leaderboard(participants);
 

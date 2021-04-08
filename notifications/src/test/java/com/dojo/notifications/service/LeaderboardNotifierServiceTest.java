@@ -5,7 +5,6 @@ import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
@@ -39,8 +38,8 @@ public class LeaderboardNotifierServiceTest {
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Participant THIRD_PARTICIPANT = new Participant(new UserInfo("3", "ThirdUser"), 400);
 
-    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>(new SortComparator()));
-    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>(new SortComparator()));//Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
+    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
+    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());//Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
 
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
@@ -74,8 +73,8 @@ public class LeaderboardNotifierServiceTest {
         when(contest.getContestId()).thenReturn(DUMMY_CONTEST_ID);
         when(notificationService.getNotificationServiceTypeMapping()).thenReturn(NotifierType.EMAIL);
 
-        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT,SECOND_PARTICIPANT));
-        NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT,FIRST_PARTICIPANT,THIRD_PARTICIPANT));
+        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
+        NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
 
         leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, Collections.singletonList(notificationService));
 
@@ -105,7 +104,7 @@ public class LeaderboardNotifierServiceTest {
         when(selectRequestService.getRequests()).thenReturn(requests);
         when(flinkTableService.executeSingleQuery(any(), eq("NewLeaderboard"), any())).thenReturn(NEW_LEADERBOARD);
         when(flinkTableService.executeSingleQuery(any(), eq("OldLeaderboard"), any())).thenReturn(OLD_LEADERBOARD);
-        when(leaderboardService.isItTheWantedEventType(any(), any(), eq(EventType.POSITION_CHANGES))).thenReturn(true);
+        when(leaderboardService.isEventType(any(), any(), eq(EventType.POSITION_CHANGES))).thenReturn(true);
         when(leaderboardService.getUserDetails(any(), any())).thenReturn(Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS));
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
@@ -117,7 +116,7 @@ public class LeaderboardNotifierServiceTest {
         verify(selectRequestService, times(1)).getRequests();
         verify(flinkTableService, times(1)).executeSingleQuery(any(), eq("NewLeaderboard"), any());
         verify(flinkTableService, times(1)).executeSingleQuery(any(), eq("OldLeaderboard"), any());
-        verify(leaderboardService, times(1)).isItTheWantedEventType(any(), any(), eq(EventType.POSITION_CHANGES));
+        verify(leaderboardService, times(1)).isEventType(any(), any(), eq(EventType.POSITION_CHANGES));
         verify(leaderboardService, times(1)).getUserDetails(any(), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
@@ -135,7 +134,7 @@ public class LeaderboardNotifierServiceTest {
         when(selectRequestService.getRequests()).thenReturn(requests);
         when(flinkTableService.executeSingleQuery(any(), eq("NewLeaderboard"), any())).thenReturn(NEW_LEADERBOARD);
         when(flinkTableService.executeSingleQuery(any(), eq("OldLeaderboard"), any())).thenReturn(OLD_LEADERBOARD);
-        when(leaderboardService.isItTheWantedEventType(any(), any(), eq(EventType.SCORE_CHANGES))).thenReturn(true);
+        when(leaderboardService.isEventType(any(), any(), eq(EventType.SCORE_CHANGES))).thenReturn(true);
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
@@ -146,7 +145,7 @@ public class LeaderboardNotifierServiceTest {
         verify(selectRequestService, times(1)).getRequests();
         verify(flinkTableService, times(1)).executeSingleQuery(any(), eq("NewLeaderboard"), any());
         verify(flinkTableService, times(1)).executeSingleQuery(any(), eq("OldLeaderboard"), any());
-        verify(leaderboardService, times(1)).isItTheWantedEventType(any(), any(), eq(EventType.SCORE_CHANGES));
+        verify(leaderboardService, times(1)).isEventType(any(), any(), eq(EventType.SCORE_CHANGES));
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
         verify(notificationService, times(1)).notify(any(), any());

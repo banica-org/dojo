@@ -3,7 +3,6 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.leaderboard.SortComparator;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -30,8 +29,8 @@ public class LeaderboardServiceTest {
     private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Participant BETTER_FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 400);
-    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>(new SortComparator()));
-    private final Leaderboard POSITION_CHANGED_LEADERBOARD = new Leaderboard(new TreeSet<>(new SortComparator()));
+    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
+    private final Leaderboard POSITION_CHANGED_LEADERBOARD = new Leaderboard(new TreeSet<>());
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
 
@@ -42,11 +41,11 @@ public class LeaderboardServiceTest {
     private LeaderboardService leaderboardService;
 
     @Before
-    public void init(){
-        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT,SECOND_PARTICIPANT));
+    public void init() {
+        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
         FIRST_USER_DETAILS.setId("1");
         SECOND_USER_DETAILS.setId("2");
-        POSITION_CHANGED_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT,BETTER_FIRST_PARTICIPANT));
+        POSITION_CHANGED_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, BETTER_FIRST_PARTICIPANT));
     }
 
     @Test
@@ -54,7 +53,7 @@ public class LeaderboardServiceTest {
 
 
         //Act
-        boolean actual = leaderboardService.isItTheWantedEventType(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD, EventType.POSITION_CHANGES);
+        boolean actual = leaderboardService.isEventType(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD, EventType.POSITION_CHANGES);
 
         //Assert
         Assert.assertTrue(actual);
@@ -65,13 +64,13 @@ public class LeaderboardServiceTest {
         //Arrange
         Participant scoreChange = new Participant(new UserInfo("2", "SecondUser"), 420);
 
-        TreeSet<Participant> treeSet = new TreeSet<>(new SortComparator());
+        TreeSet<Participant> treeSet = new TreeSet<>();
         treeSet.add(FIRST_PARTICIPANT);
         treeSet.add(scoreChange);
         Leaderboard newLeaderboard = new Leaderboard(treeSet);
 
         //Act
-        boolean actual = leaderboardService.isItTheWantedEventType(newLeaderboard, OLD_LEADERBOARD, EventType.SCORE_CHANGES);
+        boolean actual = leaderboardService.isEventType(newLeaderboard, OLD_LEADERBOARD, EventType.SCORE_CHANGES);
 
         //Assert
         Assert.assertTrue(actual);
@@ -82,7 +81,7 @@ public class LeaderboardServiceTest {
         //Arrange
 
         //Act
-        boolean actual = leaderboardService.isItTheWantedEventType(OLD_LEADERBOARD, OLD_LEADERBOARD, EventType.OTHER_LEADERBOARD_CHANGE);
+        boolean actual = leaderboardService.isEventType(OLD_LEADERBOARD, OLD_LEADERBOARD, EventType.OTHER_LEADERBOARD_CHANGE);
 
         //Assert
         Assert.assertTrue(actual);
