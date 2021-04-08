@@ -65,22 +65,29 @@
                     <div class="col">
                         <div class="form-group">
                             <select class="form-control" th:field="*{slackCommonNotifications}">
-                                <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}" inputmode="">
-                                    <label class="form-option-label" for="newParticipantSlack">On any leaderboard change</label>
-                                </option>
-                                <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">
-                                    <label class="form-option-label" for="changeInScoresSlack">On change in scores</label>
-                                </option>
-                                <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">
-                                    <label class="form-option-label" for="changeInPositionsSlack">On change in positions</label>
-                                </option>
-                                <option value="NO_NOTIFICATIONS" class="form-option-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">
-                                    <label class="form-option-label" for="noNotificationsSlack">No notifications</label>
-                                </option>
+                                <th:block th:if="*{slackCommonNotifications}">
+                                    <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}">On any leaderboard change
+                                    </option>
+                                    <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">On change in scores
+                                    </option>
+                                    <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">On change in positions
+                                    </option>
+                                    <option value="NO_NOTIFICATIONS" class="form-option-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">No notifications
+                                    </option>
+                                </th:block>
                             </select>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <h5>Custom query for leaderboard</h5>
+            <div class="container">
+                <label>SELECT *</label>
+                <br>
+                <label>FROM Leaderboard</label>
+                <br>
+                <input type="text" name="query" id="query" th:field="*{request}"/>
             </div>
 
             <hr>
@@ -116,29 +123,19 @@
             <div class="container">
                 <div class="row border">
                     <div class="col">
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_ANY_LEADERBOARD_CHANGE" class="form-check-input" id="newParticipantEmail" th:field="*{emailCommonNotifications}">
-                                <label class="form-check-label" for="newParticipantEmail">On any leaderboard change</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_CHANGED_SCORE" class="form-check-input" id="changeInScoresEmail" th:field="*{emailCommonNotifications}">
-                                <label class="form-check-label" for="changeInScoresEmail">On change in scores</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="ON_CHANGED_POSITION" class="form-check-input" id="changeInPositionsEmail" th:field="*{emailCommonNotifications}">
-                                <label class="form-check-label" for="changeInPositionsEmail">On change in positions</label>
-                            </div>
-                        </div>
-                        <div class="form-check">
-                            <div class="form-check">
-                                <input type="radio" value="NO_NOTIFICATIONS" class="form-check-input" id="noNotificationsEmail" th:field="*{emailCommonNotifications}">
-                                <label class="form-check-label" for="newParticipantEmail">No notifications</label>
-                            </div>
+                        <div class="form-group">
+                            <select class="form-control" th:field="*{emailCommonNotifications}">
+                                <th:block th:if="*{emailCommonNotifications}">
+                                    <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantEmail" th:field="*{emailCommonNotifications}">On any leaderboard change
+                                    </option>
+                                    <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresEmail" th:field="*{emailCommonNotifications}">On change in scores
+                                    </option>
+                                    <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsEmail" th:field="*{emailCommonNotifications}">On change in positions
+                                    </option>
+                                    <option value="NO_NOTIFICATIONS" class="form-option-input" id="noNotificationsEmail" th:field="*{emailCommonNotifications}">No notifications
+                                    </option>
+                                </th:block>
+                            </select>
                         </div>
                     </div>
                 </div>
