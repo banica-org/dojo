@@ -11,6 +11,10 @@
 
     <artifactId>code-execution</artifactId>
 
+    <properties>
+        <docker-java.version>3.2.7</docker-java.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -23,6 +27,19 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
+        </dependency>
+
+<!--        Docker-->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>${docker-java.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java-transport-jersey -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>${docker-java.version}</version>
         </dependency>
 
         <dependency>

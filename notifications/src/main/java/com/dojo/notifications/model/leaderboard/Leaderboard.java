@@ -8,18 +8,17 @@ import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Leaderboard {
 
     private static final UserDetails COMMON = null;
 
-    private final List<Participant> participants;
+    private final Set<Participant> participants;
 
-    public Leaderboard(List<Participant> participants) {
+    public Leaderboard(Set<Participant> participants) {
         this.participants = participants;
     }
 
@@ -28,26 +27,34 @@ public class Leaderboard {
     }
 
     public String getUserIdByPosition(int position) {
-        return this.participants.get(position).getUser().getId();
+        for (Participant p : participants) {
+            if (position == 0) {
+                return p.getUser().getId();
+            }
+            position--;
+        }
+        return "No such position";
     }
 
     public long getScoreByPosition(int position) {
-        return this.participants.get(position).getScore();
+        for (Participant p : participants) {
+            if (position == 0) {
+                return p.getScore();
+            }
+            position--;
+        }
+        return -1;
     }
 
-    public Participant getParticipantByPosition(int position) {
-        return this.participants.get(position);
-    }
-
-    public List<Participant> getParticipants() {
-        return Collections.unmodifiableList(this.participants);
+    public Set<Participant> getParticipants() {
+        return this.participants;
     }
 
     public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
         AtomicInteger position = new AtomicInteger(1);
         StringBuilder names = new StringBuilder();
 
-        participants.forEach(participant -> {
+        getParticipants().forEach(participant -> {
             String userId = slackClient.getSlackUserId(userDetailsService.getUserEmail(participant.getUser().getId()));
             String nameWithLink = "<slack://user?team=null&id=" + userId + "|" + participant.getUser().getName() + ">";
             String name = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ?
@@ -63,14 +70,13 @@ public class Leaderboard {
     public Text buildLeaderboardScores(UserDetails userDetails) {
         StringBuilder scores = new StringBuilder();
 
-        participants.forEach(participant -> {
+        getParticipants().forEach(participant -> {
             String score = (userDetails != COMMON && participant.getUser().getId().equals(userDetails.getId())) ? SlackNotificationUtils.makeBold(participant.getScore())
                     : String.valueOf(participant.getScore());
             scores.append(score).append("\n");
         });
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
-
 
     @Override
     public boolean equals(Object o) {
