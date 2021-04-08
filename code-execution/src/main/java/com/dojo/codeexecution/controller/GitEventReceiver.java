@@ -43,6 +43,14 @@ public class GitEventReceiver {
         return "OK";
     }
 
+    @GetMapping(path = "/build")
+    public String buildContainer() {
+        File dockerfile = new File("code-execution/src/main/docker/Dockerfile");
+        dockerService.buildImage(dockerfile, Collections.singleton("user-param"),
+                "giivanov722", "docker-test-parent");
+        return "OK";
+    }
+
     @GetMapping(path = "/run")
     public String runContainer() {
         dockerService.runContainer("user-param");
