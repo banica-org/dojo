@@ -12,19 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GitManager {
 
+    public static final String HOOK_URL = "http://192.168.1.104:8081/pushEvent";
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
-
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
-
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
 
@@ -32,6 +33,19 @@ public class GitManager {
     public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
         this.gitConfig = gitConfig;
         this.gitHub = gitHub;
+    }
+
+    @PostConstruct
+    public void buildParentWebHook() throws IOException {
+        GHRepository repository = gitHub.getRepository(gitConfig.getParentRepository());
+        Map<String, String> webhookConfig = gitConfig.getWebhookConfig();
+
+        if (repository.getHooks().size() == 0) {
+            repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
+                    Collections.singletonList(GHEvent.PUSH), true);
+        }
+
+        webhookConfig.put("url", HOOK_URL);
     }
 
     @Retryable
