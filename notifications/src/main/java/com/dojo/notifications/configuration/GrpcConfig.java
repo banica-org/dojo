@@ -2,40 +2,35 @@ package com.dojo.notifications.configuration;
 
 import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
 import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
+import com.dojo.common.GrpcChannel;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 @ConfigurationProperties
 @Component
 public class GrpcConfig {
 
-    private final ManagedChannel managedChannel;
+    private final GrpcChannel grpcChannel;
 
     public GrpcConfig(@Value("${grpc.server.host}") String host, @Value("${grpc.server.port}") int port) {
-        this.managedChannel = ManagedChannelBuilder.forAddress(host, port)
-                .usePlaintext()
-                .keepAliveTime(2, TimeUnit.MINUTES)
-                .build();
+        this.grpcChannel = new GrpcChannel(host, port);
     }
 
     @Bean
     public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub getLeaderboardBlockingStub() {
-        return ApiMockLeaderboardServiceGrpc.newBlockingStub(this.managedChannel);
+        return ApiMockLeaderboardServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
     }
 
     @Bean
     public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub getLeaderboardStub() {
-        return ApiMockLeaderboardServiceGrpc.newStub(this.managedChannel);
+        return ApiMockLeaderboardServiceGrpc.newStub(this.grpcChannel.getManagedChannel());
     }
 
     @Bean
     public ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub getUserDetailsBlockingStub() {
-        return ApiMockUserDetailsServiceGrpc.newBlockingStub(this.managedChannel);
+        return ApiMockUserDetailsServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
     }
 }
