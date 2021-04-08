@@ -10,6 +10,7 @@ import com.hubspot.slack.client.models.blocks.objects.TextType;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Leaderboard {
@@ -79,11 +80,16 @@ public class Leaderboard {
     }
 
     public void updateParticipant(Participant updatedParticipant) {
+        AtomicBoolean isUpdated = new AtomicBoolean(false);
         this.participants.forEach(participant -> {
             if (participant.getUser().equals(updatedParticipant.getUser())) {
                 participant.setScore(updatedParticipant.getScore());
+                isUpdated.set(true);
             }
         });
+        if (!isUpdated.get()) {
+            this.participants.add(updatedParticipant);
+        }
     }
 
     @Override

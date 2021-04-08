@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -34,9 +36,12 @@ import static org.mockito.Mockito.when;
 public class LeaderboardNotifierServiceTest {
 
     private final String DUMMY_CONTEST_ID = "149";
+    private final String ANOTHER_CONTEST_ID = "153";
     private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Participant THIRD_PARTICIPANT = new Participant(new UserInfo("3", "ThirdUser"), 400);
+    private final Participant UPDATED_PARTICIPANT = new Participant(new UserInfo("3", "ThirdUser"), 800);
+
 
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());//Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
@@ -65,6 +70,7 @@ public class LeaderboardNotifierServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    Map<String, Leaderboard> leaderboards;
 
     private LeaderboardNotifierService leaderboardNotifierService;
 
@@ -78,11 +84,31 @@ public class LeaderboardNotifierServiceTest {
 
         leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, Collections.singletonList(notificationService));
 
-        Map<String, Leaderboard> leaderboards = new ConcurrentHashMap<>();
+        leaderboards = new ConcurrentHashMap<>();
         leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);
         ReflectionTestUtils.setField(leaderboardNotifierService, "leaderboards", leaderboards);
 
         leaderBoardNotificationsType.put(NotifierType.EMAIL, CommonNotificationsLevel.ON_ANY_LEADERBOARD_CHANGE);
+    }
+
+    @Test
+    public void isBoardReceivedTest() {
+        assertTrue(leaderboardNotifierService.isBoardReceived(DUMMY_CONTEST_ID));
+    }
+
+    @Test
+    public void getLeaderboardOnStartTest() {
+        leaderboardNotifierService.getLeaderboardOnStart(ANOTHER_CONTEST_ID, OLD_LEADERBOARD);
+        assertEquals(2, leaderboards.size());
+    }
+
+    @Test
+    public void getLeaderboardUpdateTest() {
+        leaderboardNotifierService.getLeaderboardUpdate(contest, THIRD_PARTICIPANT);
+        assertEquals(400, leaderboards.get(DUMMY_CONTEST_ID).getScoreByPosition(0));
+
+        leaderboardNotifierService.getLeaderboardUpdate(contest, UPDATED_PARTICIPANT);
+        assertEquals(800, leaderboards.get(DUMMY_CONTEST_ID).getScoreByPosition(0));
     }
 
     @Test

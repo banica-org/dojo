@@ -69,12 +69,12 @@ public class LeaderboardClient {
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
 
                 String contestId = contest.getContestId();
-                if (!leaderboardNotifierService.isBoardRecieved(contestId)) {
+                if (!leaderboardNotifierService.isBoardReceived(contestId)) {
 
                     leaderboardNotifierService.getLeaderboardOnStart(contestId, getLeaderboard(leaderboardResponse));
                 } else {
 
-                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.getLeaderboardUpdate(contest, getParticipant(participantResponse)));
+                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.getLeaderboardUpdate(contest, convertToParticipant(participantResponse)));
                 }
             }
 
@@ -93,11 +93,11 @@ public class LeaderboardClient {
     private Leaderboard getLeaderboard(LeaderboardResponse leaderboardResponse) {
         TreeSet<Participant> participants = new TreeSet<>();
 
-        leaderboardResponse.getParticipantList().forEach(participantResponse -> participants.add(getParticipant(participantResponse)));
+        leaderboardResponse.getParticipantList().forEach(participantResponse -> participants.add(convertToParticipant(participantResponse)));
         return new Leaderboard(participants);
     }
 
-    private Participant getParticipant(com.codenjoy.dojo.Participant participantResponse) {
+    private Participant convertToParticipant(com.codenjoy.dojo.Participant participantResponse) {
         UserInfo userInfo = new UserInfo(participantResponse.getId(), participantResponse.getName());
         return new Participant(userInfo, participantResponse.getScore());
     }

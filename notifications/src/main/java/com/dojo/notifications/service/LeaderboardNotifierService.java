@@ -50,7 +50,7 @@ public class LeaderboardNotifierService {
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
     }
 
-    public boolean isBoardRecieved(String contestId) {
+    public boolean isBoardReceived(String contestId) {
         return leaderboards.containsKey(contestId);
     }
 
