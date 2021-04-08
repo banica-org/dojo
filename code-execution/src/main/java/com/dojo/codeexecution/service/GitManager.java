@@ -41,10 +41,11 @@ public class GitManager {
     public void buildParentWebHook() throws IOException {
         GHRepository repository = gitHub.getRepository(gitConfig.getParentRepository());
 
-        Map<String, String> webhookConfig = new HashMap<>(gitConfig.getWebhookConfig());
-        webhookConfig.put("url", gitConfig.getWebhookAddress()+"/"+PARENT_HOOK);
 
         if (repository.getHooks().size() == 0) {
+            Map<String, String> webhookConfig = new HashMap<>(gitConfig.getWebhookConfig());
+            webhookConfig.put("url", gitConfig.getWebhookAddress()+PARENT_HOOK);
+
             repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
                     Collections.singletonList(GHEvent.PUSH), true);
         }
