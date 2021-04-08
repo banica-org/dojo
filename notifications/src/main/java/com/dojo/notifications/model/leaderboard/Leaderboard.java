@@ -78,6 +78,14 @@ public class Leaderboard {
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 
+    public void updateParticipant(Participant updatedParticipant) {
+        this.participants.forEach(participant -> {
+            if (participant.getUser().equals(updatedParticipant.getUser())) {
+                participant.setScore(updatedParticipant.getScore());
+            }
+        });
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,4 +98,6 @@ public class Leaderboard {
     public int hashCode() {
         return Objects.hash(participants);
     }
+
+
 }
