@@ -81,15 +81,6 @@
                 </div>
             </div>
 
-            <h5>Custom query for leaderboard</h5>
-            <div class="container">
-                <label>SELECT *</label>
-                <br>
-                <label>FROM Leaderboard</label>
-                <br>
-                <input type="text" name="query" id="query" th:field="*{request}"/>
-            </div>
-
             <hr>
             <br>
             <h5>Personal slack notifications</h5>
@@ -162,6 +153,29 @@
 
             </div>
         </form>
+
+        <h5>Custom query for leaderboard</h5>
+        <div class="container">
+            <form action="#" th:action="@{/request}"  th:object="${newRequest}" method="post">
+                <table border="1">
+                    <tr>
+                        <td><label>SELECT</label><input type="text" th:field="*{queryParameters}" /></td>
+                    </tr>
+                    <tr>
+                        <td><label>FROM Leaderboard</label></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" th:field="*{querySpecification}" /></td>
+                    </tr>
+                    <tr>
+                        <td><label>Describe your query</label><input type="text" th:field="*{describingMessage}" /></td>
+                    </tr>
+                    <tr>
+                        <td><input type="submit" value="Add"/></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
     </div>
 
     <br>

@@ -3,6 +3,7 @@ package com.dojo.notifications.web;
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Game;
+import com.dojo.notifications.model.request.SelectRequestModel;
 import com.dojo.notifications.service.GamesService;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,9 @@ public class WebUIControllerTest {
     private Model model;
 
     @Mock
+    private SelectRequestModel selectRequestModel;
+
+    @Mock
     private GamesService gamesService;
     @Mock
     private ContestController contestController;
@@ -55,7 +59,7 @@ public class WebUIControllerTest {
         when(game.getTitle()).thenReturn(CONTEST_TITLE);
         when(gamesService.getGameById(CONTEST_ID)).thenReturn(game);
 
-        webUIController.newContest(contest, model);
+        webUIController.newContest(contest, selectRequestModel, model);
 
         verify(gamesService, times(1)).getGameById(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);

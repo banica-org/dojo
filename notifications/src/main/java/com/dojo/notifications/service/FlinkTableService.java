@@ -11,7 +11,6 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.CloseableIterator;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class FlinkTableService {
 
         DataStream<Tuple3<String, String, Long>> tuple3DataStream = convertToTuple3DataStream(executionEnvironment, participants);
 
-        tableEnvironment.createTemporaryView(tableName, tuple3DataStream);
+        tableEnvironment.createTemporaryView(tableName, tuple3DataStream,"id, name, points");
         String queryFormatted = String.format(query, tableName);
         TableResult tableLeaderboard = tableEnvironment.sqlQuery(queryFormatted).execute();
         tableEnvironment.dropTemporaryView(tableName);
@@ -67,6 +66,7 @@ public class FlinkTableService {
         TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
 
         rowsNew.forEachRemaining(row -> {
+            System.out.println(row.toString());
             UserInfo userInfo = new UserInfo((String) row.getField(USER_ID_POSITION), (String) row.getField(USER_NAME_POSITION));
             Participant participant = new Participant(userInfo, (long) row.getField(USER_SCORE_POSITION));
             participants.add(participant);
