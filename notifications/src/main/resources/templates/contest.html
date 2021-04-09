@@ -64,16 +64,13 @@
                 <div class="row border">
                     <div class="col">
                         <div class="form-group">
-                            <select class="form-control" th:field="*{slackCommonNotifications}">
+                            <select class="form-control" th:value="${selectRequest}" th:field="*{slackCommonNotifications}">
                                 <th:block th:if="*{slackCommonNotifications}">
-                                    <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{slackCommonNotifications}">On any leaderboard change
+                                    <option value="NO_NOTIFICATIONS" class="form-option-input"
+                                            id="noNotificationsSlack" th:field="*{slackCommonNotifications}">No notifications
                                     </option>
-                                    <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresSlack" th:field="*{slackCommonNotifications}">On change in scores
-                                    </option>
-                                    <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsSlack" th:field="*{slackCommonNotifications}">On change in positions
-                                    </option>
-                                    <option value="NO_NOTIFICATIONS" class="form-option-input" id="noNotificationsSlack" th:field="*{slackCommonNotifications}">No notifications
-                                    </option>
+                                    <option th:each="query : ${queries}" th:value="${query.eventType}"
+                                            th:text="${query.message}" th:field="*{slackCommonNotifications}"></option>
                                 </th:block>
                             </select>
                         </div>
@@ -157,7 +154,8 @@
         <h5>Custom query for leaderboard</h5>
         <div class="container">
             <form action="#" th:action="@{/request}"  th:object="${newRequest}" method="post">
-                <table border="1">
+                <table>
+                    <tr border="1">
                     <tr>
                         <td><label>SELECT</label><input type="text" th:field="*{queryParameters}" /></td>
                     </tr>
@@ -172,6 +170,16 @@
                     </tr>
                     <tr>
                         <td><input type="submit" value="Add"/></td>
+                    </tr>
+                    <tr>
+                        <select th:field="*{eventType}">
+                            <option value="ON_ANY_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{eventType}">On any leaderboard change
+                            </option>
+                            <option value="ON_CHANGED_SCORE" class="form-option-input" id="changeInScoresSlack" th:field="*{eventType}">On change in scores
+                            </option>
+                            <option value="ON_CHANGED_POSITION" class="form-option-input" id="changeInPositionsSlack" th:field="*{eventType}">On change in positions
+                            </option>
+                        </select>
                     </tr>
                 </table>
             </form>

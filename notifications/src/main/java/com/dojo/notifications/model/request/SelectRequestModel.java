@@ -8,6 +8,7 @@ public class SelectRequestModel {
     private String queryParameters;
     private String querySpecification;
     private String describingMessage;
+    private String eventType;
 
 
     public SelectRequestModel(){
@@ -39,4 +40,11 @@ public class SelectRequestModel {
         return querySpecification;
     }
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
 }

@@ -7,19 +7,15 @@ import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
 import com.dojo.notifications.service.GamesService;
 import com.dojo.notifications.service.SelectRequestService;
-import jdk.nashorn.internal.objects.annotations.Getter;
-import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
 
 @Controller
 public class WebUIController {
@@ -40,6 +36,7 @@ public class WebUIController {
 
     @GetMapping("/contest")
     public String contestsPage(Model model) {
+        this.addSlackOptions(model);
         return setupContestsPage(model, new Contest(), new SelectRequestModel());
     }
 
@@ -59,7 +56,8 @@ public class WebUIController {
     @PostMapping("/request")
     public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model) {
         setupRequestPage(model, new SelectRequestModel());
-        setupQueryUpdate(newRequest);
+        setupQueryUpdate(newRequest, model);
+        addSlackOptions(model);
         return redirect(model);
     }
 
@@ -92,21 +90,28 @@ public class WebUIController {
         return "contest";
     }
 
+    public void addSlackOptions(Model model){
+        List<SelectRequest> selectRequestList = selectRequestService.getRequests();
+        model.addAttribute("queries", selectRequestList);
+
+    }
+
     private String setupRequestPage(Model model, SelectRequestModel newRequest) {
         model.addAttribute("newRequest", newRequest);
         model.addAttribute("queryParameters", newRequest.getQueryParameters());
         model.addAttribute("querySpecification", newRequest.getQuerySpecification());
         model.addAttribute("describingMessage", newRequest.getDescribingMessage());
+        model.addAttribute("eventType", newRequest.getEventType());
 
         return "request";
     }
 
-    private void setupQueryUpdate(SelectRequestModel newRequest) {
+    private void setupQueryUpdate(SelectRequestModel newRequest, Model model) {
         SelectRequest selectRequest = new SelectRequest();
 
         selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM %s " + newRequest.getQuerySpecification());
         selectRequest.setMessage(newRequest.getDescribingMessage());
-        selectRequest.setEventType("POSITION_CHANGES");
+        selectRequest.setEventType(newRequest.getEventType());
         selectRequest.setQuantifier("ALL");
         selectRequestService.saveRequest(selectRequest);
     }
