@@ -59,7 +59,7 @@ public class WebUIControllerTest {
         when(game.getTitle()).thenReturn(CONTEST_TITLE);
         when(gamesService.getGameById(CONTEST_ID)).thenReturn(game);
 
-        webUIController.newContest(contest, selectRequestModel, model);
+        webUIController.newContest(contest, model,"start");
 
         verify(gamesService, times(1)).getGameById(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);

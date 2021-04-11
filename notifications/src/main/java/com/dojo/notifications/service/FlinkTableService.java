@@ -66,7 +66,6 @@ public class FlinkTableService {
         TreeSet<Participant> participants = new TreeSet<>(new SortComparator());
 
         rowsNew.forEachRemaining(row -> {
-            System.out.println(row.toString());
             UserInfo userInfo = new UserInfo((String) row.getField(USER_ID_POSITION), (String) row.getField(USER_NAME_POSITION));
             Participant participant = new Participant(userInfo, (long) row.getField(USER_SCORE_POSITION));
             participants.add(participant);

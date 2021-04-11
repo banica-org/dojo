@@ -9,9 +9,10 @@ public class SelectRequestModel {
     private String querySpecification;
     private String describingMessage;
     private String eventType;
+    private String communicationLevel;
 
 
-    public SelectRequestModel(){
+    public SelectRequestModel() {
         this.queryParameters = "*";
         this.querySpecification = "";
     }
@@ -46,5 +47,23 @@ public class SelectRequestModel {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getCommunicationLevel(String eventType) {
+        switch (eventType) {
+            case "OTHER_LEADERBOARD_CHANGE": communicationLevel = "ON_ANY_LEADERBOARD_CHANGE";
+                break;
+            case "POSITION_CHANGES": communicationLevel = "ON_CHANGED_POSITION";
+                break;
+            case "SCORE_CHANGES": communicationLevel = "ON_CHANGED_SCORE";
+                break;
+
+            default: communicationLevel = "NO_NOTIFICATIONS";
+        }
+        return communicationLevel;
+    }
+
+    public void setCommonLevel(String commonLevel) {
+        this.communicationLevel = commonLevel;
     }
 }
