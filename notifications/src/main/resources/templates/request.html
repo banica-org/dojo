@@ -11,26 +11,28 @@
 </head>
 
 <body>
-    <h5>Custom query for leaderboard</h5>
+    <h2 style="text-align:center">Custom query for leaderboard</h2>
     <div class="container">
         <form action="#" th:action="@{/request}"  th:object="${newRequest}" method="post">
-            <table border="1">
+            <table align="center">
                 <tr>
-                    <td><label>SELECT</label><input type="text" th:field="*{queryParameters}" /></td>
+                    <td>
+                        <br>
+                        <label>SELECT</label>
+                        <input type="text" style="width:275px" th:field="*{queryParameters}" value="*"/>
+                    </td>
                 </tr>
                 <tr>
                     <td><label>FROM Leaderboard</label></td>
                 </tr>
                 <tr>
-                    <td><input type="text" th:field="*{querySpecification}" /></td>
-                </tr>
-                <tr>
-                    <td><label>Describe your query:  </label><input type="text" th:field="*{describingMessage}" /></td>
+                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" value="WHERE/FETCH/ETC."/></td>
                 </tr>
                 <tr>
                     <td>
                     <label>Select a notifier type:  </label>
-                    <select th:field="*{eventType}">
+                        <br>
+                    <select style="width:330px" th:field="*{eventType}">
                         <option value="OTHER_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{eventType}">Notify on any leaderboard change
                         </option>
                         <option value="SCORE_CHANGES" class="form-option-input" id="changeInScoresSlack" th:field="*{eventType}">Notify on score changes
@@ -41,7 +43,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="submit" th:value="Add"/></td>
+                    <td>
+                        <label>Describe your query:  </label>
+                        <br>
+                        <input type="text" style="width:330px" th:field="*{describingMessage}" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br>
+                        <button type="submit" style="text-align:left"  class="btn btn-primary" name="action" value="add"/>Add</button>
+                        <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
+                            <button type="submit" style="margin-left:215px;" class="btn btn-primary" name="action" value="back" formnovalidate/>Back</button>
+                        </form>
+                    </td>
                 </tr>
             </table>
         </form>

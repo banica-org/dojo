@@ -37,7 +37,7 @@ public class WebUIController {
 
     @GetMapping("/contest")
     public String contestsPage(Model model) {
-        this.addSlackOptions(model);
+        this.addDropDownOptions(model);
         return setupContestsPage(model, new Contest());
     }
 
@@ -51,18 +51,21 @@ public class WebUIController {
         Game selectedGame = gamesService.getGameById(newContest.getContestId());
         newContest.setTitle(selectedGame.getTitle());
         contestController.subscribeForContest(newContest);
+        this.addDropDownOptions(model);
         return setupContestsPage(model, new Contest());
     }
 
     @GetMapping("/contest/open/{id}")
     public String editContest(@PathVariable String id, Model model) {
         Contest existingContest = gamesService.getContestById(id);
+        this.addDropDownOptions(model);
         return setupContestsPage(model, existingContest);
     }
 
     @GetMapping("/contest/stop/{id}")
     public String stopContest(@PathVariable String id, Model model) {
         contestController.stopNotifications(id);
+        this.addDropDownOptions(model);
         return setupContestsPage(model, new Contest());
     }
 
@@ -78,10 +81,14 @@ public class WebUIController {
     }
 
     @PostMapping("/request")
-    public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model) {
-        setupRequestPage(model, new SelectRequestModel());
-        setupQueryUpdate(newRequest);
-        addSlackOptions(model);
+    public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model,
+                             @RequestParam(value = "action", required = true) String action) {
+        if(action.equals("add")) {
+            setupRequestPage(model, new SelectRequestModel());
+            setupQueryUpdate(newRequest);
+            addDropDownOptions(model);
+            return redirect(model);
+        }
         return redirect(model);
     }
 
@@ -114,22 +121,8 @@ public class WebUIController {
         selectRequestService.saveRequest(selectRequest);
     }
 
-    public void addSlackOptions(Model model) {
+    public void addDropDownOptions(Model model) {
         List<SelectRequest> selectRequestList = selectRequestService.getRequests();
-
-//        selectRequestList.forEach(selectRequest -> {
-//            String convertToCommon = selectRequest.getEventType();
-//            switch (convertToCommon) {
-//                case "OTHER_LEADERBOARD_CHANGE": selectRequest.setEventType("ON_ANY_LEADERBOARD_CHANGE");
-//                    break;
-//                case "POSITION_CHANGES": selectRequest.setEventType("ON_CHANGED_POSITION");
-//                    break;
-//                case "SCORE_CHANGES": selectRequest.setEventType("ON_CHANGED_SCORE");
-//                    break;
-//                default:
-//                    selectRequest.setEventType("NO_NOTIFICATIONS");
-//            }
-//        });
         model.addAttribute("queries", selectRequestList);
     }
 }
