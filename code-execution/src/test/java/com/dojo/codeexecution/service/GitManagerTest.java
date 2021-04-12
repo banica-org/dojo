@@ -3,6 +3,8 @@ package com.dojo.codeexecution.service;
 import com.dojo.codeexecution.config.GitConfigProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kohsuke.github.GHHook;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
@@ -36,6 +38,12 @@ public class GitManagerTest {
 
     @Mock
     private GHUser dummyUser;
+
+    @Mock
+    private GHRepository ghRepository;
+
+    @Mock
+    private GHHook ghHook;
 
     @Test
     public void getExistingRepositoryReturnsRepository() throws IOException {
@@ -104,4 +112,36 @@ public class GitManagerTest {
         assertEquals(false, actual);
     }
 
+    @Test
+    public void buildParentWebHookWhenNoHook() throws IOException {
+        //Arrange
+        when(gitHub.getRepository(username)).thenReturn(ghRepository);
+        when(gitConfig.getParentRepository()).thenReturn(username);
+
+        //Act
+        gitManager.buildParentWebHook();
+
+        //Assert
+        verify(gitHub, times(1)).getRepository(username);
+        verify(ghRepository, times(1)).getHooks();
+        verify(gitConfig, times(1)).getWebhookConfig();
+        verify(gitConfig, times(1)).getWebhookAddress();
+    }
+
+    @Test
+    public void buildParentWebHookWhenIsHookAvailable() throws IOException {
+        //Arrange
+        when(ghRepository.getHooks()).thenReturn(Collections.singletonList(ghHook));
+        when(gitHub.getRepository(username)).thenReturn(ghRepository);
+        when(gitConfig.getParentRepository()).thenReturn(username);
+
+        //Act
+        gitManager.buildParentWebHook();
+
+        //Assert
+        verify(gitHub, times(1)).getRepository(username);
+        verify(ghRepository, times(1)).getHooks();
+        verify(gitConfig, times(1)).getWebhookConfig();
+        verify(gitConfig, times(1)).getWebhookAddress();
+    }
 }
