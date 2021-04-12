@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public final class GrpcServer {
@@ -20,13 +21,20 @@ public final class GrpcServer {
 
     private final Server server;
 
-    private final ExecutorService waitingForServerExecutor;
+    private final ExecutorService applicationExecutor;
 
-    public GrpcServer(final int port, final BindableService... services) {
-        final ServerBuilder<?> serverBuilder = NettyServerBuilder.forPort(port).directExecutor();
+
+    public GrpcServer(final int applicationExecutorPoolSize, final int port, final BindableService... services) {
+        applicationExecutor = Executors.newFixedThreadPool(applicationExecutorPoolSize);
+
+        final ServerBuilder<?> serverBuilder = NettyServerBuilder
+                .forPort(port)
+                .executor(applicationExecutor)
+                .keepAliveTime(1, TimeUnit.MINUTES)
+                .permitKeepAliveTime(1, TimeUnit.MINUTES);
+
         Stream.of(services).forEach(serverBuilder::addService);
         server = serverBuilder.build();
-        waitingForServerExecutor = Executors.newSingleThreadExecutor();
     }
 
     @PostConstruct
@@ -37,7 +45,7 @@ public final class GrpcServer {
     }
 
     private void waitForServerAsynchronously() {
-        waitingForServerExecutor.submit(() -> {
+        applicationExecutor.submit(() -> {
             try {
                 server.awaitTermination();
             } catch (final InterruptedException exception) {
@@ -49,7 +57,7 @@ public final class GrpcServer {
     @PreDestroy
     private void destroy() {
         server.shutdownNow();
-        waitingForServerExecutor.shutdownNow();
+        applicationExecutor.shutdownNow();
         LOGGER.info("Server stopped!");
     }
 

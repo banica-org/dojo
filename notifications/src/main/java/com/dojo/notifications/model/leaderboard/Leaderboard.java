@@ -9,16 +9,16 @@ import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
 import java.util.Objects;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Leaderboard {
 
     private static final UserDetails COMMON = null;
 
-    private final TreeSet<Participant> participants;
+    private final Set<Participant> participants;
 
-    public Leaderboard(TreeSet<Participant> participants) {
+    public Leaderboard(Set<Participant> participants) {
         this.participants = participants;
     }
 
@@ -46,7 +46,7 @@ public class Leaderboard {
         return -1;
     }
 
-    public TreeSet<Participant> getParticipants() {
+    public Set<Participant> getParticipants() {
         return this.participants;
     }
 

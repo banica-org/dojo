@@ -19,7 +19,7 @@ public class LeaderboardService {
         this.userDetailsService = userDetailsService;
     }
 
-    public boolean isItTheWantedEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard, EventType eventType) {
+    public boolean isEventType(Leaderboard newLeaderboard, Leaderboard oldLeaderboard, EventType eventType) {
 
         if (IntStream.range(0, Math.min(newLeaderboard.getParticipantsCount(), oldLeaderboard.getParticipantsCount()))
                 .filter(i -> !oldLeaderboard.getUserIdByPosition(i).equals(newLeaderboard.getUserIdByPosition(i)))

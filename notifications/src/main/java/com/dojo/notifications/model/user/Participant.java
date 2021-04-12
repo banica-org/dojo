@@ -9,7 +9,7 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Participant {
+public class Participant implements Comparable<Participant> {
     private UserInfo user;
     private long score;
 
@@ -25,5 +25,10 @@ public class Participant {
     @Override
     public int hashCode() {
         return Objects.hash(user, score);
+    }
+
+    @Override
+    public int compareTo(Participant o) {
+        return (int) (o.getScore() - this.getScore());
     }
 }

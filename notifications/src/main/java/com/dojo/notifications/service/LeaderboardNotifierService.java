@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -59,8 +59,8 @@ public class LeaderboardNotifierService {
                 && !oldLeaderboard.getParticipants().isEmpty()
                 && !oldLeaderboard.equals(newLeaderboard)) {
 
-            TreeSet<Participant> newParticipants = newLeaderboard.getParticipants();
-            TreeSet<Participant> oldParticipants = oldLeaderboard.getParticipants();
+            Set<Participant> newParticipants = newLeaderboard.getParticipants();
+            Set<Participant> oldParticipants = oldLeaderboard.getParticipants();
 
             try {
                 for (SelectRequest request : selectRequestService.getRequests()) {
@@ -86,7 +86,7 @@ public class LeaderboardNotifierService {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType eventTypeQuery = EventType.valueOf(eventType);
-        boolean actual = leaderboardService.isItTheWantedEventType(newQueriedLeaderboard, oldQueriedLeaderboard, eventTypeQuery);
+        boolean actual = leaderboardService.isEventType(newQueriedLeaderboard, oldQueriedLeaderboard, eventTypeQuery);
 
         if (actual) {
             if (eventTypeQuery.equals(EventType.POSITION_CHANGES)) {
