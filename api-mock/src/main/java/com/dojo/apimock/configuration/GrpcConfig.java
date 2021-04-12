@@ -1,5 +1,6 @@
 package com.dojo.apimock.configuration;
 
+import com.dojo.apimock.service.EventService;
 import com.dojo.apimock.service.LeaderboardService;
 import com.dojo.apimock.service.UserDetailsService;
 import com.dojo.common.GrpcServer;
@@ -17,8 +18,9 @@ public class GrpcConfig {
     public GrpcConfig(@Value("${executor.pool.size}") final int applicationExecutorPoolSize,
                       @Value("${grpc.server.port}") final int port,
                       final LeaderboardService leaderboardService,
-                      final UserDetailsService userDetailsService) {
-        this.grpcServer = new GrpcServer(applicationExecutorPoolSize, port, leaderboardService, userDetailsService);
+                      final UserDetailsService userDetailsService,
+                      final EventService eventService) {
+        this.grpcServer = new GrpcServer(applicationExecutorPoolSize, port, leaderboardService, userDetailsService, eventService);
     }
 
     @Bean

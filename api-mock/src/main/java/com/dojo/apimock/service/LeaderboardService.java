@@ -5,11 +5,8 @@ import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardResponse;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.Participant;
-import com.codenjoy.dojo.StartRequest;
-import com.codenjoy.dojo.StartResponse;
 import com.codenjoy.dojo.StopRequest;
 import com.codenjoy.dojo.StopResponse;
-import com.codenjoy.dojo.UserInfo;
 import com.dojo.apimock.LeaderBoardProvider;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,9 @@ public class LeaderboardService extends LeaderboardServiceGrpc.LeaderboardServic
     public void getLeaderboard(LeaderboardRequest request, StreamObserver<LeaderboardResponse> responseObserver) {
 
         AtomicInteger requestNumber = new AtomicInteger(1);
+        this.subscriptions.add(request.getContestId());
+        responseObserver.onNext(getNextLeaderboard(0, request.getContestId()));
+
         while (subscriptions.contains(request.getContestId())) {
             responseObserver.onNext(getNextLeaderboard(requestNumber.getAndIncrement(), request.getContestId()));
             try {
@@ -50,6 +50,14 @@ public class LeaderboardService extends LeaderboardServiceGrpc.LeaderboardServic
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void stopNotifications(StopRequest request, StreamObserver<StopResponse> responseObserver) {
+        String contestId = request.getContestId();
+        subscriptions.remove(contestId);
+        responseObserver.onNext(StopResponse.newBuilder().build());
+        responseObserver.onCompleted();
+    }
+
     private LeaderboardResponse getNextLeaderboard(int requestNumber, String contestId) {
         List<LinkedHashMap<String, Object>> leaderboard = generateLeaderboard(requestNumber, contestId);
 
@@ -59,32 +67,12 @@ public class LeaderboardService extends LeaderboardServiceGrpc.LeaderboardServic
                     String name = (String) obj.get("name");
                     long score = new Long((Integer) obj.get("score"));
                     return Participant.newBuilder()
-                            .setUser(UserInfo.newBuilder()
-                                    .setId(id)
-                                    .setName(name).build())
+                            .setId(id)
+                            .setName(name)
                             .setScore(score)
                             .build();
                 }).collect(Collectors.toList()))
                 .build();
-    }
-
-    @Override
-    public void stopNotifications(StopRequest request, StreamObserver<StopResponse> responseObserver) {
-        String contestId = request.getContestId();
-        subscriptions.remove(contestId);
-        responseObserver.onNext(StopResponse.newBuilder().build());
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void startNotifications(StartRequest request, StreamObserver<StartResponse> responseObserver) {
-        String contestId = request.getContestId();
-        if (!subscriptions.contains(contestId)) {
-            subscriptions.add(contestId);
-        }
-
-        responseObserver.onNext(StartResponse.newBuilder().build());
-        responseObserver.onCompleted();
     }
 
     private List<LinkedHashMap<String, Object>> generateLeaderboard(int requestNumber, String contestId) {
