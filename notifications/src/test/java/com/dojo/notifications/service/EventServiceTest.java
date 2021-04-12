@@ -1,8 +1,8 @@
 package com.dojo.notifications.service;
 
+import com.dojo.notifications.grpc.leaderboard.EventClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
-import com.dojo.notifications.service.grpc.EventClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,13 +98,6 @@ public class EventServiceTest {
     }
 
     @Test
-    public void addContestTest() {
-        eventService.addContest(contest);
-
-        verify(notificationManagingService, times(1)).startNotifications(contest);
-    }
-
-    @Test
     public void getContestByIdTest() {
         eventService.addContest(contest);
 
@@ -114,11 +107,21 @@ public class EventServiceTest {
     }
 
     @Test
-    public void stopContestById() {
+    public void addContestTest() {
+        assertTrue(eventService.getAllContests().isEmpty());
+
+        eventService.addContest(contest);
+
+        assertEquals(1, eventService.getAllContests().size());
+        verify(notificationManagingService, times(1)).startNotifications(contest);
+    }
+
+    @Test
+    public void removeContestTest() {
         eventService.addContest(contest);
         assertFalse(eventService.getAllContests().isEmpty());
 
-        eventService.stopContestById(ROOM);
+        eventService.removeContest(ROOM);
 
         assertTrue(eventService.getAllContests().isEmpty());
         verify(notificationManagingService, times(1)).stopNotifications(ROOM);

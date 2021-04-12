@@ -139,6 +139,6 @@ public class ContestControllerTest {
         //Assert
         assertEquals(expected, actual);
         verify(eventService, times(1)).getContestById("1");
-        verify(eventService, times(1)).stopContestById(null);
+        verify(eventService, times(1)).removeContest(null);
     }
 }

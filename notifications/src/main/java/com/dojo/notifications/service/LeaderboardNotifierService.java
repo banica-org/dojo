@@ -9,6 +9,7 @@ import com.dojo.notifications.model.notification.PersonalLeaderboardNotification
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.notificationService.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

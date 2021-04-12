@@ -2,11 +2,12 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
-import com.dojo.notifications.service.grpc.EventClient;
+import com.dojo.notifications.grpc.leaderboard.EventClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class EventService {
             eventRepo = new HashMap<>();
             eventList.forEach(event -> eventRepo.put(event.getRoomName(), event));
         }
-        return eventRepo.values();
+        return Collections.unmodifiableCollection(eventRepo.values());
     }
 
     public void invalidateEventsCache() {
@@ -61,7 +62,7 @@ public class EventService {
         contestRepo.put(contest.getContestId(), contest);
     }
 
-    public void stopContestById(String contestId) {
+    public void removeContest(String contestId) {
         notificationManagingService.stopNotifications(contestId);
         contestRepo.remove(contestId);
     }

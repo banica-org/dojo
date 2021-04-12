@@ -1,8 +1,9 @@
-package com.dojo.notifications.service.grpc;
+package com.dojo.notifications.grpc;
 
 import com.codenjoy.dojo.UserDetailsRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
+import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

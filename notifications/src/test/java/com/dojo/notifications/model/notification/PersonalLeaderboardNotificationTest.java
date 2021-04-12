@@ -4,10 +4,10 @@ import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.UserDetailsService;
-import com.dojo.notifications.service.emailNotifier.LeaderboardMailMessageBuilder;
-import com.dojo.notifications.service.emailNotifier.MailContentBuilder;
-import com.dojo.notifications.service.slackNotifier.LeaderboardSlackMessageBuilder;
-import com.dojo.notifications.service.slackNotifier.SlackMessageBuilder;
+import com.dojo.notifications.service.messageGenerator.mail.LeaderboardMailMessageGenerator;
+import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;
+import com.dojo.notifications.service.messageGenerator.slack.LeaderboardSlackMessageGenerator;
+import com.dojo.notifications.service.messageGenerator.slack.SlackMessageGenerator;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.models.blocks.Divider;
 import org.junit.Before;
@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -68,23 +67,23 @@ public class PersonalLeaderboardNotificationTest {
         contextParams.put(MESSAGE_KEY, REQUEST_MESSAGE);
         contextParams.put(USERDETAILS_KEY, userDetails);
 
-        MailContentBuilder mailContentBuilder = mock(LeaderboardMailMessageBuilder.class);
-        when(mailContentBuilder.generateMailContent(contextParams)).thenReturn(MESSAGE);
+        MailMessageGenerator mailMessageGenerator = mock(LeaderboardMailMessageGenerator.class);
+        when(mailMessageGenerator.generateMessage(contextParams)).thenReturn(MESSAGE);
 
-        String actual = leaderboardNotification.getAsEmailNotification(mailContentBuilder);
+        String actual = leaderboardNotification.getAsEmailNotification(mailMessageGenerator);
 
-        verify(mailContentBuilder, times(1)).generateMailContent(contextParams);
+        verify(mailMessageGenerator, times(1)).generateMessage(contextParams);
         assertEquals(actual, MESSAGE);
     }
 
     @Test
     public void getAsSlackNotificationTest() {
-        SlackMessageBuilder slackMessageBuilder = mock(LeaderboardSlackMessageBuilder.class);
-        when(slackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE))
+        SlackMessageGenerator slackMessageGenerator = mock(LeaderboardSlackMessageGenerator.class);
+        when(slackMessageGenerator.generateMessage(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE))
                 .thenReturn(chatPostMessageParams);
 
-        leaderboardNotification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+        leaderboardNotification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
 
-        verify(slackMessageBuilder, times(1)).generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, REQUEST_MESSAGE);
+        verify(slackMessageGenerator, times(1)).generateMessage(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, REQUEST_MESSAGE);
     }
 }

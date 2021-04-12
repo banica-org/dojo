@@ -1,4 +1,4 @@
-package com.dojo.notifications.service.grpc;
+package com.dojo.notifications.grpc.leaderboard;
 
 import com.codenjoy.dojo.EventServiceGrpc;
 import com.codenjoy.dojo.EventsRequest;

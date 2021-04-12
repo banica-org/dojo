@@ -34,7 +34,7 @@ public class ContestController {
     ResponseEntity<String> stopNotifications(@PathVariable String id) {
         Contest contest = eventService.getContestById(id);
         if (contest != null) {
-            eventService.stopContestById(contest.getContestId());
+            eventService.removeContest(contest.getContestId());
         }
         return new ResponseEntity<>("DELETE Response", HttpStatus.OK);
     }

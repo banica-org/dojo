@@ -1,8 +1,9 @@
-package com.dojo.notifications.service.grpc;
+package com.dojo.notifications.grpc;
 
 import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.StopRequest;
+import com.dojo.notifications.grpc.leaderboard.LeaderboardClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
