@@ -12,18 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GitManager {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
+    private static final String PARENT_HOOK = "build";
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
@@ -32,6 +35,20 @@ public class GitManager {
     public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
         this.gitConfig = gitConfig;
         this.gitHub = gitHub;
+    }
+
+    @PostConstruct
+    public void buildParentWebHook() throws IOException {
+        GHRepository repository = gitHub.getRepository(gitConfig.getParentRepository());
+
+
+        if (repository.getHooks().size() == 0) {
+            Map<String, String> webhookConfig = new HashMap<>(gitConfig.getWebhookConfig());
+            webhookConfig.put("url", gitConfig.getWebhookAddress()+PARENT_HOOK);
+
+            repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
+                    Collections.singletonList(GHEvent.PUSH), true);
+        }
     }
 
     @Retryable
