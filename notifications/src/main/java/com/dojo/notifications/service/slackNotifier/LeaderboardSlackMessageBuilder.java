@@ -31,24 +31,25 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     private static final UserDetails COMMON = null;
 
     @Override
-    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel) {
+    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
         Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(userDetails);
 
-        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE);
+        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE, queryMessage);
     }
 
     @Override
-    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel) {
+    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
         Text leaderboardNames = leaderboard.buildLeaderboardNames(COMMON, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(COMMON);
 
-        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE);
+        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE, queryMessage);
     }
 
-    private ChatPostMessageParams getChatPostMessageParams(String slackChannel, Text leaderboardNames, Text leaderboardScores, String personalTitle) {
+    private ChatPostMessageParams getChatPostMessageParams(String slackChannel, Text leaderboardNames, Text leaderboardScores, String personalTitle, String queryMessage) {
         ChatPostMessageParams.Builder builder = ChatPostMessageParams.builder();
         addDivider(builder);
+        addMessage(builder, queryMessage);
         addUsersWithScores(builder, personalTitle, leaderboardNames, leaderboardScores);
         addDivider(builder);
         addRedirectButton(builder);
@@ -60,14 +61,17 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
         builder.addBlocks(Divider.builder().build());
     }
 
+    private void addMessage(ChatPostMessageParams.Builder builder, String queryMessage) {
+        builder.addBlocks(Section.of(Text.of(TextType.PLAIN_TEXT, queryMessage)));
+    }
+
     private void addUsersWithScores(ChatPostMessageParams.Builder builder, String title, Text leaderboardNames, Text leaderboardScores) {
-        builder.addBlocks(
-                Section.of(Text.of(TextType.MARKDOWN, SlackNotificationUtils.makeBold(title)))
-                        .withFields(
-                                Text.of(TextType.MARKDOWN, USER),
-                                Text.of(TextType.MARKDOWN, SCORE),
-                                leaderboardNames,
-                                leaderboardScores));
+        builder.addBlocks(Section.of(Text.of(TextType.MARKDOWN, SlackNotificationUtils.makeBold(title)))
+                .withFields(
+                        Text.of(TextType.MARKDOWN, USER),
+                        Text.of(TextType.MARKDOWN, SCORE),
+                        leaderboardNames,
+                        leaderboardScores));
     }
 
     private void addRedirectButton(ChatPostMessageParams.Builder builder) {

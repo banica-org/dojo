@@ -14,14 +14,14 @@ public class PersonalLeaderboardNotification extends LeaderboardNotification {
 
     private final UserDetails userDetails;
 
-    public PersonalLeaderboardNotification(UserDetailsService userDetailsService, Leaderboard leaderboard, UserDetails userDetails) {
-        super(userDetailsService, leaderboard);
+    public PersonalLeaderboardNotification(UserDetailsService userDetailsService, Leaderboard leaderboard, UserDetails userDetails, String message) {
+        super(userDetailsService, leaderboard, message);
         this.userDetails = userDetails;
     }
 
     @Override
     public ChatPostMessageParams getAsSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient, String slackChannel) {
-        return slackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, slackChannel);
+        return slackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, slackChannel, super.message);
     }
 
     @Override

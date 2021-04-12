@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Component
 public class LeaderboardClient {
@@ -77,7 +77,7 @@ public class LeaderboardClient {
         leaderboardServiceStub.getLeaderboard(leaderboardRequest, new StreamObserver<LeaderboardResponse>() {
             @Override
             public void onNext(LeaderboardResponse leaderboardResponse) {
-                List<Participant> participants = getParticipants(leaderboardResponse);
+                Set<Participant> participants = getParticipants(leaderboardResponse);
 
                 leaderboardNotifierService.lookForLeaderboardChanges(contest, new Leaderboard(participants));
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
@@ -95,8 +95,9 @@ public class LeaderboardClient {
         });
     }
 
-    private List<Participant> getParticipants(LeaderboardResponse leaderboardResponse) {
-        List<Participant> participants = new ArrayList<>();
+    private TreeSet<Participant> getParticipants(LeaderboardResponse leaderboardResponse) {
+        TreeSet<Participant> participants = new TreeSet<>();
+
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> {
             UserInfo userInfo = new UserInfo(participantResponse.getUser().getId(), participantResponse.getUser().getName());

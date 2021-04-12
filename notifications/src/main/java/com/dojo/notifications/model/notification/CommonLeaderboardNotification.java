@@ -9,13 +9,13 @@ import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 
 public class CommonLeaderboardNotification extends LeaderboardNotification {
 
-    public CommonLeaderboardNotification(UserDetailsService userDetailsService, Leaderboard leaderboard) {
-        super(userDetailsService, leaderboard);
+    public CommonLeaderboardNotification(UserDetailsService userDetailsService, Leaderboard leaderboard, String message) {
+        super(userDetailsService, leaderboard, message);
     }
 
     @Override
     public ChatPostMessageParams getAsSlackNotification(SlackMessageBuilder slackMessageBuilder, CustomSlackClient slackClient, String slackChannel) {
-        return slackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, slackChannel);
+        return slackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, slackChannel, super.message);
     }
 
     @Override
