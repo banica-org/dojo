@@ -1,5 +1,6 @@
 package com.dojo.codeexecution.controller;
 
+import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -13,14 +14,21 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class GameResultController {
+    private final RestTemplate restTemplate;
+    private final CodenjoyConfigProperties codenjoyConfigProperties;
+
     @Autowired
-    private RestTemplate restTemplate;
+    public GameResultController(RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
+        this.restTemplate = restTemplate;
+        this.codenjoyConfigProperties = codenjoyConfigProperties;
+    }
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
         String username = testResult.getUsername();
         int points = testResult.getPoints();
-        final String url = "http://localhost:8080/codenjoy-contest/rest/game/update/" + username + "/score";
+        final String url = codenjoyConfigProperties.getPointsUpdateUrlStart() + username
+                + codenjoyConfigProperties.getPointsUpdateUrlTail();
         HttpHeaders headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_JSON);
