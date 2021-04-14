@@ -63,15 +63,17 @@ public class DockerServiceTest {
     @Test
     public void runContainer() {
         //Arrange
+        String dummyContainerName = dummyImageTag.split(":")[0] + (dockerServiceImpl.getContainerCnt()+1);
         CreateContainerResponse createContainerResponse = mock(CreateContainerResponse.class);
         StartContainerCmd startContainerCmdMock = mock(StartContainerCmd.class);
         WaitContainerCmd waitContainerMock = mock(WaitContainerCmd.class);
         ResultCallback.Adapter resultCallback = mock(ResultCallback.Adapter.class);
+        System.out.println(dummyContainerName);
 
         //Act
         when(dockerConfigProperties.getShellArguments()).thenReturn(Collections.singletonList(""));
         when(dockerClient.createContainerCmd(dummyImageTag).withCmd(dockerConfigProperties.getShellArguments())
-                .withName(dummyImageTag.split(":")[0])
+                .withName(dummyContainerName)
                 .exec()).thenReturn(createContainerResponse);
         when(createContainerResponse.getId()).thenReturn(dummyId);
         when(dockerClient.startContainerCmd(dummyId)).thenReturn(startContainerCmdMock);
@@ -132,7 +134,7 @@ public class DockerServiceTest {
         ResultCallback.Adapter resultCallbackMock = mock(ResultCallback.Adapter.class);
 
         //Act
-        when(dockerClient.logContainerCmd(dummyId).withStdOut(true).withStdErr(true).withTail(3))
+        when(dockerClient.logContainerCmd(dummyId).withStdErr(true))
                 .thenReturn(logContainerCmdMock);
         when(logContainerCmdMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallbackMock);
         when(resultCallbackMock.awaitCompletion()).thenReturn(resultCallbackMock);

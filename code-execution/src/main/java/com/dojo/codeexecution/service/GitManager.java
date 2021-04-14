@@ -30,11 +30,13 @@ public class GitManager {
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
+    private final DockerService dockerService;
 
     @Autowired
-    public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
+    public GitManager(GitConfigProperties gitConfig, GitHub gitHub, DockerService dockerService) {
         this.gitConfig = gitConfig;
         this.gitHub = gitHub;
+        this.dockerService = dockerService;
     }
 
     @PostConstruct
@@ -50,6 +52,7 @@ public class GitManager {
             repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
                     Collections.singletonList(GHEvent.PUSH), true);
         }
+        dockerService.buildImage();
     }
 
     @Retryable

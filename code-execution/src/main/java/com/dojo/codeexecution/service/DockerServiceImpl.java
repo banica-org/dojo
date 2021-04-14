@@ -28,12 +28,14 @@ public class DockerServiceImpl implements DockerService {
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
     private final GitConfigProperties gitConfigProperties;
+    private int containerCnt;
 
     @Autowired
     public DockerServiceImpl(DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
+        this.containerCnt = 0;
     }
 
     public void runContainer(String imageTag) {
@@ -56,8 +58,7 @@ public class DockerServiceImpl implements DockerService {
     }
 
     public List<String> getContainerLog(String containerId) throws InterruptedException {
-        LogContainerCmd logContainerCmd = dockerClient.logContainerCmd(containerId)
-                .withStdOut(true).withStdErr(true).withTail(3);
+        LogContainerCmd logContainerCmd = dockerClient.logContainerCmd(containerId).withStdErr(true);
         List<String> logs = new ArrayList<>();
         logContainerCmd.exec(getLogCallBack(logs)).awaitCompletion();
         return logs;
@@ -67,6 +68,7 @@ public class DockerServiceImpl implements DockerService {
         dockerClient.removeContainerCmd(containerId)
                 .withRemoveVolumes(true)
                 .withForce(true).exec();
+        containerCnt--;
     }
 
     private String getImageTag(String imageId) {
@@ -75,9 +77,11 @@ public class DockerServiceImpl implements DockerService {
     }
 
     private CreateContainerResponse createContainer(String imageTag) {
+        containerCnt++;
+        String containerName = imageTag.split(":")[0] + this.getContainerCnt();
         return dockerClient.createContainerCmd(imageTag)
                 .withCmd(dockerConfigProperties.getShellArguments())
-                .withName(imageTag.split(":")[0]).exec();
+                .withName(containerName).exec();
     }
 
     private BuildImageResultCallback getImageBuildResultCallBack() {
@@ -118,4 +122,7 @@ public class DockerServiceImpl implements DockerService {
         };
     }
 
+    public int getContainerCnt() {
+        return this.containerCnt;
+    }
 }
