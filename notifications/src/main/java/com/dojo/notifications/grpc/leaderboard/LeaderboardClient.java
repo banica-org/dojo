@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.TreeSet;
 
 
@@ -89,7 +90,7 @@ public class LeaderboardClient {
     }
 
     private Leaderboard getLeaderboard(LeaderboardResponse leaderboardResponse) {
-        TreeSet<Participant> participants = new TreeSet<>();
+        Set<Participant> participants = new TreeSet<>();
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> participants.add(convertToParticipant(participantResponse)));
         return new Leaderboard(participants);
