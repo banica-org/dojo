@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -34,26 +32,16 @@ public class GitEventReceiver {
         return true;
     }
 
-    //develop endpoints
-    @GetMapping(path = "/build/run")
-    public String buildAndRunContainer() {
-        File dockerfile = new File("code-execution/src/main/docker/Dockerfile");
-        dockerService.runContainer(dockerService.buildImage(dockerfile, Collections.singleton("user-param"),
-                "giivanov722", "docker-test-parent"));
-        return "OK";
-    }
-
     @GetMapping(path = "/build")
-    public String buildContainer() {
-        File dockerfile = new File("code-execution/src/main/docker/Dockerfile");
-        dockerService.buildImage(dockerfile, Collections.singleton("user-param"),
-                "giivanov722", "docker-test-parent");
+    public String buildParent() {
+        dockerService.buildImage();
         return "OK";
     }
 
+    //Currently not able to trigger the webhook which calls this endpoint from github
     @GetMapping(path = "/run")
-    public String runContainer() {
-        dockerService.runContainer("user-param");
+    public String runContainer(@RequestBody Map<String, String> payload) {
+        dockerService.runContainer(payload.get("full_name"));
         return "OK";
     }
 }
