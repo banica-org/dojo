@@ -94,21 +94,21 @@ public class LeaderboardNotifierServiceTest {
 
     @Test
     public void isBoardReceivedTest() {
-        assertTrue(leaderboardNotifierService.isBoardReceived(DUMMY_CONTEST_ID));
+        assertTrue(leaderboardNotifierService.isLeaderboardReceived(DUMMY_CONTEST_ID));
     }
 
     @Test
     public void getLeaderboardOnStartTest() {
-        leaderboardNotifierService.getLeaderboardOnStart(ANOTHER_CONTEST_ID, OLD_LEADERBOARD);
+        leaderboardNotifierService.setLeaderboardOnStart(ANOTHER_CONTEST_ID, OLD_LEADERBOARD);
         assertEquals(2, leaderboards.size());
     }
 
     @Test
     public void getLeaderboardUpdateTest() {
-        leaderboardNotifierService.getLeaderboardUpdate(contest, THIRD_PARTICIPANT);
+        leaderboardNotifierService.updateLeaderboard(contest, THIRD_PARTICIPANT);
         assertEquals(400, leaderboards.get(DUMMY_CONTEST_ID).getScoreByPosition(0));
 
-        leaderboardNotifierService.getLeaderboardUpdate(contest, UPDATED_PARTICIPANT);
+        leaderboardNotifierService.updateLeaderboard(contest, UPDATED_PARTICIPANT);
         assertEquals(800, leaderboards.get(DUMMY_CONTEST_ID).getScoreByPosition(0));
     }
 

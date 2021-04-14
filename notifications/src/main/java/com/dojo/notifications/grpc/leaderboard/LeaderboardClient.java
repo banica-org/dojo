@@ -69,12 +69,10 @@ public class LeaderboardClient {
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
 
                 String contestId = contest.getContestId();
-                if (!leaderboardNotifierService.isBoardReceived(contestId)) {
-
-                    leaderboardNotifierService.getLeaderboardOnStart(contestId, getLeaderboard(leaderboardResponse));
+                if (!leaderboardNotifierService.isLeaderboardReceived(contestId)) {
+                    leaderboardNotifierService.setLeaderboardOnStart(contestId, getLeaderboard(leaderboardResponse));
                 } else {
-
-                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.getLeaderboardUpdate(contest, convertToParticipant(participantResponse)));
+                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.updateLeaderboard(contest, convertToParticipant(participantResponse)));
                 }
             }
 
