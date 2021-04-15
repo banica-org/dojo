@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class UserResultUpdateHandler {
+public class TestResultUpdateHandler {
     private final Set<StreamObserver<TestResultResponse>> streamObservers;
 
-    public UserResultUpdateHandler() {
+    public TestResultUpdateHandler() {
         this.streamObservers = new HashSet<>();
     }
 

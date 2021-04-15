@@ -9,7 +9,7 @@ import com.dojo.codeexecution.TestResultRequest;
 import com.dojo.codeexecution.TestResultResponse;
 import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
 import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
-import com.dojo.codeexecution.service.grpc.handler.UserResultUpdateHandler;
+import com.dojo.codeexecution.service.grpc.handler.TestResultUpdateHandler;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ import org.springframework.stereotype.Service;
 public class DockerService extends DockerServiceGrpc.DockerServiceImplBase {
     private final ImageUpdateHandler imageUpdateHandler;
     private final ContainerUpdateHandler containerUpdateHandler;
-    private final UserResultUpdateHandler userResultUpdateHandler;
+    private final TestResultUpdateHandler testResultUpdateHandler;
 
     @Autowired
-    public DockerService(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, UserResultUpdateHandler userResultUpdateHandler) {
+    public DockerService(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, TestResultUpdateHandler testResultUpdateHandler) {
         this.imageUpdateHandler = imageUpdateHandler;
         this.containerUpdateHandler = containerUpdateHandler;
-        this.userResultUpdateHandler = userResultUpdateHandler;
+        this.testResultUpdateHandler = testResultUpdateHandler;
     }
 
     @Override
@@ -39,6 +39,6 @@ public class DockerService extends DockerServiceGrpc.DockerServiceImplBase {
 
     @Override
     public void getTestResults(TestResultRequest request, StreamObserver<TestResultResponse> responseObserver) {
-        userResultUpdateHandler.addObserver(responseObserver);
+        testResultUpdateHandler.addObserver(responseObserver);
     }
 }
