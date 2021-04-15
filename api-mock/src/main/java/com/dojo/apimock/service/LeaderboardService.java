@@ -1,16 +1,13 @@
 package com.dojo.apimock.service;
 
 
-import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
+import com.codenjoy.dojo.LeaderboardRequest;
+import com.codenjoy.dojo.LeaderboardResponse;
+import com.codenjoy.dojo.LeaderboardServiceGrpc;
+import com.codenjoy.dojo.Participant;
+import com.codenjoy.dojo.StopRequest;
+import com.codenjoy.dojo.StopResponse;
 import com.dojo.apimock.LeaderBoardProvider;
-import com.dojo.apimock.LeaderboardRequest;
-import com.dojo.apimock.LeaderboardResponse;
-import com.dojo.apimock.Participant;
-import com.dojo.apimock.StartRequest;
-import com.dojo.apimock.StartResponse;
-import com.dojo.apimock.StopRequest;
-import com.dojo.apimock.StopResponse;
-import com.dojo.apimock.UserInfo;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,14 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceImplBase {
+public class LeaderboardService extends LeaderboardServiceGrpc.LeaderboardServiceImplBase {
 
     private final LeaderBoardProvider leaderBoardProvider;
 
     private final List<String> subscriptions;
 
     @Autowired
-    public ApiMockLeaderboardService(LeaderBoardProvider leaderBoardProvider) {
+    public LeaderboardService(LeaderBoardProvider leaderBoardProvider) {
         this.leaderBoardProvider = leaderBoardProvider;
         this.subscriptions = new ArrayList<>();
     }
@@ -38,6 +35,9 @@ public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.Api
     public void getLeaderboard(LeaderboardRequest request, StreamObserver<LeaderboardResponse> responseObserver) {
 
         AtomicInteger requestNumber = new AtomicInteger(1);
+        this.subscriptions.add(request.getContestId());
+        responseObserver.onNext(getNextLeaderboard(0, request.getContestId()));
+
         while (subscriptions.contains(request.getContestId())) {
             responseObserver.onNext(getNextLeaderboard(requestNumber.getAndIncrement(), request.getContestId()));
             try {
@@ -50,6 +50,14 @@ public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.Api
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void stopNotifications(StopRequest request, StreamObserver<StopResponse> responseObserver) {
+        String contestId = request.getContestId();
+        subscriptions.remove(contestId);
+        responseObserver.onNext(StopResponse.newBuilder().build());
+        responseObserver.onCompleted();
+    }
+
     private LeaderboardResponse getNextLeaderboard(int requestNumber, String contestId) {
         List<LinkedHashMap<String, Object>> leaderboard = generateLeaderboard(requestNumber, contestId);
 
@@ -59,32 +67,12 @@ public class ApiMockLeaderboardService extends ApiMockLeaderboardServiceGrpc.Api
                     String name = (String) obj.get("name");
                     long score = new Long((Integer) obj.get("score"));
                     return Participant.newBuilder()
-                            .setUser(UserInfo.newBuilder()
-                                    .setId(id)
-                                    .setName(name).build())
+                            .setId(id)
+                            .setName(name)
                             .setScore(score)
                             .build();
                 }).collect(Collectors.toList()))
                 .build();
-    }
-
-    @Override
-    public void stopNotifications(StopRequest request, StreamObserver<StopResponse> responseObserver) {
-        String contestId = request.getContestId();
-        subscriptions.remove(contestId);
-        responseObserver.onNext(StopResponse.newBuilder().build());
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void startNotifications(StartRequest request, StreamObserver<StartResponse> responseObserver) {
-        String contestId = request.getContestId();
-        if (!subscriptions.contains(contestId)) {
-            subscriptions.add(contestId);
-        }
-
-        responseObserver.onNext(StartResponse.newBuilder().build());
-        responseObserver.onCompleted();
     }
 
     private List<LinkedHashMap<String, Object>> generateLeaderboard(int requestNumber, String contestId) {

@@ -1,4 +1,4 @@
-package com.dojo.notifications.service.slackNotifier;
+package com.dojo.notifications.service.messageGenerator.slack;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
@@ -13,10 +13,10 @@ import com.hubspot.slack.client.models.blocks.Divider;
 import com.hubspot.slack.client.models.blocks.Section;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
+@Service
+public class LeaderboardSlackMessageGenerator extends SlackMessageGenerator {
 
     private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
     private static final String COMMON_TITLE = "Leaderboard update";
@@ -31,7 +31,7 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     private static final UserDetails COMMON = null;
 
     @Override
-    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
+    public ChatPostMessageParams generateMessage(UserDetailsService userDetailsService, UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
         Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(userDetails);
 
@@ -39,7 +39,7 @@ public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
     }
 
     @Override
-    public ChatPostMessageParams generateSlackContent(UserDetailsService userDetailsService, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
+    public ChatPostMessageParams generateMessage(UserDetailsService userDetailsService, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
         Text leaderboardNames = leaderboard.buildLeaderboardNames(COMMON, userDetailsService, slackClient);
         Text leaderboardScores = leaderboard.buildLeaderboardScores(COMMON);
 

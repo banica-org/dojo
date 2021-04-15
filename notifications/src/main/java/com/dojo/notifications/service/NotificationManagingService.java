@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.grpc.LeaderboardClient;
+import com.dojo.notifications.grpc.leaderboard.LeaderboardClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

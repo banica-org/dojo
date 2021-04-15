@@ -1,5 +1,6 @@
-package com.dojo.notifications.service.emailNotifier;
+package com.dojo.notifications.service.notificationService;
 
+import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;
 import com.dojo.notifications.configuration.EmailConfig;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
@@ -40,7 +41,7 @@ public class EmailNotificationServiceTest {
     private Contest contest;
 
     @Mock
-    private MailContentBuilder mailContentBuilder;
+    private MailMessageGenerator mailMessageGenerator;
 
     @Mock
     private MimeMessage mimeMessage;
@@ -75,7 +76,7 @@ public class EmailNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         //Arrange
-        when(notification.getAsEmailNotification(mailContentBuilder)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
+        when(notification.getAsEmailNotification(mailMessageGenerator)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
         when(userDetails.getEmail()).thenReturn(EMAIL_FOR_USER);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(emailConfig.getUsername()).thenReturn(USERNAME_FOR_EMAILCONFIG);
@@ -84,7 +85,7 @@ public class EmailNotificationServiceTest {
         emailNotificationService.notify(userDetails, notification, contest);
 
         //Assert
-        verify(notification, times(1)).getAsEmailNotification(mailContentBuilder);
+        verify(notification, times(1)).getAsEmailNotification(mailMessageGenerator);
         verify(userDetails, times(1)).getEmail();
         verify(emailSender, times(1)).createMimeMessage();
         verify(emailConfig, times(1)).getUsername();
@@ -97,7 +98,7 @@ public class EmailNotificationServiceTest {
         emails.add(EMAIL_FOR_USER);
         int size = emails.size();
 
-        when(notification.getAsEmailNotification(mailContentBuilder)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
+        when(notification.getAsEmailNotification(mailMessageGenerator)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
         when(contest.getSenseiEmails()).thenReturn(emails);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(emailConfig.getUsername()).thenReturn(USERNAME_FOR_EMAILCONFIG);
@@ -106,7 +107,7 @@ public class EmailNotificationServiceTest {
         emailNotificationService.notify(notification, contest);
 
         //Assert
-        verify(notification, times(1)).getAsEmailNotification(mailContentBuilder);
+        verify(notification, times(1)).getAsEmailNotification(mailMessageGenerator);
         verify(contest, times(1)).getSenseiEmails();
         verify(emailSender, times(size)).createMimeMessage();
         verify(emailConfig, times(size)).getUsername();

@@ -4,10 +4,13 @@ import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.notification.SlackNotificationUtils;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.model.user.UserInfo;
 import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,9 +20,12 @@ public class Leaderboard {
     private static final UserDetails COMMON = null;
 
     private final Set<Participant> participants;
+    private final Set<String> participantsNames;
 
     public Leaderboard(Set<Participant> participants) {
         this.participants = participants;
+        this.participantsNames = new HashSet<>();
+        participants.forEach(participant -> participantsNames.add(participant.getUser().getName()));
     }
 
     public int getParticipantsCount() {
@@ -47,7 +53,7 @@ public class Leaderboard {
     }
 
     public Set<Participant> getParticipants() {
-        return this.participants;
+        return Collections.unmodifiableSet(this.participants);
     }
 
     public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {
@@ -78,6 +84,24 @@ public class Leaderboard {
         return Text.of(TextType.MARKDOWN, String.valueOf(scores));
     }
 
+    public void updateParticipant(Participant updatedParticipant) {
+        String participantName = updatedParticipant.getUser().getName();
+
+        if (participantsNames.contains(participantName)) {
+            UserInfo updatedUser = updatedParticipant.getUser();
+            for (Participant participant : this.participants) {
+                if (participant.getUser().equals(updatedUser)) {
+                    this.participants.remove(participant);
+                    break;
+                }
+            }
+        } else {
+            this.participantsNames.add(participantName);
+        }
+
+        this.participants.add(updatedParticipant);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,4 +114,6 @@ public class Leaderboard {
     public int hashCode() {
         return Objects.hash(participants);
     }
+
+
 }

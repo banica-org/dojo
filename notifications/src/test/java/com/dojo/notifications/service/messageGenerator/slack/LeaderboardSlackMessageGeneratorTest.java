@@ -1,4 +1,4 @@
-package com.dojo.notifications.service.slackNotifier;
+package com.dojo.notifications.service.messageGenerator.slack;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class LeaderboardSlackMessageBuilderTest {
+public class LeaderboardSlackMessageGeneratorTest {
 
     private static final String USER_ID = "1";
     private static final String USER_NAME = "John";
@@ -51,7 +51,7 @@ public class LeaderboardSlackMessageBuilderTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    LeaderboardSlackMessageBuilder leaderboardSlackMessageBuilder;
+    LeaderboardSlackMessageGenerator leaderboardSlackMessageBuilder;
 
     @Before
     public void init() {
@@ -61,7 +61,7 @@ public class LeaderboardSlackMessageBuilderTest {
         participants.add(participant);
         leaderboard = new Leaderboard(participants);
 
-        leaderboardSlackMessageBuilder = new LeaderboardSlackMessageBuilder();
+        leaderboardSlackMessageBuilder = new LeaderboardSlackMessageGenerator();
 
         when(userDetailsService.getUserEmail(USER_ID)).thenReturn(USER_EMAIL);
         when(slackClient.getSlackUserId(USER_EMAIL)).thenReturn(CONV_ID);
@@ -70,7 +70,7 @@ public class LeaderboardSlackMessageBuilderTest {
     @Test
     public void generatePersonalSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateMessage(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -86,7 +86,7 @@ public class LeaderboardSlackMessageBuilderTest {
     @Test
     public void generateCommonSlackMessageTest() {
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateSlackContent(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE);
+        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateMessage(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();

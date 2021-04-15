@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.notificationService;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;

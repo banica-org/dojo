@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notifications;
 
-option java_package = "com.dojo.apimock";
+option java_package = "com.codenjoy.dojo";
 option java_multiple_files = true;
 
 message LeaderboardRequest{
@@ -15,13 +15,9 @@ message LeaderboardResponse{
 }
 
 message Participant{
-  UserInfo user = 1;
-  int64 score = 2;
-}
-
-message UserInfo{
   string id = 1;
   string name = 2;
+  int64 score = 3;
 }
 
 message StopRequest{
@@ -32,16 +28,7 @@ message StopResponse{
 
 }
 
-message StartRequest{
-  string contestId = 1;
-}
-
-message StartResponse{
-
-}
-
-service ApiMockLeaderboardService{
+service LeaderboardService{
   rpc getLeaderboard(LeaderboardRequest) returns (stream LeaderboardResponse);
   rpc stopNotifications(StopRequest) returns (StopResponse);
-  rpc startNotifications(StartRequest) returns (StartResponse);
 }
