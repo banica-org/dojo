@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -161,22 +161,5 @@ public class DockerServiceTest {
         //Assert
         verify(removeContainerCmdMock, times(1)).exec();
     }
-
-//    @Test
-//    public void generateShellArgs_Should_ReturnArgs() {
-//        //Arrange
-//        String username = "giivanov722";
-//        String childRepo = "docker-test-child";
-//        String parentRepo = "docker-test-parent";
-//
-//        //Act
-//        List<String> actual = DockerServiceImpl.generateShellArgs();
-//
-//        //Assert
-//        Assert.assertEquals(actual.get(0), username);
-//        Assert.assertEquals(actual.get(2), username);
-//        Assert.assertEquals(actual.get(3), childRepo);
-//        Assert.assertEquals(actual.get(4), parentRepo);
-//    }
 
 }
