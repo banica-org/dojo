@@ -1,7 +1,6 @@
 package com.dojo.codeexecution.service.grpc.handler;
 
 import com.dojo.codeexecution.ContainerResponse;
-import com.dojo.codeexecution.model.FailedTestCase;
 import io.grpc.stub.StreamObserver;
 import org.springframework.stereotype.Component;
 
@@ -25,25 +24,16 @@ public class ContainerUpdateHandler {
         this.streamObservers.remove(observer);
     }
 
-    public void sendUpdate(String status, String username, List<String> errors, List<FailedTestCase> failedTestCases) {
-        this.streamObservers.forEach(observer -> observer.onNext(generateResponse(status, username, errors, failedTestCases)));
+    public void sendUpdate(String status, String username, List<String> errors) {
+        this.streamObservers.forEach(observer -> observer.onNext(generateResponse(status, username, errors)));
     }
 
-    private ContainerResponse generateResponse(String status, String username, List<String> errors, List<FailedTestCase> failedTestCases) {
-        ContainerResponse.Builder responseBuilder = ContainerResponse.newBuilder();
-        responseBuilder.setStatus(status)
+    private ContainerResponse generateResponse(String status, String username, List<String> logs) {
+        ContainerResponse.Builder responseBuilder = ContainerResponse.newBuilder()
+                .setStatus(status)
                 .setUsername(username);
 
-        errors.forEach(responseBuilder::addError);
-        failedTestCases.forEach(failedTestCase -> responseBuilder.addFailedTestCase(convertToFailedTestCase(failedTestCase)));
+        logs.forEach(responseBuilder::addLog);
         return responseBuilder.build();
     }
-
-    private com.dojo.codeexecution.FailedTestCase convertToFailedTestCase(FailedTestCase failedTestCase) {
-        return com.dojo.codeexecution.FailedTestCase.newBuilder()
-                .setMethodName(failedTestCase.getMethodName())
-                .setExpected(failedTestCase.getExpected())
-                .build();
-    }
-
 }
