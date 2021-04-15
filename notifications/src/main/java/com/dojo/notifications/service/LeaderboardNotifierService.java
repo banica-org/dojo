@@ -69,7 +69,7 @@ public class LeaderboardNotifierService {
 
                     if (newQueriedLeaderboard.getParticipants().size() != 0
                             && !oldQueriedLeaderboard.equals(newQueriedLeaderboard)) {
-                        notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, request.getEventType(), request.getMessage());
+                        notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, request);
                     }
                 }
             } catch (Exception e) {
@@ -81,20 +81,25 @@ public class LeaderboardNotifierService {
     }
 
 
-    public void notifyAbout(Contest contest, Leaderboard oldQueriedLeaderboard, Leaderboard newQueriedLeaderboard, String eventType, String queryMessage) {
+    public void notifyAbout(Contest contest, Leaderboard oldQueriedLeaderboard, Leaderboard newQueriedLeaderboard, SelectRequest request) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
-        EventType eventTypeQuery = EventType.valueOf(eventType);
+        EventType eventTypeQuery = EventType.valueOf(request.getEventType());
         boolean actual = leaderboardService.isEventType(newQueriedLeaderboard, oldQueriedLeaderboard, eventTypeQuery);
 
         if (actual) {
-            if (eventTypeQuery.equals(EventType.POSITION_CHANGES)) {
-                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, queryMessage);
+            if (request.getReceiver().equals("All")) {
+                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, request.getMessage());
+                contest.getCommonNotificationsLevel().entrySet().stream()
+                        .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
+                        .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), request.getMessage()));
+            } else if (request.getReceiver().equals("Participant")) {
+                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, request.getMessage());
+            } else {
+                contest.getCommonNotificationsLevel().entrySet().stream()
+                        .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
+                        .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), request.getMessage()));
             }
-
-            contest.getCommonNotificationsLevel().entrySet().stream()
-                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), queryMessage));
         }
 
     }

@@ -34,4 +34,7 @@ public class SelectRequest {
 
     @Column(name = "COMMUNICATION_LEVEL")
     String communicationLevel;
+
+    @Column(name = "RECEIVER")
+    String receiver;
 }

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LeaderboardSlackMessageBuilder extends SlackMessageBuilder {
 
-    private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
+    private static final String PERSONAL_TITLE = "Your have leaderboard changes";
     private static final String COMMON_TITLE = "Leaderboard update";
 
     private static final String BUTTON_TEXT = "View Leaderboard in Dojorena";

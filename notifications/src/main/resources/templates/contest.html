@@ -64,8 +64,8 @@
                 <div class="row border">
                     <div class="col">
                         <div class="form-group">
-                            <select class="form-control" th:value="${selectRequest}" th:field="*{slackCommonNotifications}">
-                                <th:block th:if="*{slackCommonNotifications}">
+                            <select class="form-control" id="request" th:value="${selectRequest}" th:field="*{slackCommonNotifications}">
+                                <th:block for="request" th:if="*{slackCommonNotifications}">
                                     <option th:each="query : ${queries}" th:value="${query.communicationLevel}"
                                             th:text="${query.message}" th:field="*{slackCommonNotifications}"></option>
                                 </th:block>
@@ -82,8 +82,7 @@
                 <div class="row border">
                     <div class="col">
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="personalPositionChangeSlack" th:field="*{personalPositionChangeSlack}">
-                            <label class="form-check-label" for="personalPositionChangeSlack">Notify contestant for change in his position</label>
+                            <input type="checkbox" checked class="form-check-input" id="personalNotifySlack" th:field="*{personalPositionChangeSlack}">
                         </div>
                     </div>
                 </div>
@@ -180,6 +179,5 @@
             </div>
         </div>
     </div>
-
 </body>
 </html>

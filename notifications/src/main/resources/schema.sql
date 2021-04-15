@@ -3,5 +3,6 @@ CREATE TABLE SELECT_REQUESTS(
     QUERY varchar(255) NOT NULL,
     EVENT_TYPE varchar(25) NOT NULL,
     COMMUNICATION_LEVEL varchar(25) NOT NULL,
-    MESSAGE varchar(255) NOT NULL
+    MESSAGE varchar(255) NOT NULL,
+    RECEIVER varchar(25)
 );

@@ -26,7 +26,7 @@
                     <td><label>FROM Leaderboard</label></td>
                 </tr>
                 <tr>
-                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" value="WHERE/FETCH/ETC."/></td>
+                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" placeholder="WHERE/LIMIT/ETC."/></td>
                 </tr>
                 <tr>
                     <td>
@@ -44,9 +44,23 @@
                 </tr>
                 <tr>
                     <td>
+                        <label>Select who will be notified:  </label>
+                        <br>
+                        <select style="width:330px" th:field="*{receiver}">
+                            <option value="All"  class="form-option-input" id="notifyAll" th:field="*{receiver}">All
+                            </option>
+                            <option value="Common" class="form-option-input" id="notifyCommon" th:field="*{receiver}">Only Channel/Sensei
+                            </option>
+                            <option value="Participant" class="form-option-input" id="notifyParticipant" th:field="*{receiver}">Only Participants
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <label>Describe your query:  </label>
                         <br>
-                        <input type="text" style="width:330px" th:field="*{describingMessage}" required/>
+                        <input type="text" style="width:330px" th:field="*{describingMessage}" required placeholder="Enter a description here"/>
                     </td>
                 </tr>
                 <tr>

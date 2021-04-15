@@ -109,6 +109,7 @@ public class WebUIController {
         model.addAttribute("describingMessage", newRequest.getDescribingMessage());
         model.addAttribute("eventType", newRequest.getEventType());
         model.addAttribute("communicationLevel", newRequest.getCommunicationLevel());
+        model.addAttribute("notify", newRequest.getReceiver());
 
         return "request";
     }
@@ -120,6 +121,7 @@ public class WebUIController {
         selectRequest.setMessage(newRequest.getDescribingMessage());
         selectRequest.setEventType(newRequest.getEventType());
         selectRequest.setCommunicationLevel(newRequest.getCommunicationLevel(newRequest.getEventType()));
+        selectRequest.setReceiver(newRequest.getReceiver());
         selectRequestService.saveRequest(selectRequest);
     }
 

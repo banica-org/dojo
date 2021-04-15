@@ -10,6 +10,7 @@ public class SelectRequestModel {
     private String describingMessage;
     private String eventType;
     private String communicationLevel;
+    private String receiver;
 
 
     public SelectRequestModel() {
@@ -70,5 +71,13 @@ public class SelectRequestModel {
 
     public void setCommonLevel(String commonLevel) {
         this.communicationLevel = commonLevel;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 }
