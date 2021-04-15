@@ -1,12 +1,8 @@
 package com.dojo.codeexecution.config;
 
-import org.kohsuke.github.GitHub;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -16,7 +12,7 @@ public class GitConfigProperties {
     private int contentType;
     private String user;
     private String tokenCreateRepo;
-    private String parentRepository;
+    private String parentRepositoryName;
     private String webhookAddress;
     private Map<String, String> webhookConfig;
 
@@ -64,11 +60,11 @@ public class GitConfigProperties {
         this.webhookAddress = webhookAddress;
     }
 
-    public String getParentRepository() {
-        return parentRepository;
+    public String getParentRepositoryName() {
+        return parentRepositoryName;
     }
 
-    public void setParentRepository(String parentRepository) {
-        this.parentRepository = parentRepository;
+    public void setParentRepositoryName(String parentRepositoryName) {
+        this.parentRepositoryName = parentRepositoryName;
     }
 }
