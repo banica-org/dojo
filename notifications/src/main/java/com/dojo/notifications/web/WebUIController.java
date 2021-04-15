@@ -21,6 +21,8 @@ import java.util.List;
 @Controller
 public class WebUIController {
 
+    private final static String ACTION_ADD = "add";
+
     @Autowired
     private SelectRequestService selectRequestService;
 
@@ -43,8 +45,8 @@ public class WebUIController {
 
     @PostMapping("/contest")
     public String newContest(@ModelAttribute Contest newContest, Model model,
-                             @RequestParam(value = "action", required = true) String action) {
-        if (action.equals("add")) {
+                             @RequestParam String action) {
+        if (action.equals(ACTION_ADD)) {
             setupRequestPage(model, new SelectRequestModel());
             return "request";
         }
@@ -82,8 +84,8 @@ public class WebUIController {
 
     @PostMapping("/request")
     public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model,
-                             @RequestParam(value = "action", required = true) String action) {
-        if(action.equals("add")) {
+                             @RequestParam String action) {
+        if(action.equals(ACTION_ADD)) {
             setupRequestPage(model, new SelectRequestModel());
             setupQueryUpdate(newRequest);
             addDropDownOptions(model);
@@ -114,7 +116,7 @@ public class WebUIController {
     private void setupQueryUpdate(SelectRequestModel newRequest) {
         SelectRequest selectRequest = new SelectRequest();
 
-        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM %s " + newRequest.getQuerySpecification());
+        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM Leaderboard " + newRequest.getQuerySpecification());
         selectRequest.setMessage(newRequest.getDescribingMessage());
         selectRequest.setEventType(newRequest.getEventType());
         selectRequest.setCommunicationLevel(newRequest.getCommunicationLevel(newRequest.getEventType()));

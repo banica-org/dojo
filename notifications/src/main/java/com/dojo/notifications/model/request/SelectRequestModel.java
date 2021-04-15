@@ -49,17 +49,22 @@ public class SelectRequestModel {
         this.eventType = eventType;
     }
 
-    public String getCommunicationLevel(String eventType) {
+    private String determineCommunicationLevel() {
         switch (eventType) {
-            case "OTHER_LEADERBOARD_CHANGE": communicationLevel = "ON_ANY_LEADERBOARD_CHANGE";
-                break;
-            case "POSITION_CHANGES": communicationLevel = "ON_CHANGED_POSITION";
-                break;
-            case "SCORE_CHANGES": communicationLevel = "ON_CHANGED_SCORE";
-                break;
+            case "OTHER_LEADERBOARD_CHANGE":
+                return "ON_ANY_LEADERBOARD_CHANGE";
+            case "POSITION_CHANGES":
+                return "ON_CHANGED_POSITION";
+            case "SCORE_CHANGES":
+                return "ON_CHANGED_SCORE";
 
-            default: communicationLevel = "NO_NOTIFICATIONS";
+            default:
+                return "NO_NOTIFICATIONS";
         }
+    }
+
+    public String getCommunicationLevel(String eventType) {
+        communicationLevel = determineCommunicationLevel();
         return communicationLevel;
     }
 

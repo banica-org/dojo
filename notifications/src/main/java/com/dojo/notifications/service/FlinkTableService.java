@@ -3,13 +3,13 @@ package com.dojo.notifications.service;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.TableResult;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,12 +21,9 @@ import java.util.TreeSet;
 @Service
 public class FlinkTableService {
 
-    public static final int USER_ID_POSITION = 0;
-    private static final int USER_NAME_POSITION = 1;
-    public static final int USER_SCORE_POSITION = 2;
+    private static final String TABLE_NAME = "Leaderboard";
 
-
-    public Leaderboard executeSingleQuery(Set<Participant> participants, String tableName, String query) {
+    public Leaderboard executeSingleQuery(Set<Participant> participants, String query) throws Exception {
 
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings
@@ -38,12 +35,20 @@ public class FlinkTableService {
 
         DataStream<Tuple3<String, String, Long>> tuple3DataStream = convertToTuple3DataStream(executionEnvironment, participants);
 
-        tableEnvironment.createTemporaryView(tableName, tuple3DataStream,"id, name, points");
-        String queryFormatted = String.format(query, tableName);
-        TableResult tableLeaderboard = tableEnvironment.sqlQuery(queryFormatted).execute();
-        tableEnvironment.dropTemporaryView(tableName);
+        Table table = tableEnvironment.fromDataStream(tuple3DataStream).as("id", "name", "points");
+        tableEnvironment.createTemporaryView(TABLE_NAME, table);
 
-        return new Leaderboard(convertTableResultToList(tableLeaderboard));
+        table = tableEnvironment.sqlQuery(query);
+
+        tableEnvironment.dropTemporaryView(TABLE_NAME);
+
+        DataStream<Tuple3<String, String, Long>> tupleStream = tableEnvironment.toAppendStream(
+                table,
+                new TypeHint<Tuple3<String, String, Long>>() {
+                }.getTypeInfo()
+        );
+
+        return new Leaderboard(convertDataStreamToList(tupleStream.executeAndCollect()));
     }
 
     private DataStream<Tuple3<String, String, Long>> convertToTuple3DataStream(StreamExecutionEnvironment env, Set<Participant> participants) {
@@ -60,14 +65,13 @@ public class FlinkTableService {
         return env.fromCollection(tupleLeaderboard);
     }
 
-    private TreeSet<Participant> convertTableResultToList(TableResult leaderboard) {
-        Iterator<Row> rowsNew = leaderboard.collect();
+    private TreeSet<Participant> convertDataStreamToList(Iterator<Tuple3<String, String, Long>> leaderboard) {
 
         TreeSet<Participant> participants = new TreeSet<>();
 
-        rowsNew.forEachRemaining(row -> {
-            UserInfo userInfo = new UserInfo((String) row.getField(USER_ID_POSITION), (String) row.getField(USER_NAME_POSITION));
-            Participant participant = new Participant(userInfo, (long) row.getField(USER_SCORE_POSITION));
+        leaderboard.forEachRemaining(user -> {
+            UserInfo userInfo = new UserInfo(user.f0, user.f1);
+            Participant participant = new Participant(userInfo, user.f2);
             participants.add(participant);
         });
         return participants;
