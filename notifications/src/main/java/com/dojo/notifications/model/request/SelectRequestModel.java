@@ -49,6 +49,15 @@ public class SelectRequestModel {
         this.eventType = eventType;
     }
 
+    public String getCommunicationLevel(String eventType) {
+        communicationLevel = determineCommunicationLevel();
+        return communicationLevel;
+    }
+
+    public void setCommonLevel(String commonLevel) {
+        this.communicationLevel = commonLevel;
+    }
+
     private String determineCommunicationLevel() {
         switch (eventType) {
             case "OTHER_LEADERBOARD_CHANGE":
@@ -63,12 +72,4 @@ public class SelectRequestModel {
         }
     }
 
-    public String getCommunicationLevel(String eventType) {
-        communicationLevel = determineCommunicationLevel();
-        return communicationLevel;
-    }
-
-    public void setCommonLevel(String commonLevel) {
-        this.communicationLevel = commonLevel;
-    }
 }
