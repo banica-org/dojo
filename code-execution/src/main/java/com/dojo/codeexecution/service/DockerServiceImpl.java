@@ -2,6 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
+import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageCmd;
@@ -25,13 +26,16 @@ public class DockerServiceImpl implements DockerService {
     private static final String USER_NAME = "user_name";
     private static final String REPO_NAME = "repo_name";
 
+    private final ImageUpdateHandler imageUpdateHandler;
+
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
     private final GitConfigProperties gitConfigProperties;
     private int containerCnt;
 
     @Autowired
-    public DockerServiceImpl(DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
+    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
+        this.imageUpdateHandler = imageUpdateHandler;
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
@@ -88,6 +92,19 @@ public class DockerServiceImpl implements DockerService {
         return new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
+                String imageTag = getImageTag(item.getImageId());
+                String message = "";
+
+                if (item.isErrorIndicated()){
+                    message = item.getErrorDetail().getMessage();
+                }
+                if (item.isBuildSuccessIndicated()){
+                    message = "Image built successfully!";
+                }
+
+                imageUpdateHandler.sendUpdate(imageTag, message);
+                System.out.println(message);
+
                 super.onNext(item);
             }
         };
