@@ -2,6 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
+import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
 import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -31,6 +32,7 @@ public class DockerServiceImpl implements DockerService {
     private static final String LOG_SEPARATOR = "STDOUT: build-log-separator";
 
     private final ImageUpdateHandler imageUpdateHandler;
+    private final ContainerUpdateHandler containerUpdateHandler;
 
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
@@ -39,8 +41,9 @@ public class DockerServiceImpl implements DockerService {
     private Map<String, String> containerUserCache;
 
     @Autowired
-    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
+    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
         this.imageUpdateHandler = imageUpdateHandler;
+        this.containerUpdateHandler = containerUpdateHandler;
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
@@ -54,7 +57,9 @@ public class DockerServiceImpl implements DockerService {
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
         // get the container status after it has been started
-        getContainerStatus(containerId);
+        String status = getContainerStatus(containerId);
+        containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), new ArrayList<>());
+
         dockerClient.waitContainerCmd(containerId)
                 .exec(getWaitContainerExecutionCallback(containerId));
     }
@@ -106,10 +111,10 @@ public class DockerServiceImpl implements DockerService {
                 String imageTag = getImageTag(item.getImageId());
                 String message = "";
 
-                if (item.isErrorIndicated()){
+                if (item.isErrorIndicated()) {
                     message = item.getErrorDetail().getMessage();
                 }
-                if (item.isBuildSuccessIndicated()){
+                if (item.isBuildSuccessIndicated()) {
                     message = "Image built successfully!";
                 }
 
@@ -153,7 +158,8 @@ public class DockerServiceImpl implements DockerService {
                     logs = new ArrayList<>();
                 }
                 // get the container status after completing its work
-                getContainerStatus(containerId);
+                String status = getContainerStatus(containerId);
+                containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), logs);
                 // removing from cache the key-value pair containerId -> username
                 deleteContainerUsername(containerId);
                 deleteContainer(containerId);
@@ -163,9 +169,10 @@ public class DockerServiceImpl implements DockerService {
         };
     }
 
-    private void getContainerStatus(String containerId) {
+    private String getContainerStatus(String containerId) {
         InspectContainerResponse inspectContainerCmd = dockerClient.inspectContainerCmd(containerId).exec();
         System.out.println(inspectContainerCmd.getState().toString());
+        return inspectContainerCmd.getState().getStatus();
     }
 
     public int getContainerCounter() {
@@ -183,3 +190,4 @@ public class DockerServiceImpl implements DockerService {
     private void deleteContainerUsername(String containerId) {
         containerUserCache.remove(containerId);
     }
+}
