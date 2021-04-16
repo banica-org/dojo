@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.grpc.LeaderboardClient;
+import com.dojo.notifications.grpc.leaderboard.LeaderboardClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

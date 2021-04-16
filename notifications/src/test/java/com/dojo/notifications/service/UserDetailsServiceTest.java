@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.service.grpc.UserDetailsClient;
+import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

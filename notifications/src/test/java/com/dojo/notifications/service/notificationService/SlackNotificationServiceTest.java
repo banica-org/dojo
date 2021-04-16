@@ -1,5 +1,6 @@
-package com.dojo.notifications.service.slackNotifier;
+package com.dojo.notifications.service.notificationService;
 
+import com.dojo.notifications.service.messageGenerator.slack.SlackMessageGenerator;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.client.CustomSlackClient;
@@ -40,7 +41,7 @@ public class SlackNotificationServiceTest {
     @Mock
     private SlackClientManager slackClientManager;
     @Mock
-    private SlackMessageBuilder slackMessageBuilder;
+    private SlackMessageGenerator slackMessageGenerator;
 
     @InjectMocks
     private SlackNotificationService slackNotificationService;
@@ -61,25 +62,25 @@ public class SlackNotificationServiceTest {
     public void notifyUserTest() {
         when(userDetails.getEmail()).thenReturn(EMAIL);
         when(slackClient.getConversationId(EMAIL)).thenReturn(CHANNEL);
-        when(notification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
+        when(notification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
 
         slackNotificationService.notify(userDetails, notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
         verify(slackClient, times(1)).getConversationId(EMAIL);
-        verify(notification, times(1)).getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+        verify(notification, times(1)).getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
         verify(slackClient, times(1)).postMessage(chatPostMessageParams);
     }
 
     @Test
     public void notifyChannelTest() {
         when(contest.getSlackChannel()).thenReturn(CHANNEL);
-        when(notification.getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
+        when(notification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
 
         slackNotificationService.notify(notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(notification, times(1)).getAsSlackNotification(slackMessageBuilder, slackClient, CHANNEL);
+        verify(notification, times(1)).getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
         verify(slackClient, times(1)).postMessage(chatPostMessageParams);
     }
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notifications;
 
-option java_package = "com.dojo.apimock";
+option java_package = "com.codenjoy.dojo";
 option java_multiple_files = true;
 
 message UserDetailsRequest{
@@ -14,6 +14,6 @@ message UserDetailsResponse{
   string email = 2;
 }
 
-service ApiMockUserDetailsService{
+service UserDetailsService{
   rpc getUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
 }

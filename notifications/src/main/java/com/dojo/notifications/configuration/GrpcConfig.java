@@ -1,9 +1,9 @@
 package com.dojo.notifications.configuration;
 
-import com.dojo.apimock.ApiMockLeaderboardServiceGrpc;
-import com.dojo.apimock.ApiMockUserDetailsServiceGrpc;
+import com.codenjoy.dojo.EventServiceGrpc;
+import com.codenjoy.dojo.LeaderboardServiceGrpc;
+import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.common.GrpcChannel;
-import io.grpc.ManagedChannel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,17 +20,22 @@ public class GrpcConfig {
     }
 
     @Bean
-    public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceBlockingStub getLeaderboardBlockingStub() {
-        return ApiMockLeaderboardServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
+    public LeaderboardServiceGrpc.LeaderboardServiceBlockingStub getLeaderboardBlockingStub() {
+        return LeaderboardServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
     }
 
     @Bean
-    public ApiMockLeaderboardServiceGrpc.ApiMockLeaderboardServiceStub getLeaderboardStub() {
-        return ApiMockLeaderboardServiceGrpc.newStub(this.grpcChannel.getManagedChannel());
+    public LeaderboardServiceGrpc.LeaderboardServiceStub getLeaderboardStub() {
+        return LeaderboardServiceGrpc.newStub(this.grpcChannel.getManagedChannel());
     }
 
     @Bean
-    public ApiMockUserDetailsServiceGrpc.ApiMockUserDetailsServiceBlockingStub getUserDetailsBlockingStub() {
-        return ApiMockUserDetailsServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
+    public UserDetailsServiceGrpc.UserDetailsServiceBlockingStub getUserDetailsBlockingStub() {
+        return UserDetailsServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
+    }
+
+    @Bean
+    public EventServiceGrpc.EventServiceBlockingStub getEventBlockingStub() {
+        return EventServiceGrpc.newBlockingStub(this.grpcChannel.getManagedChannel());
     }
 }

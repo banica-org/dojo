@@ -9,6 +9,7 @@ import com.dojo.notifications.model.notification.PersonalLeaderboardNotification
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.notificationService.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,6 +48,24 @@ public class LeaderboardNotifierService {
         this.leaderboards = new ConcurrentHashMap<>();
         this.notificationServices = notificationServices.stream()
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
+    }
+
+    public boolean isLeaderboardReceived(String contestId) {
+        return leaderboards.containsKey(contestId);
+    }
+
+    public void setLeaderboardOnStart(String contestId, Leaderboard leaderboard) {
+        leaderboards.put(contestId, leaderboard);
+    }
+
+    public void updateLeaderboard(final Contest contest, Participant participant) {
+        String contestId = contest.getContestId();
+
+        Leaderboard leaderboard = leaderboards.get(contestId);
+        Set<Participant> participants = new TreeSet<>(leaderboard.getParticipants());
+        Leaderboard newLeaderboard = new Leaderboard(participants);
+        newLeaderboard.updateParticipant(participant);
+        lookForLeaderboardChanges(contest, newLeaderboard);
     }
 
 

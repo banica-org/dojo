@@ -1,7 +1,7 @@
 package com.dojo.notifications.api;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.GamesService;
+import com.dojo.notifications.service.EventService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class ContestControllerTest {
 
     @Mock
-    private GamesService gamesService;
+    private EventService eventService;
 
     @Mock
     private Contest contest;
@@ -38,7 +38,7 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(contest);
+        verify(eventService, times(1)).addContest(contest);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(null);
+        verify(eventService, times(1)).addContest(null);
     }
 
     @Test
@@ -66,8 +66,8 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(notNull);
-        verify(gamesService, times(1)).getContestById("1");
+        verify(eventService, times(1)).addContest(notNull);
+        verify(eventService, times(1)).getContestById("1");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(contest);
+        verify(eventService, times(1)).addContest(contest);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(null);
+        verify(eventService, times(1)).addContest(null);
     }
 
     @Test
@@ -108,8 +108,8 @@ public class ContestControllerTest {
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).addContest(notNull);
-        verify(gamesService, times(1)).getContestById("1");
+        verify(eventService, times(1)).addContest(notNull);
+        verify(eventService, times(1)).getContestById("1");
 
     }
 
@@ -117,28 +117,28 @@ public class ContestControllerTest {
     public void stopNotificationsForNullContestTest() {
         //Arrange
         ResponseEntity<String> expected = new ResponseEntity<>("DELETE Response", HttpStatus.OK);
-        when(gamesService.getContestById("1")).thenReturn(null);
+        when(eventService.getContestById("1")).thenReturn(null);
 
         //Act
         ResponseEntity<String> actual = contestController.stopNotifications("1");
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).getContestById("1");
+        verify(eventService, times(1)).getContestById("1");
     }
 
     @Test
     public void stopNotificationsForMockContestTest() {
         //Arrange
         ResponseEntity<String> expected = new ResponseEntity<>("DELETE Response", HttpStatus.OK);
-        when(gamesService.getContestById("1")).thenReturn(contest);
+        when(eventService.getContestById("1")).thenReturn(contest);
 
         //Act
         ResponseEntity<String> actual = contestController.stopNotifications("1");
 
         //Assert
         assertEquals(expected, actual);
-        verify(gamesService, times(1)).getContestById("1");
-        verify(gamesService, times(1)).stopContestById(null);
+        verify(eventService, times(1)).getContestById("1");
+        verify(eventService, times(1)).removeContest(null);
     }
 }
