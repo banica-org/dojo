@@ -1,4 +1,4 @@
-package com.dojo.notifications.service.emailNotifier;
+package com.dojo.notifications.service.messageGenerator.mail;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class LeaderboardMailMessageBuilderTest {
+public class LeaderboardMailMessageGeneratorTest {
 
     private final String EXPECTED_PROCESS_RETURN_TYPE = "PROCESSED";
 
@@ -27,7 +27,7 @@ public class LeaderboardMailMessageBuilderTest {
     private ITemplateEngine templateEngine;
 
     @InjectMocks
-    private LeaderboardMailMessageBuilder leaderboardMailMessageBuilder;
+    private LeaderboardMailMessageGenerator leaderboardMailMessageGenerator;
 
     @Test
     public void generateMailContentTest() {
@@ -38,7 +38,7 @@ public class LeaderboardMailMessageBuilderTest {
         when(templateEngine.process(eq("mailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
         //Act
-        String actual = leaderboardMailMessageBuilder.generateMailContent(contextParams);
+        String actual = leaderboardMailMessageGenerator.generateMessage(contextParams);
 
         //Assert
         Assert.assertEquals(EXPECTED_PROCESS_RETURN_TYPE, actual);

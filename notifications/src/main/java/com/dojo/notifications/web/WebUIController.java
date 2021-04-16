@@ -2,8 +2,8 @@ package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.Game;
-import com.dojo.notifications.service.GamesService;
+import com.dojo.notifications.model.contest.Event;
+import com.dojo.notifications.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class WebUIController {
 
     @Autowired
-    private GamesService gamesService;
+    private EventService eventService;
 
     @Autowired
     private ContestController contestController;
@@ -33,15 +33,15 @@ public class WebUIController {
 
     @PostMapping("/contest")
     public String newContest(@ModelAttribute Contest newContest, Model model) {
-        Game selectedGame = gamesService.getGameById(newContest.getContestId());
-        newContest.setTitle(selectedGame.getTitle());
+        Event selectedEvent = eventService.getEventByRoomName(newContest.getContestId());
+        newContest.setTitle(selectedEvent.getGameName());
         contestController.subscribeForContest(newContest);
         return setupContestsPage(model, new Contest());
     }
 
     @GetMapping("/contest/open/{id}")
     public String editContest(@PathVariable String id, Model model) {
-        Contest existingContest = gamesService.getContestById(id);
+        Contest existingContest = eventService.getContestById(id);
         return setupContestsPage(model, existingContest);
     }
 
@@ -51,16 +51,16 @@ public class WebUIController {
         return setupContestsPage(model, new Contest());
     }
 
-    @GetMapping("/games/refresh")
-    public String gamesRefresh(Model model) {
-        gamesService.invalidateGamesCache();
+    @GetMapping("/events/refresh")
+    public String eventsRefresh(Model model) {
+        eventService.invalidateEventsCache();
         return contestsPage(model);
     }
 
     private String setupContestsPage(Model model, Contest contest) {
         model.addAttribute("newContest", contest);
-        model.addAttribute("games", gamesService.getAllGames());
-        model.addAttribute("contests", gamesService.getAllContests());
+        model.addAttribute("events", eventService.getAllEvents());
+        model.addAttribute("contests", eventService.getAllContests());
         return "contest";
     }
 }
