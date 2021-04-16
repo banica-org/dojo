@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHHook;
