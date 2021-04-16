@@ -51,15 +51,15 @@ public class LeaderboardNotifierService {
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
     }
 
-    public boolean isBoardReceived(String contestId) {
+    public boolean isLeaderboardReceived(String contestId) {
         return leaderboards.containsKey(contestId);
     }
 
-    public void getLeaderboardOnStart(String contestId, Leaderboard leaderboard) {
+    public void setLeaderboardOnStart(String contestId, Leaderboard leaderboard) {
         leaderboards.put(contestId, leaderboard);
     }
 
-    public void getLeaderboardUpdate(final Contest contest, Participant participant) {
+    public void updateLeaderboard(final Contest contest, Participant participant) {
         String contestId = contest.getContestId();
 
         Leaderboard leaderboard = leaderboards.get(contestId);

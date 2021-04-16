@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.TreeSet;
 
 
@@ -69,12 +70,10 @@ public class LeaderboardClient {
                 LOGGER.info(RESPONSE_MESSAGE, leaderboardResponse);
 
                 String contestId = contest.getContestId();
-                if (!leaderboardNotifierService.isBoardReceived(contestId)) {
-
-                    leaderboardNotifierService.getLeaderboardOnStart(contestId, getLeaderboard(leaderboardResponse));
+                if (!leaderboardNotifierService.isLeaderboardReceived(contestId)) {
+                    leaderboardNotifierService.setLeaderboardOnStart(contestId, getLeaderboard(leaderboardResponse));
                 } else {
-
-                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.getLeaderboardUpdate(contest, convertToParticipant(participantResponse)));
+                    leaderboardResponse.getParticipantList().forEach(participantResponse -> leaderboardNotifierService.updateLeaderboard(contest, convertToParticipant(participantResponse)));
                 }
             }
 
@@ -91,7 +90,7 @@ public class LeaderboardClient {
     }
 
     private Leaderboard getLeaderboard(LeaderboardResponse leaderboardResponse) {
-        TreeSet<Participant> participants = new TreeSet<>();
+        Set<Participant> participants = new TreeSet<>();
 
         leaderboardResponse.getParticipantList().forEach(participantResponse -> participants.add(convertToParticipant(participantResponse)));
         return new Leaderboard(participants);
