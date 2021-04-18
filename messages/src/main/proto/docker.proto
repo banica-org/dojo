@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option java_package = "com.dojo.codeexecution";
+option java_multiple_files = true;
+
+message ImageRequest{
+
+}
+
+message ImageResponse{
+  string tag = 1;
+  string message = 2;
+}
+
+message ContainerRequest{
+
+}
+
+message ContainerResponse{
+  string status = 1;
+  string username = 2;
+  repeated string log = 3;
+}
+
+message TestResultRequest{
+
+}
+
+message TestResultResponse{
+  string username = 1;
+  repeated FailedTestCase failedTestCase = 2;
+}
+
+message FailedTestCase{
+  string methodName = 1;
+  string expected = 2;
+}
+
+service DockerService {
+  rpc getImageResults(ImageRequest) returns (stream ImageResponse);
+  rpc getContainerResults(ContainerRequest) returns (stream ContainerResponse);
+  rpc getTestResults(TestResultRequest) returns (stream TestResultResponse);
+}
