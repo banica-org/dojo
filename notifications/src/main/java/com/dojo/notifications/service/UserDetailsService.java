@@ -37,4 +37,12 @@ public class UserDetailsService {
         UserDetails userDetails = getUserDetails(userId);
         return userDetails != null ? userDetails.getEmail() : null;
     }
+
+    public UserDetails getUserDetailsByUsername(String username) {
+        UserDetails userDetails = userDetailsClient.getUserDetailsByUsername(username);
+        if (userDetails != null) {
+            userDetailsCache.put(userDetails.getId(), userDetails);
+        }
+        return userDetails;
+    }
 }
