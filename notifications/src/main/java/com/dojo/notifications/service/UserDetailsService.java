@@ -24,7 +24,7 @@ public class UserDetailsService {
         UserDetails userDetails = userDetailsCache.get(userId);
         if (userDetails == null) {
 
-            userDetails = userDetailsClient.getUserDetails(userId);
+            userDetails = userDetailsClient.getUserDetailsById(userId);
 
             if (userDetails != null) {
                 userDetailsCache.put(userId, userDetails);

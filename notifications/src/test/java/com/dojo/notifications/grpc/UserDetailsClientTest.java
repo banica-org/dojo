@@ -1,6 +1,6 @@
 package com.dojo.notifications.grpc;
 
-import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.ByIdRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
@@ -33,17 +33,17 @@ public class UserDetailsClientTest {
 
     @Test
     public void getUserDetailsTest() {
-        UserDetailsRequest request = UserDetailsRequest.newBuilder().setId(USER_ID).build();
+        ByIdRequest request = ByIdRequest.newBuilder().setId(USER_ID).build();
 
         UserDetailsResponse response = mock(UserDetailsResponse.class);
         when(response.getId()).thenReturn(USER_ID);
         when(response.getEmail()).thenReturn(EMAIL);
 
-        when(userDetailsServiceBlockingStub.getUserDetails(request)).thenReturn(response);
+        when(userDetailsServiceBlockingStub.getUserDetailsById(request)).thenReturn(response);
 
-        userDetailsClient.getUserDetails(USER_ID);
+        userDetailsClient.getUserDetailsById(USER_ID);
 
-        verify(userDetailsServiceBlockingStub, times(1)).getUserDetails(request);
+        verify(userDetailsServiceBlockingStub, times(1)).getUserDetailsById(request);
         verify(response, times(1)).getId();
         verify(response, times(1)).getEmail();
     }

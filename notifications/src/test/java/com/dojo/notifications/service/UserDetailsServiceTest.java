@@ -50,7 +50,7 @@ public class UserDetailsServiceTest {
         testUser.setId(USER_ID);
         testUser.setEmail(USER_EMAIL);
 
-        when(userDetailsClient.getUserDetails(USER_ID)).thenReturn(testUser);
+        when(userDetailsClient.getUserDetailsById(USER_ID)).thenReturn(testUser);
     }
 
 }

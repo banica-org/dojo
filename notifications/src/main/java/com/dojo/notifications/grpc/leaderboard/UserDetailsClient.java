@@ -1,6 +1,7 @@
 package com.dojo.notifications.grpc.leaderboard;
 
-import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.ByIdRequest;
+import com.codenjoy.dojo.ByUsernameRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.notifications.model.user.UserDetails;
@@ -23,18 +24,33 @@ public class UserDetailsClient {
     }
 
 
-    public UserDetails getUserDetails(String userId) {
-        UserDetailsRequest request = UserDetailsRequest.newBuilder().setId(userId).build();
+    public UserDetails getUserDetailsById(String userId) {
+        ByIdRequest request = ByIdRequest.newBuilder().setId(userId).build();
         try {
-            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetails(request);
-            UserDetails userDetails = new UserDetails();
-            userDetails.setId(response.getId());
-            userDetails.setEmail(response.getEmail());
-
-            return userDetails;
+            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsById(request);
+            return getUserDetails(response);
         } catch (StatusRuntimeException e) {
             LOGGER.error("Cannot find user with id: {}", userId);
             return null;
         }
+    }
+
+    public UserDetails getUserDetailsByUsername(String username) {
+        ByUsernameRequest request = ByUsernameRequest.newBuilder().setUsername(username).build();
+        try {
+            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsByUsername(request);
+            return getUserDetails(response);
+        } catch (StatusRuntimeException e) {
+            LOGGER.error("Cannot find user with username: {}", username);
+            return null;
+        }
+    }
+
+    private UserDetails getUserDetails(UserDetailsResponse response) {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setId(response.getId());
+        userDetails.setEmail(response.getEmail());
+
+        return userDetails;
     }
 }

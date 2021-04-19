@@ -5,8 +5,12 @@ package notifications;
 option java_package = "com.codenjoy.dojo";
 option java_multiple_files = true;
 
-message UserDetailsRequest{
+message ByIdRequest{
   string id = 1;
+}
+
+message ByUsernameRequest{
+  string username = 1;
 }
 
 message UserDetailsResponse{
@@ -15,5 +19,6 @@ message UserDetailsResponse{
 }
 
 service UserDetailsService{
-  rpc getUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
+  rpc getUserDetailsById(ByIdRequest) returns (UserDetailsResponse);
+  rpc getUserDetailsByUsername(ByUsernameRequest) returns (UserDetailsResponse);
 }
