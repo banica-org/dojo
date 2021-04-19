@@ -1,4 +1,4 @@
-package com.dojo.codeexecution.config;
+package com.dojo.codeexecution.config.github;
 
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;

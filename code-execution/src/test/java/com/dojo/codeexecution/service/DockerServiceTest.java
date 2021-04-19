@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -63,7 +63,7 @@ public class DockerServiceTest {
     @Test
     public void runContainer() {
         //Arrange
-        String dummyContainerName = dummyImageTag.split(":")[0] + (dockerServiceImpl.getContainerCnt()+1);
+        String dummyContainerName = dummyImageTag.split(":")[0] + (dockerServiceImpl.getContainerCounter()+1);
         CreateContainerResponse createContainerResponse = mock(CreateContainerResponse.class);
         StartContainerCmd startContainerCmdMock = mock(StartContainerCmd.class);
         WaitContainerCmd waitContainerMock = mock(WaitContainerCmd.class);
@@ -134,7 +134,7 @@ public class DockerServiceTest {
         ResultCallback.Adapter resultCallbackMock = mock(ResultCallback.Adapter.class);
 
         //Act
-        when(dockerClient.logContainerCmd(dummyId).withStdErr(true))
+        when(dockerClient.logContainerCmd(dummyId).withStdOut(true).withStdErr(true))
                 .thenReturn(logContainerCmdMock);
         when(logContainerCmdMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallbackMock);
         when(resultCallbackMock.awaitCompletion()).thenReturn(resultCallbackMock);
@@ -161,22 +161,5 @@ public class DockerServiceTest {
         //Assert
         verify(removeContainerCmdMock, times(1)).exec();
     }
-
-//    @Test
-//    public void generateShellArgs_Should_ReturnArgs() {
-//        //Arrange
-//        String username = "giivanov722";
-//        String childRepo = "docker-test-child";
-//        String parentRepo = "docker-test-parent";
-//
-//        //Act
-//        List<String> actual = DockerServiceImpl.generateShellArgs();
-//
-//        //Assert
-//        Assert.assertEquals(actual.get(0), username);
-//        Assert.assertEquals(actual.get(2), username);
-//        Assert.assertEquals(actual.get(3), childRepo);
-//        Assert.assertEquals(actual.get(4), parentRepo);
-//    }
 
 }

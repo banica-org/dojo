@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHRepository;

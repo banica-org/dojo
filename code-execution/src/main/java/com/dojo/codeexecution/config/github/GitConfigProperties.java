@@ -1,4 +1,4 @@
-package com.dojo.codeexecution.config;
+package com.dojo.codeexecution.config.github;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
