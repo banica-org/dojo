@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHHook;
@@ -116,32 +116,37 @@ public class GitManagerTest {
     public void buildParentWebHookWhenNoHook() throws IOException {
         //Arrange
         when(gitHub.getRepository(username)).thenReturn(ghRepository);
-        when(gitConfig.getParentRepository()).thenReturn(username);
+        when(gitConfig.getUser()).thenReturn(username);
+        when(gitConfig.getParentRepositoryName()).thenReturn(username);
 
         //Act
         gitManager.buildParentWebHook();
 
         //Assert
-        verify(gitHub, times(1)).getRepository(username);
-        verify(ghRepository, times(1)).getHooks();
+        verify(gitHub, times(1)).getRepository(username + "/" + username);
         verify(gitConfig, times(1)).getWebhookConfig();
         verify(gitConfig, times(1)).getWebhookAddress();
+        verify(gitConfig, times(1)).getUser();
+        verify(gitConfig, times(1)).getParentRepositoryName();
     }
 
     @Test
     public void buildParentWebHookWhenIsHookAvailable() throws IOException {
         //Arrange
         when(ghRepository.getHooks()).thenReturn(Collections.singletonList(ghHook));
+
         when(gitHub.getRepository(username)).thenReturn(ghRepository);
-        when(gitConfig.getParentRepository()).thenReturn(username);
+        when(gitConfig.getParentRepositoryName()).thenReturn(username);
+        when(gitConfig.getUser()).thenReturn(username);
 
         //Act
         gitManager.buildParentWebHook();
 
         //Assert
-        verify(gitHub, times(1)).getRepository(username);
-        verify(ghRepository, times(1)).getHooks();
+        verify(gitHub, times(1)).getRepository(username + "/" + username);
         verify(gitConfig, times(1)).getWebhookConfig();
         verify(gitConfig, times(1)).getWebhookAddress();
+        verify(gitConfig, times(1)).getUser();
+        verify(gitConfig, times(1)).getParentRepositoryName();
     }
 }

@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.service;
 
-import com.dojo.codeexecution.config.GitConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHRepository;
@@ -30,25 +30,29 @@ public class GitManager {
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
+    private final DockerService dockerService;
 
     @Autowired
-    public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
+    public GitManager(GitConfigProperties gitConfig, GitHub gitHub, DockerService dockerService) {
         this.gitConfig = gitConfig;
         this.gitHub = gitHub;
+        this.dockerService = dockerService;
     }
 
     @PostConstruct
     public void buildParentWebHook() throws IOException {
-        GHRepository repository = gitHub.getRepository(gitConfig.getParentRepository());
+        String repositoryPath = gitConfig.getUser() + "/" + gitConfig.getParentRepositoryName();
+        GHRepository repository = gitHub.getRepository(repositoryPath);
 
 
         if (repository.getHooks().size() == 0) {
             Map<String, String> webhookConfig = new HashMap<>(gitConfig.getWebhookConfig());
-            webhookConfig.put("url", gitConfig.getWebhookAddress()+PARENT_HOOK);
+            webhookConfig.put("url", gitConfig.getWebhookAddress() + PARENT_HOOK);
 
             repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
                     Collections.singletonList(GHEvent.PUSH), true);
         }
+        dockerService.buildImage();
     }
 
     @Retryable

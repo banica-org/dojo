@@ -2,9 +2,9 @@ package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.Game;
+import com.dojo.notifications.model.contest.Event;
+import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
-import com.dojo.notifications.service.GamesService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class WebUIControllerTest {
     private SelectRequestService selectRequestService;
 
     @Mock
-    private GamesService gamesService;
+    private EventService eventService;
     @Mock
     private ContestController contestController;
 
@@ -53,32 +53,33 @@ public class WebUIControllerTest {
         contest = new Contest();
         contest.setContestId(CONTEST_ID);
 
-        when(gamesService.getAllGames()).thenReturn(Collections.emptyList());
-        when(gamesService.getAllContests()).thenReturn(Collections.emptyList());
+        when(eventService.getAllEvents()).thenReturn(Collections.emptyList());
+        when(eventService.getAllContests()).thenReturn(Collections.emptyList());
     }
 
     @Test
     public void newContestTest() {
-        Game game = mock(Game.class);
-        when(game.getTitle()).thenReturn(CONTEST_TITLE);
-        when(gamesService.getGameById(CONTEST_ID)).thenReturn(game);
+        Event event = mock(Event.class);
+        when(event.getGameName()).thenReturn(CONTEST_TITLE);
+        when(eventService.getEventByRoomName(CONTEST_ID)).thenReturn(event);
         when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+
 
         webUIController.newContest(contest, model, ACTION_START);
 
-        verify(gamesService, times(1)).getGameById(CONTEST_ID);
+        verify(eventService, times(1)).getEventByRoomName(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);
         verify(selectRequestService, times(1)).getRequests();
     }
 
     @Test
     public void editContestTest() {
-        when(gamesService.getContestById(CONTEST_ID)).thenReturn(contest);
+        when(eventService.getContestById(CONTEST_ID)).thenReturn(contest);
         when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         webUIController.editContest(CONTEST_ID, model);
 
-        verify(gamesService, times(1)).getContestById(CONTEST_ID);
+        verify(eventService, times(1)).getContestById(CONTEST_ID);
         verify(model, times(1)).addAttribute(anyString(), eq(contest));
         verify(model, times(2)).addAttribute(anyString(), eq(Collections.emptyList()));
         verify(selectRequestService, times(1)).getRequests();
@@ -98,9 +99,10 @@ public class WebUIControllerTest {
     public void gamesRefreshTest() {
         when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
-        webUIController.gamesRefresh(model);
+        webUIController.eventsRefresh(model);
 
-        verify(gamesService, times(1)).invalidateGamesCache();
+        verify(eventService, times(1)).invalidateEventsCache();
         verify(selectRequestService, times(1)).getRequests();
+
     }
 }

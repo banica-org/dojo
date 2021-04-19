@@ -2,10 +2,10 @@ package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.Game;
+import com.dojo.notifications.model.contest.Event;
+import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
-import com.dojo.notifications.service.GamesService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,7 +27,7 @@ public class WebUIController {
     private SelectRequestService selectRequestService;
 
     @Autowired
-    private GamesService gamesService;
+    private EventService eventService;
 
     @Autowired
     private ContestController contestController;
@@ -50,8 +50,8 @@ public class WebUIController {
             setupRequestPage(model, new SelectRequestModel());
             return "request";
         }
-        Game selectedGame = gamesService.getGameById(newContest.getContestId());
-        newContest.setTitle(selectedGame.getTitle());
+        Event selectedEvent = eventService.getEventByRoomName(newContest.getContestId());
+        newContest.setTitle(selectedEvent.getGameName());
         contestController.subscribeForContest(newContest);
         this.addDropDownOptions(model);
         return setupContestsPage(model, new Contest());
@@ -59,7 +59,7 @@ public class WebUIController {
 
     @GetMapping("/contest/open/{id}")
     public String editContest(@PathVariable String id, Model model) {
-        Contest existingContest = gamesService.getContestById(id);
+        Contest existingContest = eventService.getContestById(id);
         this.addDropDownOptions(model);
         return setupContestsPage(model, existingContest);
     }
@@ -71,9 +71,9 @@ public class WebUIController {
         return setupContestsPage(model, new Contest());
     }
 
-    @GetMapping("/games/refresh")
-    public String gamesRefresh(Model model) {
-        gamesService.invalidateGamesCache();
+    @GetMapping("/events/refresh")
+    public String eventsRefresh(Model model) {
+        eventService.invalidateEventsCache();
         return contestsPage(model);
     }
 
@@ -96,9 +96,8 @@ public class WebUIController {
 
     private String setupContestsPage(Model model, Contest contest) {
         model.addAttribute("newContest", contest);
-        model.addAttribute("games", gamesService.getAllGames());
-        model.addAttribute("contests", gamesService.getAllContests());
-
+        model.addAttribute("events", eventService.getAllEvents());
+        model.addAttribute("contests", eventService.getAllContests());
         return "contest";
     }
 

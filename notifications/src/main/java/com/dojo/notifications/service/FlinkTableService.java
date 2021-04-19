@@ -65,7 +65,7 @@ public class FlinkTableService {
         return env.fromCollection(tupleLeaderboard);
     }
 
-    private TreeSet<Participant> convertDataStreamToList(Iterator<Tuple3<String, String, Long>> leaderboard) {
+    private Set<Participant> convertDataStreamToList(Iterator<Tuple3<String, String, Long>> leaderboard) {
 
         TreeSet<Participant> participants = new TreeSet<>();
 

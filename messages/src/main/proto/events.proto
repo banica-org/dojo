@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "com.codenjoy.dojo";
+option java_multiple_files = true;
+
+message EventsRequest{
+
+}
+
+message EventsResponse{
+  repeated Event event = 1;
+}
+
+message Event{
+  string roomName = 1;
+  string gameName = 2;
+}
+
+service EventService{
+  rpc getAllEvents(EventsRequest) returns (EventsResponse);
+}
