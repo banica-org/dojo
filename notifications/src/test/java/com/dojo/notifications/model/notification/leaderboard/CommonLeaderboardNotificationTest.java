@@ -1,7 +1,9 @@
-package com.dojo.notifications.model.notification;
+package com.dojo.notifications.model.notification.leaderboard;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.notification.leaderboard.CommonLeaderboardNotification;
+import com.dojo.notifications.model.notification.leaderboard.LeaderboardNotification;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.messageGenerator.mail.LeaderboardMailMessageGenerator;
 import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;

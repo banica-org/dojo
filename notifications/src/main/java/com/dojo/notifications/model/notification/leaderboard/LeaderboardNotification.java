@@ -1,6 +1,7 @@
-package com.dojo.notifications.model.notification;
+package com.dojo.notifications.model.notification.leaderboard;
 
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.service.UserDetailsService;
 
 import java.util.HashMap;

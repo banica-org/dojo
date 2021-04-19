@@ -1,4 +1,4 @@
-package com.dojo.notifications.model.notification;
+package com.dojo.notifications.model.notification.leaderboard;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
