@@ -9,7 +9,6 @@ import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -53,7 +52,7 @@ public class Leaderboard {
     }
 
     public Set<Participant> getParticipants() {
-        return Collections.unmodifiableSet(this.participants);
+        return this.participants;
     }
 
     public Text buildLeaderboardNames(UserDetails userDetails, UserDetailsService userDetailsService, CustomSlackClient slackClient) {

@@ -32,6 +32,6 @@ public class SelectRequest {
     @Column(name = "MESSAGE")
     String message;
 
-    @Column(name = "QUANTIFIER")
-    String quantifier;
+    @Column(name = "COMMUNICATION_LEVEL")
+    String communicationLevel;
 }

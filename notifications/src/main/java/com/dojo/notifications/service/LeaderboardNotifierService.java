@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,8 +28,6 @@ import java.util.stream.Collectors;
 public class LeaderboardNotifierService {
 
     private static final String NOTIFYING_MESSAGE = "There are changes in leaderboard!";
-    private static final String NEW_LEADERBOARD_NAME = "NewLeaderboard";
-    private static final String OLD_LEADERBOARD_NAME = "OldLeaderboard";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
 
@@ -63,8 +62,10 @@ public class LeaderboardNotifierService {
         String contestId = contest.getContestId();
 
         Leaderboard leaderboard = leaderboards.get(contestId);
-        leaderboard.updateParticipant(participant);
-        lookForLeaderboardChanges(contest, leaderboard);
+        Set<Participant> participants = new TreeSet<>(leaderboard.getParticipants());
+        Leaderboard newLeaderboard = new Leaderboard(participants);
+        newLeaderboard.updateParticipant(participant);
+        lookForLeaderboardChanges(contest, newLeaderboard);
     }
 
 
@@ -82,11 +83,12 @@ public class LeaderboardNotifierService {
             try {
                 for (SelectRequest request : selectRequestService.getRequests()) {
 
-                    Leaderboard oldQueriedLeaderboard = flinkTableService.executeSingleQuery(oldParticipants, OLD_LEADERBOARD_NAME, request.getQuery());
+                    Leaderboard oldQueriedLeaderboard = flinkTableService.executeSingleQuery(oldParticipants, request.getQuery());
 
-                    Leaderboard newQueriedLeaderboard = flinkTableService.executeSingleQuery(newParticipants, NEW_LEADERBOARD_NAME, request.getQuery());
+                    Leaderboard newQueriedLeaderboard = flinkTableService.executeSingleQuery(newParticipants, request.getQuery());
 
-                    if (newQueriedLeaderboard.getParticipants().size() != 0) {
+                    if (newQueriedLeaderboard.getParticipants().size() != 0
+                            && !oldQueriedLeaderboard.equals(newQueriedLeaderboard)) {
                         notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, request.getEventType(), request.getMessage());
                     }
                 }
