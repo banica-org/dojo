@@ -99,6 +99,7 @@ public class LeaderboardNotifierServiceTest {
     public void notifyPersonalChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setEventType("POSITION_CHANGES");
+        SELECT_REQUEST.setReceiver("All");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
         when(selectRequestService.getRequests()).thenReturn(requests);
@@ -128,6 +129,7 @@ public class LeaderboardNotifierServiceTest {
     public void notifyCommonChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setEventType("SCORE_CHANGES");
+        SELECT_REQUEST.setReceiver("All");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
         when(selectRequestService.getRequests()).thenReturn(requests);

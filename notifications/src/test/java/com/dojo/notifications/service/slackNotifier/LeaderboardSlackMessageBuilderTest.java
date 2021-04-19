@@ -34,7 +34,7 @@ public class LeaderboardSlackMessageBuilderTest {
     private static final String CHANNEL = "Channel";
     private static final String CONV_ID = "Conversation";
 
-    private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
+    private static final String PERSONAL_TITLE = "Your have leaderboard changes";
     private static final String COMMON_TITLE = "Leaderboard update";
 
     private static final int BLOCKS_EXPECTED_SIZE = 4;
