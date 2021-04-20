@@ -66,8 +66,8 @@
                         <div class="form-group">
                             <select class="form-control" id="request" th:value="${selectRequest}" th:field="*{slackCommonNotifications}">
                                 <th:block for="request" th:if="*{slackCommonNotifications}">
-                                    <option th:each="query : ${queries}" th:value="${query.communicationLevel}"
-                                            th:text="${query.message}" th:field="*{slackCommonNotifications}"></option>
+                                    <option th:each="query : ${queries}" th:value="${query.notificationLevel}"
+                                            th:text="${query.queryDescription}" th:field="*{slackCommonNotifications}"></option>
                                 </th:block>
                             </select>
                         </div>
@@ -82,7 +82,7 @@
                 <div class="row border">
                     <div class="col">
                         <div class="form-check">
-                            <input type="checkbox" checked class="form-check-input" id="personalNotifySlack" th:field="*{personalPositionChangeSlack}">
+                            <input type="checkbox" class="form-check-input" id="personalNotifySlack" th:field="*{personalPositionChangeSlack}">
                             <label class="form-check-label" for="personalNotifySlack">Turn on personal slack notifications</label>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                         <div class="form-group">
                             <select class="form-control" th:value="${selectRequest}" th:field="*{emailCommonNotifications}">
                                 <th:block th:if="*{emailCommonNotifications}">
-                                    <option th:each="query : ${queries}" th:value="${query.communicationLevel}"
+                                    <option th:each="query : ${queries}" th:value="${query.notificationLevel}"
                                             th:text="${query.message}" th:field="*{emailCommonNotifications}"></option>
                                 </th:block>
                             </select>

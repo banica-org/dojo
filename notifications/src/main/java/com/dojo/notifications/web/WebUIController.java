@@ -98,6 +98,7 @@ public class WebUIController {
         model.addAttribute("newContest", contest);
         model.addAttribute("events", eventService.getAllEvents());
         model.addAttribute("contests", eventService.getAllContests());
+
         return "contest";
     }
 
@@ -105,10 +106,11 @@ public class WebUIController {
         model.addAttribute("newRequest", newRequest);
         model.addAttribute("queryParameters", newRequest.getQueryParameters());
         model.addAttribute("querySpecification", newRequest.getQuerySpecification());
-        model.addAttribute("describingMessage", newRequest.getDescribingMessage());
-        model.addAttribute("eventType", newRequest.getEventType());
-        model.addAttribute("communicationLevel", newRequest.getCommunicationLevel());
         model.addAttribute("notify", newRequest.getReceiver());
+        model.addAttribute("eventType", newRequest.getEventType());
+        model.addAttribute("notificationLevel", newRequest.getNotificationLevel());
+        model.addAttribute("describingMessage", newRequest.getNotificationMessage());
+        model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
 
         return "request";
     }
@@ -117,10 +119,12 @@ public class WebUIController {
         SelectRequest selectRequest = new SelectRequest();
 
         selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM Leaderboard " + newRequest.getQuerySpecification());
-        selectRequest.setMessage(newRequest.getDescribingMessage());
-        selectRequest.setEventType(newRequest.getEventType());
-        selectRequest.setCommunicationLevel(newRequest.getCommunicationLevel(newRequest.getEventType()));
         selectRequest.setReceiver(newRequest.getReceiver());
+        selectRequest.setEventType(newRequest.getEventType());
+        selectRequest.setNotificationLevel(newRequest.getNotificationLevel(newRequest.getEventType()));
+        selectRequest.setQueryDescription(newRequest.getDescribingMessage());
+        selectRequest.setMessage(newRequest.getNotificationMessage());
+
         selectRequestService.saveRequest(selectRequest);
     }
 
