@@ -9,6 +9,13 @@ RUN git clone --depth 1 --no-tags https://github.com/$user_name/$repo_name
 #RUN cd test-parent && mvn package
 RUN cd $repo_name && mvn -DskipTests package
 
+#FROM gradle:7.0.0-jdk16
+#ARG user_name
+#ARG repo_name
+#WORKDIR /app
+#COPY --from=parent-build /app/$repo_name/target/${repo_name}-1.0-SNAPSHOT-solution-tests.jar /app/${repo_name}-1.0-SNAPSHOT-solution-tests.jar
+#COPY run.sh run.sh
+
 FROM maven:3.6.3-openjdk-15
 ARG user_name
 ARG repo_name
@@ -18,4 +25,4 @@ COPY --from=parent-build /app/$repo_name/target/${repo_name}-1.0-SNAPSHOT-soluti
 COPY --from=parent-build /root/.m2 /root/.m2
 COPY run.sh run.sh
 # $0 is username, $1 is password/token for Github, $2 is child username, $3 is child repo name, $4 is parent-repo-name
-ENTRYPOINT chmod +x run.sh && ./run.sh $0 $1 $2 $3 $4
+ENTRYPOINT chmod +x run.sh && ./run.sh $0 $1 $2 $3 $4 $5
