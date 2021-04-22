@@ -41,8 +41,8 @@ public class DockerServiceImpl implements DockerService {
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
     private final GitConfigProperties gitConfigProperties;
-    private AtomicInteger containerCounter;
-    private Map<String, String> containerUserCache;
+    private final AtomicInteger containerCounter;
+    private final Map<String, String> containerUserCache;
 
     @Autowired
     public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
