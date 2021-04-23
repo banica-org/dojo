@@ -1,9 +1,9 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
 import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
-import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageCmd;
@@ -14,7 +14,6 @@ import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Frame;
-import com.github.dockerjava.api.model.PruneResponse;
 import com.github.dockerjava.api.model.PruneType;
 import com.github.dockerjava.api.model.WaitResponse;
 import org.springframework.beans.factory.annotation.Autowired;
