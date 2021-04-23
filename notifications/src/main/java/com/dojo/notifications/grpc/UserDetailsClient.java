@@ -1,4 +1,4 @@
-package com.dojo.notifications.grpc.leaderboard;
+package com.dojo.notifications.grpc;
 
 import com.codenjoy.dojo.ByIdRequest;
 import com.codenjoy.dojo.ByUsernameRequest;

@@ -2,6 +2,7 @@ package com.dojo.notifications.service.messageGenerator.slack;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
@@ -15,7 +16,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
@@ -37,6 +40,10 @@ public class LeaderboardSlackMessageGeneratorTest {
     private static final String PERSONAL_TITLE = "Your position in leaderboard has changed";
     private static final String COMMON_TITLE = "Leaderboard update";
 
+    private static final String CONTENT_KEY = "content";
+    private static final String MESSAGE_KEY = "message";
+    private static final String USERDERAILS_KEY = "userDetails";
+
     private static final int BLOCKS_EXPECTED_SIZE = 4;
     private static final int ATTACHMENTS_EXPECTED_SIZE = 1;
 
@@ -51,7 +58,7 @@ public class LeaderboardSlackMessageGeneratorTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    LeaderboardSlackMessageGenerator leaderboardSlackMessageBuilder;
+    LeaderboardSlackMessageGenerator leaderboardSlackMessageGenerator;
 
     @Before
     public void init() {
@@ -61,16 +68,26 @@ public class LeaderboardSlackMessageGeneratorTest {
         participants.add(participant);
         leaderboard = new Leaderboard(participants);
 
-        leaderboardSlackMessageBuilder = new LeaderboardSlackMessageGenerator();
+        leaderboardSlackMessageGenerator = new LeaderboardSlackMessageGenerator();
 
         when(userDetailsService.getUserEmail(USER_ID)).thenReturn(USER_EMAIL);
         when(slackClient.getSlackUserId(USER_EMAIL)).thenReturn(CONV_ID);
     }
 
     @Test
-    public void generatePersonalSlackMessageTest() {
+    public void getMessageGeneratorTypeMappingTest() {
+        NotificationType expected = NotificationType.LEADERBOARD;
+        NotificationType actual = leaderboardSlackMessageGenerator.getMessageGeneratorTypeMapping();
+        assertEquals(expected, actual);
+    }
 
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateMessage(userDetailsService, userDetails, leaderboard, slackClient, CHANNEL, MESSAGE);
+    @Test
+    public void generatePersonalSlackMessageTest() {
+        userDetails = new UserDetails();
+        Map<String, Object> contextParams = getContextParams();
+        contextParams.put(USERDERAILS_KEY, userDetails);
+
+        ChatPostMessageParams content = leaderboardSlackMessageGenerator.generateMessage(userDetailsService, contextParams, slackClient, CHANNEL);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -85,8 +102,7 @@ public class LeaderboardSlackMessageGeneratorTest {
 
     @Test
     public void generateCommonSlackMessageTest() {
-
-        ChatPostMessageParams content = leaderboardSlackMessageBuilder.generateMessage(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE);
+        ChatPostMessageParams content = leaderboardSlackMessageGenerator.generateMessage(userDetailsService, getContextParams(), slackClient, CHANNEL);
 
         List<Block> blocks = content.getBlocks();
         List<Attachment> attachments = content.getAttachments();
@@ -97,5 +113,12 @@ public class LeaderboardSlackMessageGeneratorTest {
         assertTrue(blocks.get(2).toString().contains(USER_NAME));
         assertTrue(blocks.get(2).toString().contains(String.valueOf(USER_SCORE)));
         assertTrue(blocks.get(2).toString().contains(COMMON_TITLE));
+    }
+
+    private Map<String, Object> getContextParams() {
+        Map<String, Object> contextParams = new HashMap<>();
+        contextParams.put(MESSAGE_KEY, MESSAGE);
+        contextParams.put(CONTENT_KEY, leaderboard);
+        return contextParams;
     }
 }

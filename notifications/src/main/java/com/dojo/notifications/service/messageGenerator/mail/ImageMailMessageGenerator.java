@@ -8,15 +8,14 @@ import org.thymeleaf.context.Context;
 import java.util.Map;
 
 @Service
-public class LeaderboardMailMessageGenerator extends MailMessageGenerator {
-
-    public LeaderboardMailMessageGenerator(ITemplateEngine templateEngine) {
+public class ImageMailMessageGenerator extends MailMessageGenerator {
+    public ImageMailMessageGenerator(ITemplateEngine templateEngine) {
         super(templateEngine);
     }
 
     @Override
     public NotificationType getMessageGeneratorTypeMapping() {
-        return NotificationType.LEADERBOARD;
+        return NotificationType.IMAGE;
     }
 
     @Override
@@ -24,7 +23,6 @@ public class LeaderboardMailMessageGenerator extends MailMessageGenerator {
         Context context = new Context();
         contextParams.forEach(context::setVariable);
 
-        return getTemplateEngine().process("leaderboardMailTemplate", context);
+        return getTemplateEngine().process("imageMailTemplate", context);
     }
-
 }

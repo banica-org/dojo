@@ -2,7 +2,8 @@ package com.dojo.notifications.service.messageGenerator.slack;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.notification.SlackNotificationUtils;
+import com.dojo.notifications.model.leaderboard.SlackNotificationUtils;
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.UserDetailsService;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
@@ -14,6 +15,8 @@ import com.hubspot.slack.client.models.blocks.Section;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class LeaderboardSlackMessageGenerator extends SlackMessageGenerator {
@@ -28,22 +31,30 @@ public class LeaderboardSlackMessageGenerator extends SlackMessageGenerator {
     private static final String USER = "*User*";
     private static final String SCORE = "*Score*";
 
-    private static final UserDetails COMMON = null;
-
     @Override
-    public ChatPostMessageParams generateMessage(UserDetailsService userDetailsService, UserDetails userDetails, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
-        Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, userDetailsService, slackClient);
-        Text leaderboardScores = leaderboard.buildLeaderboardScores(userDetails);
-
-        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, PERSONAL_TITLE, queryMessage);
+    public NotificationType getMessageGeneratorTypeMapping() {
+        return NotificationType.LEADERBOARD;
     }
 
     @Override
-    public ChatPostMessageParams generateMessage(UserDetailsService userDetailsService, Leaderboard leaderboard, CustomSlackClient slackClient, String slackChannel, String queryMessage) {
-        Text leaderboardNames = leaderboard.buildLeaderboardNames(COMMON, userDetailsService, slackClient);
-        Text leaderboardScores = leaderboard.buildLeaderboardScores(COMMON);
+    public ChatPostMessageParams generateMessage(UserDetailsService userDetailsService, Map<String, Object> contextParams, CustomSlackClient slackClient, String slackChannel) {
+        Leaderboard leaderboard = (Leaderboard) contextParams.get(CONTENT_KEY);
+        UserDetails userDetails;
+        String title;
 
-        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, COMMON_TITLE, queryMessage);
+        if (contextParams.containsKey(USERDETAILS_KEY)) {
+            userDetails = (UserDetails) contextParams.get(USERDETAILS_KEY);
+            title = PERSONAL_TITLE;
+        } else {
+            userDetails = null;
+            title = COMMON_TITLE;
+        }
+
+        String message = (String) contextParams.get(MESSAGE_KEY);
+        Text leaderboardNames = leaderboard.buildLeaderboardNames(userDetails, userDetailsService, slackClient);
+        Text leaderboardScores = leaderboard.buildLeaderboardScores(userDetails);
+
+        return getChatPostMessageParams(slackChannel, leaderboardNames, leaderboardScores, title, message);
     }
 
     private ChatPostMessageParams getChatPostMessageParams(String slackChannel, Text leaderboardNames, Text leaderboardScores, String personalTitle, String queryMessage) {

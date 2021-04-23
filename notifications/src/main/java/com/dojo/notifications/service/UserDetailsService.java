@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
+import com.dojo.notifications.grpc.UserDetailsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

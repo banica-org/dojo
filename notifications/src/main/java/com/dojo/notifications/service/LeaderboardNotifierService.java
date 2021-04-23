@@ -4,8 +4,9 @@ import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.notification.leaderboard.CommonLeaderboardNotification;
-import com.dojo.notifications.model.notification.leaderboard.PersonalLeaderboardNotification;
+import com.dojo.notifications.model.notification.ParticipantNotification;
+import com.dojo.notifications.model.notification.SenseiNotification;
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
@@ -68,7 +69,6 @@ public class LeaderboardNotifierService {
         lookForLeaderboardChanges(contest, newLeaderboard);
     }
 
-
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
@@ -109,31 +109,31 @@ public class LeaderboardNotifierService {
 
         if (actual) {
             if (eventTypeQuery.equals(EventType.POSITION_CHANGES)) {
-                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, queryMessage);
+                notifyParticipant(contest, newQueriedLeaderboard, oldQueriedLeaderboard, queryMessage);
             }
 
             contest.getCommonNotificationsLevel().entrySet().stream()
                     .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), queryMessage));
+                    .forEach(entry -> notifySensei(contest, newQueriedLeaderboard, entry.getKey(), queryMessage));
         }
 
     }
 
-    private void notifyPersonal(Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard, String queryMessage) {
+    private void notifyParticipant(Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard, String queryMessage) {
 
         List<UserDetails> userDetails = leaderboardService.getUserDetails(newLeaderboard, oldLeaderboard);
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new PersonalLeaderboardNotification(userDetailsService, newLeaderboard, user, queryMessage), contest);
+                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, queryMessage, NotificationType.LEADERBOARD), contest);
             }
         }
     }
 
-    private void notifyCommon(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
+    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
         notificationServices.get(notifierType)
-                .notify(new CommonLeaderboardNotification(userDetailsService, newLeaderboard, queryMessage), contest);
+                .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
 
 }

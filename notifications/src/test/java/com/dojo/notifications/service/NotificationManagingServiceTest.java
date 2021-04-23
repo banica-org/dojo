@@ -1,7 +1,8 @@
 package com.dojo.notifications.service;
 
+import com.dojo.notifications.grpc.DockerClient;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.grpc.leaderboard.LeaderboardClient;
+import com.dojo.notifications.grpc.LeaderboardClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,8 @@ public class NotificationManagingServiceTest {
 
     @Mock
     private LeaderboardClient leaderboardClient;
+    @Mock
+    private DockerClient dockerClient;
 
     private NotificationManagingService notificationManagingService;
 
@@ -27,7 +30,7 @@ public class NotificationManagingServiceTest {
 
     @Before
     public void init() {
-        notificationManagingService = new NotificationManagingService(leaderboardClient);
+        notificationManagingService = new NotificationManagingService(leaderboardClient, dockerClient);
         when(contest.getContestId()).thenReturn(CONTEST_ID);
     }
 
@@ -40,7 +43,7 @@ public class NotificationManagingServiceTest {
     @Test
     public void stopNotificationsTest() {
         startNotificationsTest();
-        notificationManagingService.stopNotifications(CONTEST_ID);
-        verify(leaderboardClient, times(1)).stopLeaderboardNotifications(CONTEST_ID);
+        notificationManagingService.stopNotifications(contest);
+        verify(leaderboardClient, times(1)).stopLeaderboardNotifications(contest);
     }
 }

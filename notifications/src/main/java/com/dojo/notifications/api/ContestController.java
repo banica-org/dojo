@@ -2,6 +2,7 @@ package com.dojo.notifications.api;
 
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.service.NotificationManagingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ public class ContestController {
 
     @Autowired
     private EventService eventService;
+    @Autowired
+    private NotificationManagingService notificationManagingService;
 
     @PostMapping("/api/v1/contest")
     public @ResponseBody
@@ -20,6 +23,7 @@ public class ContestController {
             stopNotifications(contest.getContestId());
         }
         eventService.addContest(contest);
+        notificationManagingService.startNotifications(contest);
         return new ResponseEntity<>(contest, HttpStatus.OK);
     }
 
@@ -34,7 +38,8 @@ public class ContestController {
     ResponseEntity<String> stopNotifications(@PathVariable String id) {
         Contest contest = eventService.getContestById(id);
         if (contest != null) {
-            eventService.removeContest(contest.getContestId());
+            eventService.removeContest(id);
+            notificationManagingService.stopNotifications(contest);
         }
         return new ResponseEntity<>("DELETE Response", HttpStatus.OK);
     }

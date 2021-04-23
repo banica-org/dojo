@@ -1,9 +1,9 @@
-package com.dojo.notifications.model.notification.leaderboard;
+package com.dojo.notifications.model.notification;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.notification.leaderboard.CommonLeaderboardNotification;
-import com.dojo.notifications.model.notification.leaderboard.LeaderboardNotification;
+import com.dojo.notifications.model.notification.enums.NotificationType;
+import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.messageGenerator.mail.LeaderboardMailMessageGenerator;
 import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;
@@ -28,12 +28,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CommonLeaderboardNotificationTest {
+public class ParticipantNotificationTest {
 
     private static final String CHANNEL = "channel";
     private static final String MESSAGE = "Mail message";
-    private static final String LEADERBOARD_KEY = "leaderboard";
+    private static final String REQUEST_MESSAGE = "Test";
+
+    private static final String CONTENT_KEY = "content";
     private static final String MESSAGE_KEY = "message";
+    private static final String USERDERAILS_KEY = "userDetails";
 
     @Mock
     private CustomSlackClient slackClient;
@@ -41,10 +44,13 @@ public class CommonLeaderboardNotificationTest {
     @Mock
     private UserDetailsService userDetailsService;
 
+    @Mock
+    private UserDetails userDetails;
+
     private ChatPostMessageParams chatPostMessageParams;
     private Leaderboard leaderboard;
 
-    private LeaderboardNotification leaderboardNotification;
+    private NotificationImpl notification;
 
     @Before
     public void init() {
@@ -53,19 +59,17 @@ public class CommonLeaderboardNotificationTest {
                 .setChannelId(CHANNEL)
                 .build();
         leaderboard = new Leaderboard(new TreeSet<>());
-        leaderboardNotification = new CommonLeaderboardNotification(userDetailsService, leaderboard, MESSAGE);
+        notification = new ParticipantNotification(userDetailsService, leaderboard, userDetails, REQUEST_MESSAGE, NotificationType.LEADERBOARD);
     }
 
     @Test
     public void getAsEmailNotificationTest() {
-        Map<String, Object> contextParams = new HashMap<>();
-        contextParams.put(MESSAGE_KEY, MESSAGE);
-        contextParams.put(LEADERBOARD_KEY, leaderboard.getParticipants());
+        Map<String, Object> contextParams = getContextParams();
 
         MailMessageGenerator mailMessageGenerator = mock(LeaderboardMailMessageGenerator.class);
         when(mailMessageGenerator.generateMessage(contextParams)).thenReturn(MESSAGE);
 
-        String actual = leaderboardNotification.getAsEmailNotification(mailMessageGenerator);
+        String actual = notification.getAsEmailNotification(mailMessageGenerator);
 
         verify(mailMessageGenerator, times(1)).generateMessage(contextParams);
         assertEquals(actual, MESSAGE);
@@ -73,12 +77,22 @@ public class CommonLeaderboardNotificationTest {
 
     @Test
     public void getAsSlackNotificationTest() {
+        Map<String, Object> contextParams = getContextParams();
         SlackMessageGenerator slackMessageGenerator = mock(LeaderboardSlackMessageGenerator.class);
-        when(slackMessageGenerator.generateMessage(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE))
+        when(slackMessageGenerator.generateMessage(userDetailsService, contextParams, slackClient, CHANNEL))
                 .thenReturn(chatPostMessageParams);
 
-        leaderboardNotification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
+        notification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
 
-        verify(slackMessageGenerator, times(1)).generateMessage(userDetailsService, leaderboard, slackClient, CHANNEL, MESSAGE);
+        verify(slackMessageGenerator, times(1)).generateMessage(userDetailsService, contextParams, slackClient, CHANNEL);
     }
+
+    private Map<String, Object> getContextParams() {
+        Map<String, Object> contextParams = new HashMap<>();
+        contextParams.put(CONTENT_KEY, leaderboard);
+        contextParams.put(MESSAGE_KEY, REQUEST_MESSAGE);
+        contextParams.put(USERDERAILS_KEY, userDetails);
+        return contextParams;
+    }
+
 }
