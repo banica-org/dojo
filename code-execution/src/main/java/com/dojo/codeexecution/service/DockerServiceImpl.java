@@ -11,8 +11,11 @@ import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Frame;
+import com.github.dockerjava.api.model.PruneResponse;
+import com.github.dockerjava.api.model.PruneType;
 import com.github.dockerjava.api.model.WaitResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +23,11 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DockerServiceImpl implements DockerService {
@@ -37,8 +41,8 @@ public class DockerServiceImpl implements DockerService {
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
     private final GitConfigProperties gitConfigProperties;
-    private int containerCounter;
-    private Map<String, String> containerUserCache;
+    private final AtomicInteger containerCounter;
+    private final Map<String, String> containerUserCache;
 
     @Autowired
     public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
@@ -47,12 +51,12 @@ public class DockerServiceImpl implements DockerService {
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
-        this.containerCounter = 0;
-        this.containerUserCache = new HashMap<>();
+        this.containerCounter = new AtomicInteger();
+        this.containerUserCache = new ConcurrentHashMap<>();
     }
 
     public void runContainer(String imageTag) {
-        String username = "example_username";
+        String username = "kaloyan_dutsolov6";
         String containerId = createContainer(imageTag).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
@@ -65,10 +69,10 @@ public class DockerServiceImpl implements DockerService {
     }
 
     public String buildImage() {
+        deleteUnnecessaryImages();
         BuildImageCmd buildImage = dockerClient.buildImageCmd()
                 .withDockerfile(new File(dockerConfigProperties.getFilepath()))
                 .withRemove(true)
-                .withNoCache(true)
                 .withTags(Collections.singleton(dockerConfigProperties.getParentTag()))
                 .withBuildArg(USER_NAME, gitConfigProperties.getUser())
                 .withBuildArg(REPO_NAME, gitConfigProperties.getParentRepositoryName());
@@ -76,9 +80,11 @@ public class DockerServiceImpl implements DockerService {
         return getImageTag(imageId);
     }
 
-    public List<String> getContainerLog(String containerId) throws InterruptedException {
-        LogContainerCmd logContainerCmd = dockerClient.logContainerCmd(containerId).withStdOut(true).withStdErr(true);
-        List<String> logs = new ArrayList<>();
+    public List<String> getContainerLog(String containerId, List<String> logs) throws InterruptedException {
+        LogContainerCmd logContainerCmd =
+                dockerClient.logContainerCmd(containerId)
+                        .withStdOut(true)
+                        .withStdErr(true);
         StringBuilder stringBuilder = new StringBuilder();
         logContainerCmd.exec(getLogCallBack(logs, stringBuilder)).awaitCompletion();
         return logs;
@@ -88,16 +94,28 @@ public class DockerServiceImpl implements DockerService {
         dockerClient.removeContainerCmd(containerId)
                 .withRemoveVolumes(true)
                 .withForce(true).exec();
-        containerCounter--;
+        decrementContainerCounter();
+    }
+
+    private void deleteUnnecessaryImages() {
+        dockerClient.pruneCmd(PruneType.IMAGES)
+                .withDangling(true).exec();
+        try {
+            dockerClient.removeImageCmd(dockerConfigProperties.getParentTag())
+                    .withForce(true).exec();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getImageTag(String imageId) {
-        return Objects.requireNonNull(dockerClient.inspectImageCmd(imageId)
-                .exec().getRepoTags()).get(0);
+        return Objects.requireNonNull(dockerClient.inspectImageCmd(imageId).exec()
+                .getRepoTags())
+                .get(0);
     }
 
     private CreateContainerResponse createContainer(String imageTag) {
-        containerCounter++;
+        incrementContainerCounter();
         String containerName = imageTag.split(":")[0] + this.getContainerCounter();
         return dockerClient.createContainerCmd(imageTag)
                 .withCmd(dockerConfigProperties.getShellArguments())
@@ -143,35 +161,37 @@ public class DockerServiceImpl implements DockerService {
         return new ResultCallback.Adapter<WaitResponse>() {
             @Override
             public void onNext(WaitResponse object) {
-                List<String> logs = null;
+                List<String> logs = new ArrayList<>();
+                String status = getContainerStatus(containerId);
                 try {
-                    logs = getContainerLog(containerId);
+                    containerUpdateHandler.sendUpdate(status,
+                            containerUserCache.get(containerId), getContainerLog(containerId, logs));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (logs == null) {
-                    logs = new ArrayList<>();
-                }
-                // get the container status after completing its work
-                String status = getContainerStatus(containerId);
-                containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), logs);
-                // removing from cache the key-value pair containerId -> username
                 deleteContainerUsername(containerId);
                 deleteContainer(containerId);
-                logs.forEach(System.out::println);
                 super.onNext(object);
             }
         };
     }
 
     private String getContainerStatus(String containerId) {
-        InspectContainerResponse inspectContainerCmd = dockerClient.inspectContainerCmd(containerId).exec();
-        System.out.println(inspectContainerCmd.getState().toString());
-        return inspectContainerCmd.getState().getStatus();
+        InspectContainerResponse inspectContainerResponse =
+                dockerClient.inspectContainerCmd(containerId).exec();
+        return inspectContainerResponse.getState().getStatus();
     }
 
     public int getContainerCounter() {
-        return this.containerCounter;
+        return containerCounter.get();
+    }
+
+    private int incrementContainerCounter() {
+        return containerCounter.incrementAndGet();
+    }
+
+    private int decrementContainerCounter() {
+        return containerCounter.decrementAndGet();
     }
 
     private void addContainerUsername(String containerId, String username) {
