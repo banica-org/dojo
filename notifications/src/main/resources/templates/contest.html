@@ -38,110 +38,106 @@
                     </div>
                 </th:block>
             </div>
-            <hr>
-            <br>
 
-            <h4 style="text-align:center">Slack Notifications</h4>
+            <table style="width:100%">
+            <h4 style="text-align:center">Notifications</h4>
+                <tr>
+                    <th style="width:50%">
+                        <label>For slack:</label>
+                        <input type="checkbox" style="left-margin:30px" value="ON_ANY_LEADERBOARD_CHANGE" th:field="*{slackCommonNotifications}" onclick="hiddenAndUnhiddenDiv('slackToken'); hiddenAndUnhiddenDiv('slackChannel'); hiddenAndUnhiddenDiv('personalNotifySlack')">
+                    </th>
+                    <th style="width:50%">
+                        <label>For email:</label>
+                        <input type="checkbox" style="left-margin:30px" value="ON_ANY_LEADERBOARD_CHANGE" th:field="*{emailCommonNotifications}" onclick="hiddenAndUnhiddenDiv('senseiEmailsAsString'); hiddenAndUnhiddenDiv('personalNotifyEmail')">
+                    </th>
+                </tr>
 
-            <div class="form-group">
-                <label for="slackToken">Slack token:</label>
-                <input class="form-control" id="slackToken" th:field="*{slackToken}">
-            </div>
-            <div class="form-group">
-                <label for="slackChannel">Slack channel:</label>
-                <div class="input-group">
-                    <div class="input-group-addon">
-                        <span class="input-group-text" id="sc-addon">#</span>
-                    </div>
-                    <input class="form-control" id="slackChannel" th:field="*{slackChannel}" aria-describedby="sc-addon">
-                </div>
-            </div>
-
-            <hr>
-            <br>
-            <h5>Group channel notification</h5>
-            <div class="container">
-                <div class="row border">
-                    <div class="col">
+                <hr>
+                <br>
+                <tr>
+                    <td>
                         <div class="form-group">
-                            <select class="form-control" id="request" th:value="${selectRequest}" th:field="*{slackCommonNotifications}">
-                                <th:block for="request" th:if="*{slackCommonNotifications}">
-                                    <option th:each="query : ${queries}" th:value="${query.notificationLevel}"
-                                            th:text="${query.queryDescription}" th:field="*{slackCommonNotifications}"></option>
-                                </th:block>
-                            </select>
+                            <label for="slackToken">Slack token:</label>
+                            <input class="form-control" id="slackToken" th:field="*{slackToken}" disabled>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-            <br>
-            <h5>Personal slack notifications</h5>
-            <div class="container">
-                <div class="row border">
-                    <div class="col">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="personalNotifySlack" th:field="*{personalPositionChangeSlack}">
-                            <label class="form-check-label" for="personalNotifySlack">Turn on personal slack notifications</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-            <br>
-            <h4 style="text-align:center">Email Notifications</h4>
-            <div class="form-group">
-                <label for="senseiEmailsAsString">Sensei e-mail(s):</label>
-                <div class="input-group">
-                    <div class="input-group-addon">
-                        <span class="input-group-text" id="se-addon">@</span>
-                    </div>
-                    <input class="form-control" id="senseiEmailsAsString" th:field="*{senseiEmailsAsString}" aria-describedby="se-addon">
-                </div>
-            </div>
-
-            <hr>
-            <br>
-            <h5>Sensei's email notification</h5>
-            <div class="container">
-                <div class="row border">
-                    <div class="col">
+                    </td>
+                    <td>
                         <div class="form-group">
-                            <select class="form-control" th:value="${selectRequest}" th:field="*{emailCommonNotifications}">
-                                <th:block th:if="*{emailCommonNotifications}">
-                                    <option th:each="query : ${queries}" th:value="${query.notificationLevel}"
-                                            th:text="${query.message}" th:field="*{emailCommonNotifications}"></option>
-                                </th:block>
-                            </select>
+                            <label for="senseiEmailsAsString">Sensei e-mail(s):</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="input-group-text" id="se-addon">@</span>
+                                </div>
+                                <input class="form-control" id="senseiEmailsAsString" th:field="*{senseiEmailsAsString}" aria-describedby="se-addon" disabled>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group" id="slack-channel">
+                            <label for="slackChannel">Slack channel:</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="input-group-text" id="sc-addon">#</span>
+                                </div>
+                                <input class="form-control" id="slackChannel" th:field="*{slackChannel}" aria-describedby="sc-addon" disabled>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="slack-personal" class="container">
+                            <h5>Personal slack notifications</h5>
+                            <div class="row border">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="personalNotifySlack" th:field="*{personalPositionChangeSlack}" disabled>
+                                        <label class="form-check-label" for="personalNotifySlack">Turn on personal slack notifications</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="email-personal" class="container">
+                            <h5>Personal email notifications</h5>
+                            <div class="row border">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="personalNotifyEmail" th:field="*{personalPositionChangeEmail}" disabled>
+                                        <label class="form-check-label" for="personalNotifyEmail">Turn on personal email notifications</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
             <hr>
             <br>
-            <h5>Personal email notifications</h5>
-            <div class="container">
+            <div class="container" style="align:center">
+                <h5>Group notification rules</h5>
                 <div class="row border">
                     <div class="col">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="personalPositionChangeEmail" th:field="*{personalPositionChangeEmail}">
-                            <label class="form-check-label" for="personalPositionChangeEmail">Turn on personal email notifications</label>
-                        </div>
+                        <table class="table-control" th:value="${selectRequest}">
+                            <tr th:each="query : ${queries}">
+                                <td>
+                                    <label th:text="${query.id} + ."></label>
+                                    <label th:text="${query.queryDescription}"></label>
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
                     </div>
                 </div>
             </div>
-
-            <hr>
-            <br>
-            <div style="text-align:center" >
+            <div style="text-align:center">
                 <form action="#" th:action="@{/request}" th:object="${newRequest}" method="post">
                     <button style="text-align:center" class="btn btn-primary" type="submit" name="action" value="add">Add Request</button>
                 </form>
                 <button style="text-align:center" class="btn btn-primary" type="submit" name="action" value="start" th:text="*{contestId} ? 'Restart Notifications' : 'Start Notifications'">Start Notifications</button>
-
             </div>
         </form>
     </div>
@@ -180,5 +176,15 @@
             </div>
         </div>
     </div>
+    <script>
+        function hiddenAndUnhiddenDiv(divName) {
+            var x = document.getElementById(divName);
+            if (x.disabled) {
+                x.disabled = false;
+            } else {
+                x.disabled = true;
+            }
+        }
+    </script>
 </body>
 </html>

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 public class LeaderboardNotifierService {
 
     private static final String NOTIFYING_MESSAGE = "There are changes in leaderboard!";
+    private static final String RECEIVER_PARTICIPANT = "Participant";
+    private static final String RECEIVER_COMMON = "Common";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaderboardNotifierService.class);
 
@@ -72,61 +75,58 @@ public class LeaderboardNotifierService {
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (oldLeaderboard != null
-                && newLeaderboard != null
-                && !oldLeaderboard.getParticipants().isEmpty()
-                && !oldLeaderboard.equals(newLeaderboard)) {
+        if (oldLeaderboard != null && newLeaderboard != null
+                && !oldLeaderboard.getParticipants().isEmpty() && !oldLeaderboard.equals(newLeaderboard)) {
 
-            Set<Participant> newParticipants = newLeaderboard.getParticipants();
-            Set<Participant> oldParticipants = oldLeaderboard.getParticipants();
+            for (SelectRequest request : selectRequestService.getRequests()) {
+                Set<Participant> queriedParticipants = new TreeSet<>();
 
-            try {
-                for (SelectRequest request : selectRequestService.getRequests()) {
-
-                    Leaderboard oldQueriedLeaderboard = flinkTableService.executeSingleQuery(oldParticipants, request.getQuery());
-
-                    Leaderboard newQueriedLeaderboard = flinkTableService.executeSingleQuery(newParticipants, request.getQuery());
-
-                    if (newQueriedLeaderboard.getParticipants().size() != 0
-                            && !oldQueriedLeaderboard.equals(newQueriedLeaderboard)) {
-                        notifyAbout(contest, oldQueriedLeaderboard, newQueriedLeaderboard, request);
+                if (request.getCondition() != 0) {
+                    try {
+                        queriedParticipants = flinkTableService.executeSingleQuery(request, newLeaderboard, oldLeaderboard);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                if (queriedParticipants.size() != 0) {
+                    notifyAbout(contest, request, queriedParticipants, newLeaderboard);
+                }
             }
         }
-
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
 
-    public void notifyAbout(Contest contest, Leaderboard oldQueriedLeaderboard, Leaderboard newQueriedLeaderboard, SelectRequest request) {
+    public void notifyAbout(Contest contest, SelectRequest request, Set<Participant> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType eventTypeQuery = EventType.valueOf(request.getEventType());
-        boolean actual = leaderboardService.isEventType(newQueriedLeaderboard, oldQueriedLeaderboard, eventTypeQuery);
 
-        if (actual) {
-            if (request.getReceiver().equals("All")) {
-                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, request.getMessage());
+        if (queriedParticipants.size() != 0) {
+
+            if (request.getReceiver().equals(RECEIVER_PARTICIPANT)) {
+
+                notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
+            } else if (request.getReceiver().equals(RECEIVER_COMMON)) {
+
                 contest.getCommonNotificationsLevel().entrySet().stream()
+                        .filter(entry -> entry.getValue() != null)
                         .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                        .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), request.getMessage()));
-            } else if (request.getReceiver().equals("Participant")) {
-                notifyPersonal(contest, newQueriedLeaderboard, oldQueriedLeaderboard, request.getMessage());
+                        .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
             } else {
+                notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
+
                 contest.getCommonNotificationsLevel().entrySet().stream()
+                        .filter(entry -> entry.getValue() != null)
                         .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                        .forEach(entry -> notifyCommon(contest, newQueriedLeaderboard, entry.getKey(), request.getMessage()));
+                        .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
             }
         }
-
     }
 
-    private void notifyPersonal(Contest contest, Leaderboard newLeaderboard, Leaderboard oldLeaderboard, String queryMessage) {
-
-        List<UserDetails> userDetails = leaderboardService.getUserDetails(newLeaderboard, oldLeaderboard);
+    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<Participant> participants, String queryMessage) {
+        List<UserDetails> userDetails = new ArrayList<>();
+        participants.forEach(participant -> userDetails.add(userDetailsService.getUserDetails(participant.getUser().getId())));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
