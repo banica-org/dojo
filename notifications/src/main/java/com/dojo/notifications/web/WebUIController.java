@@ -22,6 +22,8 @@ import java.util.List;
 public class WebUIController {
 
     private final static String ACTION_ADD = "add";
+    private final static String ACTION_START = "start";
+    private final static String ACTION_BACK = "back";
 
     @Autowired
     private SelectRequestService selectRequestService;
@@ -43,13 +45,21 @@ public class WebUIController {
         return setupContestsPage(model, new Contest());
     }
 
-    @PostMapping("/contest")
-    public String newContest(@ModelAttribute Contest newContest, Model model,
-                             @RequestParam String action) {
-        if (action.equals(ACTION_ADD)) {
-            setupRequestPage(model, new SelectRequestModel());
-            return "request";
+    @PostMapping("/event")
+    public String determineEvent(@ModelAttribute Contest newContest, Model model, @RequestParam String action) {
+        switch (action) {
+            case ACTION_ADD:
+                return setupRequestPage(model, new SelectRequestModel());
+            case ACTION_START:
+                return newContest(newContest, model);
+            case ACTION_BACK:
+                return redirect(model);
+            default:
+                return deleteRequest(Integer.parseInt(action), model);
         }
+    }
+
+    public String newContest(@ModelAttribute Contest newContest, Model model) {
         Event selectedEvent = eventService.getEventByRoomName(newContest.getContestId());
         newContest.setTitle(selectedEvent.getGameName());
         contestController.subscribeForContest(newContest);
@@ -83,15 +93,19 @@ public class WebUIController {
     }
 
     @PostMapping("/request")
-    public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model,
-                             @RequestParam String action) {
-        if (action.equals(ACTION_ADD)) {
-            setupRequestPage(model, new SelectRequestModel());
+    public String newRequest(@ModelAttribute SelectRequestModel newRequest, Model model, @RequestParam String action) {
+        setupRequestPage(model, new SelectRequestModel());
+        if(action.equals(ACTION_ADD)) {
             setupQueryUpdate(newRequest);
-            addDropDownOptions(model);
-            return redirect(model);
         }
+        addDropDownOptions(model);
         return redirect(model);
+
+    }
+
+    public String deleteRequest(@PathVariable int id, Model model) {
+        selectRequestService.deleteRequest(id);
+        return contestsPage(model);
     }
 
     private String setupContestsPage(Model model, Contest contest) {
