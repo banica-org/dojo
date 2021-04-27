@@ -44,7 +44,7 @@ public class LeaderboardNotifierServiceTest {
 
 
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
-    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());//Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
+    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());
 
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
@@ -148,7 +148,7 @@ public class LeaderboardNotifierServiceTest {
     }
 
     @Test
-    public void notifyCommonChangesTest() throws Exception {
+    public void notifyAllChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setEventType("SCORE_CHANGES");
         SELECT_REQUEST.setReceiver("All");
@@ -171,4 +171,26 @@ public class LeaderboardNotifierServiceTest {
         verify(notificationService, times(1)).notify(any(), any());
     }
 
+    @Test
+    public void notifyCommonChangesTest() throws Exception {
+        //Arrange
+        SELECT_REQUEST.setEventType("SCORE_CHANGES");
+        SELECT_REQUEST.setReceiver("Common");
+        SELECT_REQUEST.setCondition(100);
+        List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
+
+        when(selectRequestService.getRequests()).thenReturn(requests);
+        when(flinkTableService.executeSingleQuery(any(), eq(NEW_LEADERBOARD), eq(OLD_LEADERBOARD))).thenReturn(NEW_LEADERBOARD.getParticipants());
+        when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
+
+        //Act
+        leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
+
+        //Assert
+        verify(selectRequestService, times(1)).getRequests();
+        verify(flinkTableService, times(1)).executeSingleQuery(any(), eq(NEW_LEADERBOARD), eq(OLD_LEADERBOARD));
+        verify(contest, times(2)).getContestId();
+        verify(contest, times(1)).getCommonNotificationsLevel();
+        verify(notificationService, times(1)).notify(any(), any());
+    }
 }

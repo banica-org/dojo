@@ -4,6 +4,7 @@ import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.repo.SelectRequestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,4 +32,7 @@ public class SelectRequestService {
         selectRequestRepo.save(selectRequest);
     }
 
+    public void deleteRequest(@PathVariable int id) {
+        selectRequestRepo.deleteById(id);
+    }
 }
