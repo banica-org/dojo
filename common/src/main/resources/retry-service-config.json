@@ -1,0 +1,32 @@
+{
+  "methodConfig": [
+    {
+      "name": [
+        {
+          "service": "com.dojo.codeexecution.DockerService"
+        },
+        {
+          "service": "com.codenjoy.dojo.EventService"
+        },
+        {
+          "service": "com.codenjoy.dojo.LeaderboardService"
+        },
+        {
+          "service": "com.codenjoy.dojo.UserDetailsService"
+        }
+      ],
+      "retryPolicy": {
+        "maxAttempts": 1000,
+        "initialBackoff": "2s",
+        "maxBackoff": "10s",
+        "backoffMultiplier": 4,
+        "retryableStatusCodes": [
+          "UNAVAILABLE",
+          "NOT_FOUND",
+          "DEADLINE_EXCEEDED",
+          "DATA_LOSS"
+        ]
+      }
+    }
+  ]
+}
