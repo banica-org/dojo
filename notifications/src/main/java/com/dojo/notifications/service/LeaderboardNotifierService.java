@@ -115,11 +115,11 @@ public class LeaderboardNotifierService {
             contest.getCommonNotificationsLevel().entrySet().stream()
                     .filter(entry -> entry.getValue() != null)
                     .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifySensei(contest, newQueriedLeaderboard, entry.getKey(), queryMessage));
+                    .forEach(entry -> notifySensei(contest, newLeaderboard, entry.getKey(), request.getMessage()));
         }
 
-        }
     }
+
 
 
     private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
