@@ -1,9 +1,9 @@
 package com.dojo.notifications.grpc;
 
-import com.codenjoy.dojo.ByIdRequest;
-import com.codenjoy.dojo.ByUsernameRequest;
+import com.codenjoy.dojo.UserDetailsIdRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
+import com.codenjoy.dojo.UserDetailsUsernameRequest;
 import com.dojo.notifications.model.user.UserDetails;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class UserDetailsClient {
 
 
     public UserDetails getUserDetailsById(String userId) {
-        ByIdRequest request = ByIdRequest.newBuilder().setId(userId).build();
+        UserDetailsIdRequest request = UserDetailsIdRequest.newBuilder().setId(userId).build();
         try {
             UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsById(request);
             return getUserDetails(response);
@@ -36,7 +36,7 @@ public class UserDetailsClient {
     }
 
     public UserDetails getUserDetailsByUsername(String username) {
-        ByUsernameRequest request = ByUsernameRequest.newBuilder().setUsername(username).build();
+        UserDetailsUsernameRequest request = UserDetailsUsernameRequest.newBuilder().setUsername(username).build();
         try {
             UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsByUsername(request);
             return getUserDetails(response);

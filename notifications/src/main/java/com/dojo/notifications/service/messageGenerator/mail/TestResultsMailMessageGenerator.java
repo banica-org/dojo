@@ -3,12 +3,11 @@ package com.dojo.notifications.service.messageGenerator.mail;
 import com.dojo.notifications.model.notification.enums.NotificationType;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.context.Context;
-
-import java.util.Map;
 
 @Service
 public class TestResultsMailMessageGenerator extends MailMessageGenerator {
+    private static final String TEMPLATE = "testResultsMailTemplate";
+
     public TestResultsMailMessageGenerator(ITemplateEngine templateEngine) {
         super(templateEngine);
     }
@@ -19,11 +18,7 @@ public class TestResultsMailMessageGenerator extends MailMessageGenerator {
     }
 
     @Override
-    public String generateMessage(Map<String, Object> contextParams) {
-        Context context = new Context();
-        contextParams.forEach(context::setVariable);
-
-        return getTemplateEngine().process("testResultsMailTemplate", context);
+    public String getTemplate() {
+        return TEMPLATE;
     }
-
 }

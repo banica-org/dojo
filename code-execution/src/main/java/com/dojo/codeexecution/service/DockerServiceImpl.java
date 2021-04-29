@@ -125,13 +125,15 @@ public class DockerServiceImpl implements DockerService {
         return new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
+                String message;
+                String imageTag = dockerConfigProperties.getParentTag();
                 if (item.isErrorIndicated()) {
-                    String message = item.getErrorDetail().getMessage();
-                    imageUpdateHandler.sendUpdate(dockerConfigProperties.getParentTag(), message);
+                    message = item.getErrorDetail().getMessage();
+                    imageUpdateHandler.sendUpdate(imageTag, message);
                 }
                 if (item.isBuildSuccessIndicated()) {
-                    String message = "Image built successfully!";
-                    imageUpdateHandler.sendUpdate(dockerConfigProperties.getParentTag(), message);
+                    message = "Image built successfully!";
+                    imageUpdateHandler.sendUpdate(imageTag, message);
                 }
                 super.onNext(item);
             }

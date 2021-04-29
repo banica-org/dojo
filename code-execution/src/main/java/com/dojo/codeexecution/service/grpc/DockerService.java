@@ -46,13 +46,10 @@ public class DockerService extends DockerServiceGrpc.DockerServiceImplBase {
 
     @Override
     public void stopNotifications(StopRequest request, StreamObserver<StopResponse> responseObserver) {
-        StreamObserver<ImageResponse> imageResponseStreamObserver = imageUpdateHandler.removeObserver(request.getId());
-        StreamObserver<ContainerResponse> containerResponseStreamObserver = containerUpdateHandler.removeObserver(request.getId());
-        StreamObserver<TestResultResponse> testResultResponseStreamObserver = testResultUpdateHandler.removeObserver(request.getId());
-
-        imageResponseStreamObserver.onCompleted();
-        containerResponseStreamObserver.onCompleted();
-        testResultResponseStreamObserver.onCompleted();
+        String requestId = request.getId();
+        imageUpdateHandler.removeObserver(requestId).onCompleted();
+        containerUpdateHandler.removeObserver(requestId).onCompleted();
+        testResultUpdateHandler.removeObserver(requestId).onCompleted();
 
         responseObserver.onNext(StopResponse.newBuilder().build());
         responseObserver.onCompleted();
