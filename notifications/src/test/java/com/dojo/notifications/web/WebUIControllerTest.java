@@ -134,7 +134,6 @@ public class WebUIControllerTest {
         when(selectRequestModel.getNotificationLevel("")).thenReturn("");
         when(selectRequestModel.getDescribingMessage()).thenReturn("");
         when(selectRequestModel.getNotificationMessage()).thenReturn("");
-        when(selectRequestModel.getCondition()).thenReturn(0);
 
         String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD);
 
@@ -148,9 +147,8 @@ public class WebUIControllerTest {
         verify(selectRequestModel, times(1)).getNotificationLevel("");
         verify(selectRequestModel, times(1)).getDescribingMessage();
         verify(selectRequestModel, times(1)).getNotificationMessage();
-        verify(selectRequestModel, times(1)).getCondition();
         verify(selectRequestService, times(1)).saveRequest(any());
-        verify(model, times(14)).addAttribute(any(), any());
+        verify(model, times(13)).addAttribute(any(), any());
     }
 
     @Test

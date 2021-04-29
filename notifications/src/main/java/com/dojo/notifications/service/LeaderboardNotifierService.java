@@ -10,6 +10,7 @@ import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.notificationService.NotificationService;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,19 +76,17 @@ public class LeaderboardNotifierService {
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (oldLeaderboard != null && newLeaderboard != null
-                && !oldLeaderboard.getParticipants().isEmpty() && !oldLeaderboard.equals(newLeaderboard)) {
+        List<Tuple4<String, String, Integer, Long>> changedUsers = leaderboardService.getLeaderboardChanges(oldLeaderboard, newLeaderboard);
 
+        if (changedUsers.size() != 0) {
             for (SelectRequest request : selectRequestService.getRequests()) {
-                Set<Participant> queriedParticipants = new TreeSet<>();
-
-                if (request.getCondition() != 0) {
-                    try {
-                        queriedParticipants = flinkTableService.executeSingleQuery(request, newLeaderboard, oldLeaderboard);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Set<String> queriedParticipants = new TreeSet<>();
+                try {
+                    queriedParticipants = flinkTableService.executeSingleQuery(request, changedUsers);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
                 if (queriedParticipants.size() != 0) {
                     notifyAboutCondition(contest, request, queriedParticipants, newLeaderboard);
                 }
@@ -97,7 +96,7 @@ public class LeaderboardNotifierService {
     }
 
 
-    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<Participant> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType eventTypeQuery = EventType.valueOf(request.getEventType());
@@ -122,9 +121,9 @@ public class LeaderboardNotifierService {
     }
 
 
-    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<Participant> participants, String queryMessage) {
+    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
-        participants.forEach(participant -> userDetails.add(userDetailsService.getUserDetails(participant.getUser().getId())));
+        userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
@@ -140,3 +139,4 @@ public class LeaderboardNotifierService {
     }
 
 }
+

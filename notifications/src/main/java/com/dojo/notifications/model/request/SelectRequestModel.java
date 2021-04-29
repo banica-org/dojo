@@ -12,8 +12,6 @@ public class SelectRequestModel {
     private String notificationLevel;
     private String describingMessage;
     private String notificationMessage;
-    private int condition;
-
 
     public SelectRequestModel() {
         this.queryParameters = "*";
@@ -74,14 +72,6 @@ public class SelectRequestModel {
     public String getNotificationLevel(String eventType) {
         notificationLevel = determineCommunicationLevel(eventType);
         return notificationLevel;
-    }
-
-    public void setCondition(int condition) {
-        this.condition = condition;
-    }
-
-    public int getCondition() {
-        return condition;
     }
 
     private String determineCommunicationLevel(String eventType) {
