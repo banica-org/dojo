@@ -4,6 +4,7 @@ import com.dojo.notifications.model.notification.enums.NotificationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.util.Map;
 
@@ -19,7 +20,14 @@ public abstract class MailMessageGenerator {
 
     public abstract NotificationType getMessageGeneratorTypeMapping();
 
-    public abstract String generateMessage(Map<String, Object> contextParams);
+    public abstract String getTemplate();
+
+    public String generateMessage(Map<String, Object> contextParams) {
+        Context context = new Context();
+        contextParams.forEach(context::setVariable);
+
+        return getTemplateEngine().process(getTemplate(), context);
+    }
 
     public ITemplateEngine getTemplateEngine() {
         return templateEngine;
