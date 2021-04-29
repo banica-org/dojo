@@ -1,6 +1,6 @@
 package com.dojo.apimock.service;
 
-import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.UserDetailsIdRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.apimock.LeaderBoardProvider;
@@ -21,7 +21,7 @@ public class UserDetailsService extends UserDetailsServiceGrpc.UserDetailsServic
     }
 
     @Override
-    public void getUserDetails(UserDetailsRequest request, StreamObserver<UserDetailsResponse> responseObserver) {
+    public void getUserDetailsById(UserDetailsIdRequest request, StreamObserver<UserDetailsResponse> responseObserver) {
         LinkedHashMap<String, String> userDetails = (LinkedHashMap<String, String>) leaderBoardProvider.getUserDetails(request.getId());
         UserDetailsResponse response = UserDetailsResponse.newBuilder()
                 .setId(userDetails.get("id"))

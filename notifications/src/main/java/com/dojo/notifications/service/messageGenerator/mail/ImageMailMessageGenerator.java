@@ -5,16 +5,16 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 
 @Service
-public class LeaderboardMailMessageGenerator extends MailMessageGenerator {
-    private static final String TEMPLATE = "leaderboardMailTemplate";
+public class ImageMailMessageGenerator extends MailMessageGenerator {
+    private static final String TEMPLATE = "imageMailTemplate";
 
-    public LeaderboardMailMessageGenerator(ITemplateEngine templateEngine) {
+    public ImageMailMessageGenerator(ITemplateEngine templateEngine) {
         super(templateEngine);
     }
 
     @Override
     public NotificationType getMessageGeneratorTypeMapping() {
-        return NotificationType.LEADERBOARD;
+        return NotificationType.IMAGE;
     }
 
     @Override

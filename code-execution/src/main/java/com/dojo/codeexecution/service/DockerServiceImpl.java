@@ -1,9 +1,9 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
+import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
 import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
-import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageCmd;
@@ -14,7 +14,6 @@ import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Frame;
-import com.github.dockerjava.api.model.PruneResponse;
 import com.github.dockerjava.api.model.PruneType;
 import com.github.dockerjava.api.model.WaitResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +59,10 @@ public class DockerServiceImpl implements DockerService {
         String containerId = createContainer(imageTag).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
+        // get the container status after it has been started
         String status = getContainerStatus(containerId);
         containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), new ArrayList<>());
+
         dockerClient.waitContainerCmd(containerId)
                 .exec(getWaitContainerExecutionCallback(containerId));
     }
@@ -124,14 +125,15 @@ public class DockerServiceImpl implements DockerService {
         return new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
-                String message = "";
+                String message;
+                String imageTag = dockerConfigProperties.getParentTag();
                 if (item.isErrorIndicated()) {
                     message = item.getErrorDetail().getMessage();
-                    imageUpdateHandler.sendUpdate(dockerConfigProperties.getParentTag(), message);
+                    imageUpdateHandler.sendUpdate(imageTag, message);
                 }
                 if (item.isBuildSuccessIndicated()) {
                     message = "Image built successfully!";
-                    imageUpdateHandler.sendUpdate(dockerConfigProperties.getParentTag(), message);
+                    imageUpdateHandler.sendUpdate(imageTag, message);
                 }
                 super.onNext(item);
             }
@@ -142,6 +144,7 @@ public class DockerServiceImpl implements DockerService {
         return new ResultCallback.Adapter<Frame>() {
             @Override
             public void onNext(Frame item) {
+                //Parsing the container log
                 String itemValue = item.toString();
                 if (itemValue.equals(LOG_SEPARATOR)) {
                     logs.add(stringBuilder.toString());

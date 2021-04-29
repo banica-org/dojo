@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <title>Email Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style>
+    table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 50%;
+    }
+
+    td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    }
+
+    tr:nth-child(even) {
+    background-color: #dddddd;
+    }
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+
+<h2 th:text="${message}"></h2>
+<label>Username:</label>
+<label th:text="${content.username}"></label>
+<br>
+<label>Status:</label>
+<label th:text="${content.status}"></label>
+<br>
+
+<h4>Logs</h4>
+
+<div th:each="log : ${content.logs}">
+    <label th:text="${log}">
+    </label>
+</div>
+
+
+</body>
+
+</html>

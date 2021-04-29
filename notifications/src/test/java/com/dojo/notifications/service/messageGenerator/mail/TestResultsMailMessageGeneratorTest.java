@@ -2,9 +2,9 @@ package com.dojo.notifications.service.messageGenerator.mail;
 
 import com.dojo.notifications.model.notification.enums.NotificationType;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.thymeleaf.ITemplateEngine;
@@ -21,37 +21,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class LeaderboardMailMessageGeneratorTest {
+public class TestResultsMailMessageGeneratorTest {
 
     private final String EXPECTED_PROCESS_RETURN_TYPE = "PROCESSED";
 
     @Mock
-    private ITemplateEngine templateEngine;
+    private ITemplateEngine iTemplateEngine;
 
-    @InjectMocks
-    private LeaderboardMailMessageGenerator leaderboardMailMessageGenerator;
+    private TestResultsMailMessageGenerator testResultsMailMessageGenerator;
+
+    @Before
+    public void init() {
+        testResultsMailMessageGenerator = new TestResultsMailMessageGenerator(iTemplateEngine);
+    }
 
     @Test
     public void getMessageGeneratorTypeMapping() {
-        NotificationType expected = NotificationType.LEADERBOARD;
-        NotificationType actual = leaderboardMailMessageGenerator.getMessageGeneratorTypeMapping();
+        NotificationType expected = NotificationType.TEST_RESULTS;
+        NotificationType actual = testResultsMailMessageGenerator.getMessageGeneratorTypeMapping();
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void generateMessageTest() {
-        //Arrange
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 20);
+        when(iTemplateEngine.process(eq("testResultsMailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
-        when(templateEngine.process(eq("leaderboardMailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
+        String actual = testResultsMailMessageGenerator.generateMessage(contextParams);
 
-        //Act
-        String actual = leaderboardMailMessageGenerator.generateMessage(contextParams);
-
-        //Assert
         Assert.assertEquals(EXPECTED_PROCESS_RETURN_TYPE, actual);
-        verify(templateEngine, times(1)).process(eq("leaderboardMailTemplate"), any(Context.class));
+        verify(iTemplateEngine, times(1)).process(eq("testResultsMailTemplate"), any(Context.class));
+
     }
 }

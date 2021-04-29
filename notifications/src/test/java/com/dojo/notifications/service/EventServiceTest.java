@@ -1,6 +1,6 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.grpc.leaderboard.EventClient;
+import com.dojo.notifications.grpc.EventClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
 import org.junit.Before;
@@ -11,7 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,26 +29,24 @@ public class EventServiceTest {
 
     private static final String ROOM = "room";
     private static final String GAME = "game";
+    private static final String GAME_SERVER_URL = "localhost:9090";
 
     @Mock
     private EventClient eventClient;
 
-    @Mock
-    private NotificationManagingService notificationManagingService;
-
     private EventService eventService;
 
-    private List<Event> events;
     private Event testEvent;
 
     private Contest contest;
 
     @Before
     public void init() {
-        eventService = new EventService(eventClient, notificationManagingService);
+        eventService = new EventService(eventClient);
 
         testEvent = new Event(ROOM, GAME);
-        events = Collections.singletonList(testEvent);
+        Map<Event, String> events = new HashMap<>();
+        events.put(testEvent, GAME_SERVER_URL);
 
         when(eventClient.getAllEvents()).thenReturn(events);
         eventService.getAllEvents();
@@ -59,7 +58,7 @@ public class EventServiceTest {
 
     @Test
     public void getAllEventsTest() {
-        Collection<Event> expected = events;
+        Collection<Event> expected = Collections.singletonList(testEvent);
         Collection<Event> actual = eventService.getAllEvents();
 
         verify(eventClient, times(1)).getAllEvents();
@@ -113,7 +112,6 @@ public class EventServiceTest {
         eventService.addContest(contest);
 
         assertEquals(1, eventService.getAllContests().size());
-        verify(notificationManagingService, times(1)).startNotifications(contest);
     }
 
     @Test
@@ -124,7 +122,11 @@ public class EventServiceTest {
         eventService.removeContest(ROOM);
 
         assertTrue(eventService.getAllContests().isEmpty());
-        verify(notificationManagingService, times(1)).stopNotifications(ROOM);
     }
 
+    @Test
+    public void getGameServerForContestTest() {
+        String actual = eventService.getGameServerForContest(ROOM);
+        assertEquals(GAME_SERVER_URL, actual);
+    }
 }

@@ -1,4 +1,4 @@
-package com.dojo.notifications.model.notification;
+package com.dojo.notifications.model.leaderboard;
 
 public class SlackNotificationUtils {
 

@@ -4,28 +4,28 @@ import com.dojo.codeexecution.ContainerResponse;
 import io.grpc.stub.StreamObserver;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Component
 public class ContainerUpdateHandler {
-    private final Set<StreamObserver<ContainerResponse>> streamObservers;
+    private final Map<String, StreamObserver<ContainerResponse>> streamObservers;
 
     public ContainerUpdateHandler() {
-        this.streamObservers = new HashSet<>();
+        this.streamObservers = new HashMap<>();
     }
 
-    public void addObserver(StreamObserver<ContainerResponse> observer) {
-        this.streamObservers.add(observer);
+    public void addObserver(String id, StreamObserver<ContainerResponse> observer) {
+        this.streamObservers.put(id, observer);
     }
 
-    public void removeObserver(StreamObserver<ContainerResponse> observer) {
-        this.streamObservers.remove(observer);
+    public StreamObserver<ContainerResponse> removeObserver(String id) {
+        return this.streamObservers.remove(id);
     }
 
     public void sendUpdate(String status, String username, List<String> errors) {
-        this.streamObservers.forEach(observer -> observer.onNext(generateResponse(status, username, errors)));
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateResponse(status, username, errors)));
     }
 
     private ContainerResponse generateResponse(String status, String username, List<String> logs) {

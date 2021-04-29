@@ -1,9 +1,9 @@
 package com.dojo.notifications.grpc;
 
-import com.codenjoy.dojo.UserDetailsRequest;
+import com.codenjoy.dojo.UserDetailsIdRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
-import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
+import com.codenjoy.dojo.UserDetailsUsernameRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +20,7 @@ public class UserDetailsClientTest {
 
     private static final String USER_ID = "id";
     private static final String EMAIL = "email";
+    private static final String USERNAME = "username";
 
     @Mock
     private UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
@@ -32,20 +33,32 @@ public class UserDetailsClientTest {
     }
 
     @Test
-    public void getUserDetailsTest() {
-        UserDetailsRequest request = UserDetailsRequest.newBuilder().setId(USER_ID).build();
-
+    public void getUserDetailsByIdTest() {
+        UserDetailsIdRequest request = UserDetailsIdRequest.newBuilder().setId(USER_ID).build();
         UserDetailsResponse response = mock(UserDetailsResponse.class);
         when(response.getId()).thenReturn(USER_ID);
         when(response.getEmail()).thenReturn(EMAIL);
+        when(userDetailsServiceBlockingStub.getUserDetailsById(request)).thenReturn(response);
 
-        when(userDetailsServiceBlockingStub.getUserDetails(request)).thenReturn(response);
+        userDetailsClient.getUserDetailsById(USER_ID);
 
-        userDetailsClient.getUserDetails(USER_ID);
-
-        verify(userDetailsServiceBlockingStub, times(1)).getUserDetails(request);
+        verify(userDetailsServiceBlockingStub, times(1)).getUserDetailsById(request);
         verify(response, times(1)).getId();
         verify(response, times(1)).getEmail();
     }
 
+    @Test
+    public void getUserDetailsByUsernameTest() {
+        UserDetailsUsernameRequest request = UserDetailsUsernameRequest.newBuilder().setUsername(USERNAME).build();
+        UserDetailsResponse response = mock(UserDetailsResponse.class);
+        when(response.getId()).thenReturn(USER_ID);
+        when(response.getEmail()).thenReturn(EMAIL);
+        when(userDetailsServiceBlockingStub.getUserDetailsByUsername(request)).thenReturn(response);
+
+        userDetailsClient.getUserDetailsByUsername(USERNAME);
+
+        verify(userDetailsServiceBlockingStub, times(1)).getUserDetailsByUsername(request);
+        verify(response, times(1)).getId();
+        verify(response, times(1)).getEmail();
+    }
 }

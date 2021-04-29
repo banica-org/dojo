@@ -1,0 +1,56 @@
+package com.dojo.notifications.grpc;
+
+import com.codenjoy.dojo.UserDetailsIdRequest;
+import com.codenjoy.dojo.UserDetailsResponse;
+import com.codenjoy.dojo.UserDetailsServiceGrpc;
+import com.codenjoy.dojo.UserDetailsUsernameRequest;
+import com.dojo.notifications.model.user.UserDetails;
+import io.grpc.StatusRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserDetailsClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsClient.class);
+
+    private final UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub;
+
+    @Autowired
+    public UserDetailsClient(UserDetailsServiceGrpc.UserDetailsServiceBlockingStub userDetailsServiceBlockingStub) {
+        this.userDetailsServiceBlockingStub = userDetailsServiceBlockingStub;
+    }
+
+
+    public UserDetails getUserDetailsById(String userId) {
+        UserDetailsIdRequest request = UserDetailsIdRequest.newBuilder().setId(userId).build();
+        try {
+            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsById(request);
+            return getUserDetails(response);
+        } catch (StatusRuntimeException e) {
+            LOGGER.error("Cannot find user with id: {}", userId);
+            return null;
+        }
+    }
+
+    public UserDetails getUserDetailsByUsername(String username) {
+        UserDetailsUsernameRequest request = UserDetailsUsernameRequest.newBuilder().setUsername(username).build();
+        try {
+            UserDetailsResponse response = userDetailsServiceBlockingStub.getUserDetailsByUsername(request);
+            return getUserDetails(response);
+        } catch (StatusRuntimeException e) {
+            LOGGER.error("Cannot find user with username: {}", username);
+            return null;
+        }
+    }
+
+    private UserDetails getUserDetails(UserDetailsResponse response) {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setId(response.getId());
+        userDetails.setEmail(response.getEmail());
+
+        return userDetails;
+    }
+}

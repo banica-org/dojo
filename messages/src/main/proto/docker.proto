@@ -4,7 +4,7 @@ option java_package = "com.dojo.codeexecution";
 option java_multiple_files = true;
 
 message ImageRequest{
-
+  string id = 1;
 }
 
 message ImageResponse{
@@ -13,7 +13,7 @@ message ImageResponse{
 }
 
 message ContainerRequest{
-
+  string id = 1;
 }
 
 message ContainerResponse{
@@ -23,7 +23,7 @@ message ContainerResponse{
 }
 
 message TestResultRequest{
-
+  string id = 1;
 }
 
 message TestResultResponse{
@@ -36,8 +36,17 @@ message FailedTestCase{
   string expected = 2;
 }
 
+message StopRequest{
+  string id = 1;
+}
+
+message StopResponse{
+
+}
+
 service DockerService {
   rpc getImageResults(ImageRequest) returns (stream ImageResponse);
   rpc getContainerResults(ContainerRequest) returns (stream ContainerResponse);
   rpc getTestResults(TestResultRequest) returns (stream TestResultResponse);
+  rpc stopNotifications(StopRequest) returns (StopResponse);
 }
