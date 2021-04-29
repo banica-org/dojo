@@ -45,17 +45,18 @@ public class LeaderboardService {
                 .collect(Collectors.toList());
     }
 
-    public List<Tuple4<String,String, Integer, Long>> getLeaderboardChanges(Leaderboard oldLeaderboard, Leaderboard newLeaderboard) {
-        List<Tuple4<String,String, Integer, Long>> changedUsers = new ArrayList<>();
+    public List<Tuple4<String, String, Integer, Long>> getLeaderboardChanges(Leaderboard oldLeaderboard, Leaderboard newLeaderboard) {
+        List<Tuple4<String, String, Integer, Long>> changedUsers = new ArrayList<>();
         for (Participant p : newLeaderboard.getParticipants()) {
-            int oldPos = oldLeaderboard.getPositionByUserId(p.getUser().getId());
-            int newPos = newLeaderboard.getPositionByUserId(p.getUser().getId());
+            String id = p.getUser().getId();
+            int oldPos = oldLeaderboard.getPositionByUserId(id);
+            int newPos = newLeaderboard.getPositionByUserId(id);
 
-            long oldScore = oldLeaderboard.getScoreByUserId(p.getUser().getId());
+            long oldScore = oldLeaderboard.getScoreByUserId(id);
             long newScore = p.getScore();
 
             if (newPos != oldPos || newScore != oldScore) {
-                changedUsers.add(new Tuple4<>(p.getUser().getId(), p.getUser().getName(), oldPos - newPos, newScore - oldScore));
+                changedUsers.add(new Tuple4<>(id, p.getUser().getName(), oldPos - newPos, newScore - oldScore));
             }
         }
         return changedUsers;

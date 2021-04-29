@@ -81,7 +81,7 @@ public class LeaderboardNotifierService {
             for (SelectRequest request : selectRequestService.getRequests()) {
                 Set<String> queriedParticipants = new TreeSet<>();
                 try {
-                    queriedParticipants = flinkTableService.executeSingleQuery(request, changedUsers);
+                    queriedParticipants = flinkTableService.getNotifyIds(request, changedUsers);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
