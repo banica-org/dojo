@@ -5,24 +5,24 @@ import com.dojo.codeexecution.model.FailedTestCase;
 import io.grpc.stub.StreamObserver;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Component
 public class TestResultUpdateHandler {
-    private final Set<StreamObserver<TestResultResponse>> streamObservers;
+    private final Map<String, StreamObserver<TestResultResponse>> streamObservers;
 
     public TestResultUpdateHandler() {
-        this.streamObservers = new HashSet<>();
+        this.streamObservers = new HashMap<>();
     }
 
-    public void addObserver(StreamObserver<TestResultResponse> observer) {
-        this.streamObservers.add(observer);
+    public void addObserver(String id, StreamObserver<TestResultResponse> observer) {
+        this.streamObservers.put(id, observer);
     }
 
-    public void removeObserver(StreamObserver<TestResultResponse> observer) {
-        this.streamObservers.remove(observer);
+    public StreamObserver<TestResultResponse> removeObserver(String id) {
+        return this.streamObservers.remove(id);
     }
 
     public void sendUpdate(String username, List<FailedTestCase> failedTestCases) {
@@ -30,7 +30,7 @@ public class TestResultUpdateHandler {
                 .setUsername(username);
 
         failedTestCases.forEach(failedTestCase -> responseBuilder.addFailedTestCase(convertToFailedTestCase(failedTestCase)));
-        this.streamObservers.forEach(observer -> observer.onNext(responseBuilder.build()));
+        this.streamObservers.forEach((id, observer) -> observer.onNext(responseBuilder.build()));
     }
 
     private com.dojo.codeexecution.FailedTestCase convertToFailedTestCase(FailedTestCase failedTestCase) {

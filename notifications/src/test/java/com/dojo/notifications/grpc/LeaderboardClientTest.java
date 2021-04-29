@@ -3,7 +3,6 @@ package com.dojo.notifications.grpc;
 import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.StopRequest;
-import com.dojo.notifications.grpc.leaderboard.LeaderboardClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
@@ -57,7 +56,7 @@ public class LeaderboardClientTest {
     public void stopLeaderboardNotificationsTest() {
         StopRequest request = StopRequest.newBuilder().setContestId(CONTEST_ID).build();
 
-        leaderboardClient.stopLeaderboardNotifications(CONTEST_ID);
+        leaderboardClient.stopLeaderboardNotifications(contest);
 
         verify(leaderboardServiceBlockingStub, times(1)).stopNotifications(request);
     }

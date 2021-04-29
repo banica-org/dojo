@@ -1,7 +1,6 @@
 package com.dojo.notifications.model.leaderboard;
 
 import com.dojo.notifications.model.client.CustomSlackClient;
-import com.dojo.notifications.model.notification.SlackNotificationUtils;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
