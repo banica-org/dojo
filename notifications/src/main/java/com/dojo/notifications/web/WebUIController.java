@@ -111,7 +111,6 @@ public class WebUIController {
         model.addAttribute("notificationLevel", newRequest.getNotificationLevel());
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
-        model.addAttribute("condition", newRequest.getCondition());
 
         return "request";
     }
@@ -125,7 +124,6 @@ public class WebUIController {
         selectRequest.setNotificationLevel(newRequest.getNotificationLevel(newRequest.getEventType()));
         selectRequest.setQueryDescription(newRequest.getDescribingMessage());
         selectRequest.setMessage(newRequest.getNotificationMessage());
-        selectRequest.setCondition(newRequest.getCondition());
 
         selectRequestService.saveRequest(selectRequest);
     }

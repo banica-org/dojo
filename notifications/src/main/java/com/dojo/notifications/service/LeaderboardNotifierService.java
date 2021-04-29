@@ -10,6 +10,7 @@ import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.service.notificationService.NotificationService;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,25 +72,22 @@ public class LeaderboardNotifierService {
         lookForLeaderboardChanges(contest, newLeaderboard);
     }
 
-
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
-        if (oldLeaderboard != null && newLeaderboard != null
-                && !oldLeaderboard.getParticipants().isEmpty() && !oldLeaderboard.equals(newLeaderboard)) {
+        List<Tuple4<String, String, Integer, Long>> changedUsers = leaderboardService.getLeaderboardChanges(oldLeaderboard, newLeaderboard);
 
+        if (changedUsers.size() != 0) {
             for (SelectRequest request : selectRequestService.getRequests()) {
-                Set<Participant> queriedParticipants = new TreeSet<>();
-
-                if (request.getCondition() != 0) {
-                    try {
-                        queriedParticipants = flinkTableService.executeSingleQuery(request, newLeaderboard, oldLeaderboard);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Set<String> queriedParticipants = new TreeSet<>();
+                try {
+                    queriedParticipants = flinkTableService.executeSingleQuery(request, changedUsers);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
                 if (queriedParticipants.size() != 0) {
-                    notifyAbout(contest, request, queriedParticipants, newLeaderboard);
+                    notifyAboutCondition(contest, request, queriedParticipants, newLeaderboard);
                 }
             }
         }
@@ -97,36 +95,34 @@ public class LeaderboardNotifierService {
     }
 
 
-    public void notifyAbout(Contest contest, SelectRequest request, Set<Participant> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType eventTypeQuery = EventType.valueOf(request.getEventType());
 
-        if (queriedParticipants.size() != 0) {
+        if (request.getReceiver().equals(RECEIVER_PARTICIPANT)) {
+            notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
 
-            if (request.getReceiver().equals(RECEIVER_PARTICIPANT)) {
+        } else if (request.getReceiver().equals(RECEIVER_COMMON)) {
+            contest.getCommonNotificationsLevel().entrySet().stream()
+                    .filter(entry -> entry.getValue() != null)
+                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
+                    .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
 
-                notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
-            } else if (request.getReceiver().equals(RECEIVER_COMMON)) {
+        } else {
+            notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
+            contest.getCommonNotificationsLevel().entrySet().stream()
+                    .filter(entry -> entry.getValue() != null)
+                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
+                    .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
 
-                contest.getCommonNotificationsLevel().entrySet().stream()
-                        .filter(entry -> entry.getValue() != null)
-                        .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                        .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
-            } else {
-                notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
-
-                contest.getCommonNotificationsLevel().entrySet().stream()
-                        .filter(entry -> entry.getValue() != null)
-                        .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                        .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
-            }
         }
     }
 
-    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<Participant> participants, String queryMessage) {
+
+    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
-        participants.forEach(participant -> userDetails.add(userDetailsService.getUserDetails(participant.getUser().getId())));
+        userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
@@ -142,3 +138,4 @@ public class LeaderboardNotifierService {
     }
 
 }
+

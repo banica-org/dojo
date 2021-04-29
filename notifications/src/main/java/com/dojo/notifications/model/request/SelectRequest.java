@@ -40,7 +40,4 @@ public class SelectRequest {
 
     @Column(name = "MESSAGE")
     String message;
-
-    @Column(name = "CONDITION")
-    long condition;
 }
