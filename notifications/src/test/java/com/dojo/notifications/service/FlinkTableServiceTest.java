@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.flink.api.java.tuple.Tuple4;
 
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +36,7 @@ public class FlinkTableServiceTest {
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
 
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());
-    private final List<Tuple4<String,String,Integer,Long>> CHANGED_USERS = new ArrayList<>();
+    private final List<Tuple4<String, String, Integer, Long>> CHANGED_USERS = new ArrayList<>();
 
     @Mock
     private SelectRequest selectRequest;
@@ -45,7 +46,7 @@ public class FlinkTableServiceTest {
     @Before
     public void init() {
         flinkTableService = new FlinkTableService();
-        CHANGED_USERS.add(new Tuple4<>(DUMMY_STRING, DUMMY_STRING,0,(long)0));
+        CHANGED_USERS.add(new Tuple4<>(DUMMY_STRING, DUMMY_STRING, 0, (long) 0));
     }
 
     @Test
@@ -55,7 +56,7 @@ public class FlinkTableServiceTest {
         Set<String> expected = Collections.singleton(DUMMY_STRING);
         when(selectRequest.getQuery()).thenReturn(QUERY);
         //Act
-        Set<String> actual = flinkTableService.executeSingleQuery(selectRequest, CHANGED_USERS);
+        Set<String> actual = flinkTableService.getNotifyIds(selectRequest, CHANGED_USERS);
 
         //Assert
         Assert.assertEquals(expected, actual);
@@ -63,7 +64,7 @@ public class FlinkTableServiceTest {
         verify(selectRequest, times(1)).getQuery();
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void executeSingleQueryEmptyExceptionTest() throws Exception {
         //Arrange
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
@@ -71,76 +72,10 @@ public class FlinkTableServiceTest {
         when(selectRequest.getQuery()).thenReturn(BROKEN_QUERY);
 
         //Act
-        Set<String> actual = flinkTableService.executeSingleQuery(selectRequest, CHANGED_USERS);
+        Set<String> actual = flinkTableService.getNotifyIds(selectRequest, CHANGED_USERS);
 
         //Assert
         Assert.assertEquals(expected, actual);
 
     }
-
-//    @Test
-//    public void positionClimbConditionTest() throws Exception {
-//        //Arrange
-//        NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT, THIRD_PARTICIPANT));
-//        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, THIRD_PARTICIPANT));
-//
-//        Set<Participant> expected = Collections.singleton(SECOND_PARTICIPANT);
-//        when(selectRequest.getQuery()).thenReturn(QUERY);
-//        when(selectRequest.getEventType()).thenReturn(POSITION_CHANGES);
-//
-//        //Act
-//        Set<Participant> actual = flinkTableService.executeSingleQuery(selectRequest, NEW_LEADERBOARD, OLD_LEADERBOARD);
-//
-//        //Assert
-//        Assert.assertEquals(expected, actual);
-//
-//        verify(selectRequest, times(1)).getQuery();
-//        verify(selectRequest, times(1)).getEventType();
-//    }
-//
-//    @Test
-//    public void positionDownConditionTest() throws Exception {
-//        //Arrange
-//        NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT, THIRD_PARTICIPANT));
-//        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, THIRD_PARTICIPANT));
-//
-//        Set<Participant> expected = Collections.singleton(FIRST_PARTICIPANT);
-//        when(selectRequest.getQuery()).thenReturn(QUERY);
-//        when(selectRequest.getEventType()).thenReturn(POSITION_CHANGES);
-//        when(selectRequest.getCondition()).thenReturn((long) -1);
-//
-//        //Act
-//        Set<Participant> actual = flinkTableService.executeSingleQuery(selectRequest, NEW_LEADERBOARD, OLD_LEADERBOARD);
-//
-//        //Assert
-//        Assert.assertEquals(expected, actual);
-//
-//        verify(selectRequest, times(1)).getQuery();
-//        verify(selectRequest, times(1)).getEventType();
-//        verify(selectRequest, times(9)).getCondition();
-//    }
-//
-//    @Test
-//    public void scoreUpConditionTest() throws Exception {
-//        //Arrange
-//        NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT, THIRD_PARTICIPANT));
-//        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
-//
-//        Set<Participant> expected = Collections.singleton(THIRD_PARTICIPANT);
-//        when(selectRequest.getQuery()).thenReturn(QUERY);
-//        when(selectRequest.getEventType()).thenReturn(SCORE_CHANGES);
-//        when(selectRequest.getCondition()).thenReturn((long) 400);
-//
-//        //Act
-//        Set<Participant> actual = flinkTableService.executeSingleQuery(selectRequest, NEW_LEADERBOARD, OLD_LEADERBOARD);
-//
-//        //Assert
-//        Assert.assertEquals(expected, actual);
-//
-//        verify(selectRequest, times(1)).getQuery();
-//        verify(selectRequest, times(2)).getEventType();
-//        verify(selectRequest, times(3)).getCondition();
-//    }
-
-
 }
