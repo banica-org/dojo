@@ -3,16 +3,16 @@
     {
       "name": [
         {
-          "service": "com.dojo.codeexecution.DockerService"
+          "service": "codeexecution.DockerService"
         },
         {
-          "service": "com.codenjoy.dojo.EventService"
+          "service": "codenjoy.EventService"
         },
         {
-          "service": "com.codenjoy.dojo.LeaderboardService"
+          "service": "codenjoy.LeaderboardService"
         },
         {
-          "service": "com.codenjoy.dojo.UserDetailsService"
+          "service": "codenjoy.UserDetailsService"
         }
       ],
       "retryPolicy": {
