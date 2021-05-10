@@ -30,6 +30,26 @@ public class Leaderboard {
         return this.participants.size();
     }
 
+    public int getPositionByUserId(String userId) {
+        int pos = 1;
+        for (Participant p : participants) {
+            if (p.getUser().getId().equals(userId)) {
+                return pos;
+            }
+            pos++;
+        }
+        return participants.size() + 1;
+    }
+
+    public long getScoreByUserId(String userId) {
+        for (Participant p : participants) {
+            if (p.getUser().getId().equals(userId)) {
+                return p.getScore();
+            }
+        }
+        return 0;
+    }
+
     public String getUserIdByPosition(int position) {
         for (Participant p : participants) {
             if (position == 0) {

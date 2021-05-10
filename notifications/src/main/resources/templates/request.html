@@ -26,29 +26,63 @@
                     <td><label>FROM Leaderboard</label></td>
                 </tr>
                 <tr>
-                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" value="WHERE/FETCH/ETC."/></td>
+                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" placeholder="WHERE/LIMIT/ETC."/></td>
                 </tr>
                 <tr>
                     <td>
-                    <label>Select a notifier type:  </label>
+                        <label>Select a notifier type:  </label>
                         <br>
-                    <select style="width:330px" th:field="*{eventType}">
-                        <option value="OTHER_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{eventType}">Notify on any leaderboard change
-                        </option>
-                        <option value="SCORE_CHANGES" class="form-option-input" id="changeInScoresSlack" th:field="*{eventType}">Notify on score changes
-                        </option>
-                        <option value="POSITION_CHANGES" class="form-option-input" id="changeInPositionsSlack" th:field="*{eventType}">Notify on position changes
-                        </option>
-                    </select>
+                        <select style="width:330px" th:field="*{eventType}">
+                            <option value="OTHER_LEADERBOARD_CHANGE"  class="form-option-input" id="newParticipantSlack" th:field="*{eventType}">Notify on any leaderboard change
+                            </option>
+                            <option value="SCORE_CHANGES" class="form-option-input" id="changeInScoresSlack" th:field="*{eventType}">Notify on score changes
+                            </option>
+                            <option value="POSITION_CHANGES" class="form-option-input" id="changeInPositionsSlack" th:field="*{eventType}">Notify on position changes
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Select who will be notified:  </label>
+                        <br>
+                        <select style="width:330px" th:field="*{receiver}">
+                            <option value="All"  class="form-option-input" id="notifyAll" th:field="*{receiver}">All
+                            </option>
+                            <option value="Common" class="form-option-input" id="notifyCommon" th:field="*{receiver}">Only Channel/Sensei
+                            </option>
+                            <option value="Participant" class="form-option-input" id="notifyParticipant" th:field="*{receiver}">Only Participants
+                            </option>
+                        </select>
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <label>Describe your query:  </label>
                         <br>
-                        <input type="text" style="width:330px" th:field="*{describingMessage}" required/>
+                        <input type="text" style="width:330px" th:field="*{describingMessage}" required placeholder="Enter a description here"/>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <label>Notification message:  </label>
+                        <br>
+                        <input type="text" style="width:330px" th:field="*{notificationMessage}" required placeholder="Enter a message here"/>
+                    </td>
+                </tr>
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <label>How often will the event be triggered?  </label>-->
+<!--                        <br>-->
+<!--                        <select style="width:200px" th:field="*{eventType}">-->
+<!--                            <option value="POSITION_CHANGES" class="form-option-input" th:field="*{eventType}">On change in position-->
+<!--                            </option>-->
+<!--                            <option value="SCORE_CHANGES" class="form-option-input" th:field="*{eventType}">On change in score-->
+<!--                            </option>-->
+<!--                        </select>-->
+<!--                        <input type="text" style="width:130px" th:field="*{condition}" required placeholder="Enter a number"/>-->
+<!--                    </td>-->
+<!--                </tr>-->
                 <tr>
                     <td>
                         <br>

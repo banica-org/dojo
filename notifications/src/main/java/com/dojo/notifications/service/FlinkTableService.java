@@ -1,10 +1,8 @@
 package com.dojo.notifications.service;
 
-import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.user.Participant;
-import com.dojo.notifications.model.user.UserInfo;
+import com.dojo.notifications.model.request.SelectRequest;
 import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -12,7 +10,7 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -23,8 +21,7 @@ public class FlinkTableService {
 
     private static final String TABLE_NAME = "Leaderboard";
 
-    public Leaderboard executeSingleQuery(Set<Participant> participants, String query) throws Exception {
-
+    public Set<String> getNotifyIds(SelectRequest request, List<Tuple4<String, String, Integer, Long>> changedUsers) throws Exception {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings
                 .newInstance()
@@ -33,48 +30,39 @@ public class FlinkTableService {
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(executionEnvironment, settings);
 
-        DataStream<Tuple3<String, String, Long>> tuple3DataStream = convertToTuple3DataStream(executionEnvironment, participants);
+        DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream = executionEnvironment.fromCollection(changedUsers);
 
-        Table table = tableEnvironment.fromDataStream(tuple3DataStream).as("id", "name", "points");
-        tableEnvironment.createTemporaryView(TABLE_NAME, table);
+        Table table = executeSql(tableEnvironment, tuple4DataStream, request);
 
-        table = tableEnvironment.sqlQuery(query);
-
-        tableEnvironment.dropTemporaryView(TABLE_NAME);
-
-        DataStream<Tuple3<String, String, Long>> tupleStream = tableEnvironment.toAppendStream(
+        DataStream<Tuple4<String, String, Integer, Long>> tupleStream = tableEnvironment.toAppendStream(
                 table,
-                new TypeHint<Tuple3<String, String, Long>>() {
+                new TypeHint<Tuple4<String, String, Integer, Long>>() {
                 }.getTypeInfo()
         );
 
-        return new Leaderboard(convertDataStreamToList(tupleStream.executeAndCollect()));
+        return convertDataStreamToSet(tupleStream.executeAndCollect());
     }
 
-    private DataStream<Tuple3<String, String, Long>> convertToTuple3DataStream(StreamExecutionEnvironment env, Set<Participant> participants) {
-        List<Tuple3<String, String, Long>> tupleLeaderboard = new ArrayList<>();
+    private Set<String> convertDataStreamToSet(Iterator<Tuple4<String, String, Integer, Long>> leaderboard) {
+        Set<String> userIds = new TreeSet<>();
 
-        participants.forEach(participant -> {
-            Tuple3<String, String, Long> oneRow = new Tuple3<>();
-            oneRow.f0 = participant.getUser().getId();
-            oneRow.f1 = participant.getUser().getName();
-            oneRow.f2 = participant.getScore();
-
-            tupleLeaderboard.add(oneRow);
-        });
-        return env.fromCollection(tupleLeaderboard);
+        leaderboard.forEachRemaining(user -> userIds.add(user.f0));
+        return userIds;
     }
 
-    private Set<Participant> convertDataStreamToList(Iterator<Tuple3<String, String, Long>> leaderboard) {
+    private Table executeSql(StreamTableEnvironment tableEnvironment, DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream, SelectRequest request) {
+        Table table = tableEnvironment.fromDataStream(tuple4DataStream).as("id", "name", "place", "score");
 
-        TreeSet<Participant> participants = new TreeSet<>();
+        tableEnvironment.createTemporaryView(TABLE_NAME, table);
+        try {
+            table = tableEnvironment.sqlQuery(request.getQuery());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        tableEnvironment.dropTemporaryView(TABLE_NAME);
 
-        leaderboard.forEachRemaining(user -> {
-            UserInfo userInfo = new UserInfo(user.f0, user.f1);
-            Participant participant = new Participant(userInfo, user.f2);
-            participants.add(participant);
-        });
-        return participants;
+        return table;
     }
 
 }

@@ -26,12 +26,18 @@ public class SelectRequest {
     @Column(name = "QUERY")
     String query;
 
+    @Column(name = "RECEIVER")
+    String receiver;
+
     @Column(name = "EVENT_TYPE")
     String eventType;
 
+    @Column(name = "NOTIFICATION_LEVEL")
+    String notificationLevel;
+
+    @Column(name = "QUERY_DESCRIPTION")
+    String queryDescription;
+
     @Column(name = "MESSAGE")
     String message;
-
-    @Column(name = "COMMUNICATION_LEVEL")
-    String communicationLevel;
 }

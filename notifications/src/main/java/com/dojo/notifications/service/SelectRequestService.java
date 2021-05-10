@@ -5,10 +5,12 @@ import com.dojo.notifications.repo.SelectRequestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SelectRequestService {
@@ -25,7 +27,7 @@ public class SelectRequestService {
         return Collections.unmodifiableList(requests);
     }
 
-    public void saveRequest(@RequestBody SelectRequest selectRequest){
+    public void saveRequest(@RequestBody SelectRequest selectRequest) {
         selectRequestRepo.save(selectRequest);
     }
 

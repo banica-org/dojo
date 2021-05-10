@@ -2,7 +2,6 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
-import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.request.SelectRequest;
@@ -16,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.apache.flink.api.java.tuple.Tuple4;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,10 +42,11 @@ public class LeaderboardNotifierServiceTest {
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
     private final Participant THIRD_PARTICIPANT = new Participant(new UserInfo("3", "ThirdUser"), 400);
     private final Participant UPDATED_PARTICIPANT = new Participant(new UserInfo("3", "ThirdUser"), 800);
-
+    private static final String USER_ID = "userid";
 
     private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
-    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());//Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
+    private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());
+    private final List<Tuple4<String, String, Integer, Long>> CHANGED_USERS = new ArrayList<>();
 
     private final UserDetails FIRST_USER_DETAILS = new UserDetails();
     private final UserDetails SECOND_USER_DETAILS = new UserDetails();
@@ -90,6 +91,8 @@ public class LeaderboardNotifierServiceTest {
         ReflectionTestUtils.setField(leaderboardNotifierService, "leaderboards", leaderboards);
 
         leaderBoardNotificationsType.put(NotifierType.EMAIL, CommonNotificationsLevel.ON_ANY_LEADERBOARD_CHANGE);
+
+        CHANGED_USERS.add(new Tuple4<>(USER_ID, USER_ID, 0, (long) 0));
     }
 
     @Test
@@ -126,13 +129,39 @@ public class LeaderboardNotifierServiceTest {
     public void notifyPersonalChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setEventType("POSITION_CHANGES");
+        SELECT_REQUEST.setReceiver("Participant");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
+        when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getRequests()).thenReturn(requests);
-        when(flinkTableService.executeSingleQuery(eq(NEW_LEADERBOARD.getParticipants()), any())).thenReturn(NEW_LEADERBOARD);
-        when(flinkTableService.executeSingleQuery(eq(OLD_LEADERBOARD.getParticipants()), any())).thenReturn(OLD_LEADERBOARD);
-        when(leaderboardService.isEventType(any(), any(), eq(EventType.POSITION_CHANGES))).thenReturn(true);
-        when(leaderboardService.getUserDetails(any(), any())).thenReturn(Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS));
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
+        when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
+        when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
+
+        //Act
+        leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
+
+        //Assert
+        verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
+        verify(selectRequestService, times(1)).getRequests();
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
+        verify(userDetailsService, times(1)).getUserDetails(any());
+        verify(contest, times(2)).getContestId();
+        verify(contest, times(1)).getPersonalNotifiers();
+        verify(notificationService, times(1)).notify(any(), any(), any());
+    }
+
+    @Test
+    public void notifyAllChangesTest() throws Exception {
+        //Arrange
+        SELECT_REQUEST.setEventType("SCORE_CHANGES");
+        SELECT_REQUEST.setReceiver("All");
+        List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
+
+        when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
+        when(selectRequestService.getRequests()).thenReturn(requests);
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
@@ -140,14 +169,11 @@ public class LeaderboardNotifierServiceTest {
         leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
 
         //Assert
+        verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getRequests();
-        verify(flinkTableService, times(2)).executeSingleQuery(any(), any());
-        verify(leaderboardService, times(1)).isEventType(any(), any(), eq(EventType.POSITION_CHANGES));
-        verify(leaderboardService, times(1)).getUserDetails(any(), any());
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
-        verify(contest, times(2)).getPersonalNotifiers();
-        verify(notificationService, times(2)).notify(any(), any(), any());
         verify(notificationService, times(1)).notify(any(), any());
     }
 
@@ -155,25 +181,23 @@ public class LeaderboardNotifierServiceTest {
     public void notifyCommonChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setEventType("SCORE_CHANGES");
+        SELECT_REQUEST.setReceiver("Common");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
+        when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getRequests()).thenReturn(requests);
-        when(flinkTableService.executeSingleQuery(eq(NEW_LEADERBOARD.getParticipants()), any())).thenReturn(NEW_LEADERBOARD);
-        when(flinkTableService.executeSingleQuery(eq(OLD_LEADERBOARD.getParticipants()), any())).thenReturn(OLD_LEADERBOARD);
-        when(leaderboardService.isEventType(any(), any(), eq(EventType.SCORE_CHANGES))).thenReturn(true);
-        when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
         //Act
         leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
 
         //Assert
+        verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getRequests();
-        verify(flinkTableService, times(2)).executeSingleQuery(any(), any());
-        verify(leaderboardService, times(1)).isEventType(any(), any(), eq(EventType.SCORE_CHANGES));
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
         verify(notificationService, times(1)).notify(any(), any());
     }
-
 }

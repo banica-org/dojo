@@ -15,7 +15,6 @@ public class Contest {
     private String slackChannel;
     private Set<String> senseiEmails;
 
-
     private Map<NotifierType, CommonNotificationsLevel> commonNotificationsLevel;
     private Set<NotifierType> personalNotifiers;
 
@@ -74,5 +73,4 @@ public class Contest {
     public boolean getPersonalPositionChangeEmail() {
         return personalNotifiers.contains(NotifierType.EMAIL);
     }
-
 }

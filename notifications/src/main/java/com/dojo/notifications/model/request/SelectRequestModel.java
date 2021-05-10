@@ -7,14 +7,15 @@ public class SelectRequestModel {
 
     private String queryParameters;
     private String querySpecification;
-    private String describingMessage;
+    private String receiver;
     private String eventType;
-    private String communicationLevel;
+    private String notificationLevel;
+    private String describingMessage;
+    private String notificationMessage;
 
 
     public SelectRequestModel() {
         this.queryParameters = "*";
-        this.querySpecification = "";
     }
 
     public void setDescribingMessage(String describingMessage) {
@@ -29,36 +30,52 @@ public class SelectRequestModel {
         this.querySpecification = querySpecification;
     }
 
-    public String getQueryParameters() {
-        return queryParameters;
+    public String getQuerySpecification() {
+        return querySpecification;
     }
 
     public void setQueryParameters(String queryParameters) {
         this.queryParameters = queryParameters;
     }
 
-    public String getQuerySpecification() {
-        return querySpecification;
-    }
-
-    public String getEventType() {
-        return eventType;
+    public String getQueryParameters() {
+        return queryParameters;
     }
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
     }
 
-    public String getCommunicationLevel(String eventType) {
-        communicationLevel = determineCommunicationLevel();
-        return communicationLevel;
+    public String getEventType() {
+        return eventType;
     }
 
-    public void setCommonLevel(String commonLevel) {
-        this.communicationLevel = commonLevel;
+    public void setNotificationMessage(String notificationMessage) {
+        this.notificationMessage = notificationMessage;
     }
 
-    private String determineCommunicationLevel() {
+    public String getNotificationMessage() {
+        return notificationMessage;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setNotificationLevel(String notificationLevel) {
+        this.notificationLevel = notificationLevel;
+    }
+
+    public String getNotificationLevel(String eventType) {
+        notificationLevel = determineCommunicationLevel(eventType);
+        return notificationLevel;
+    }
+
+    private String determineCommunicationLevel(String eventType) {
         switch (eventType) {
             case "OTHER_LEADERBOARD_CHANGE":
                 return "ON_ANY_LEADERBOARD_CHANGE";
@@ -71,5 +88,4 @@ public class SelectRequestModel {
                 return "NO_NOTIFICATIONS";
         }
     }
-
 }
