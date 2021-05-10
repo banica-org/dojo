@@ -100,6 +100,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency> <!-- Needed for gRPC ServiceConfig setup -->
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.dojo</groupId>
             <artifactId>messages</artifactId>
