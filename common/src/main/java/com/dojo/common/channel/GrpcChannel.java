@@ -1,4 +1,4 @@
-package com.dojo.common;
+package com.dojo.common.channel;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -10,15 +10,20 @@ import java.util.concurrent.TimeUnit;
 
 public final class GrpcChannel {
 
+    private static final int MAX_RETRY_ATTEMPTS = 1000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GrpcChannel.class);
 
     private final ManagedChannel managedChannel;
 
     public GrpcChannel(final String host, final int port) {
         LOGGER.info("Managed channel started on address {}:{}...", host, port);
-        this.managedChannel = ManagedChannelBuilder.forAddress(host, port)
+        this.managedChannel = ManagedChannelBuilder
+                .forAddress(host, port)
                 .usePlaintext()
-                .keepAliveTime(2, TimeUnit.MINUTES)
+                .defaultServiceConfig(ChannelRPCConfig.getInstance().getServiceConfig())
+                .enableRetry()
+                .maxRetryAttempts(MAX_RETRY_ATTEMPTS)
                 .build();
     }
 
@@ -28,6 +33,15 @@ public final class GrpcChannel {
 
     @PreDestroy
     private void stop() {
+        managedChannel.shutdownNow();
+
+        try {
+            managedChannel.awaitTermination(5L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage());
+        }
+
         managedChannel.shutdownNow();
         LOGGER.info("Managed channel stopped!");
     }

@@ -4,7 +4,7 @@ import com.codenjoy.dojo.EventServiceGrpc;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.codeexecution.DockerServiceGrpc;
-import com.dojo.common.GrpcChannel;
+import com.dojo.common.channel.GrpcChannel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
