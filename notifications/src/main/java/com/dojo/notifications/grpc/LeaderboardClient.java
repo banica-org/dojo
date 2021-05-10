@@ -1,4 +1,4 @@
-package com.dojo.notifications.grpc.leaderboard;
+package com.dojo.notifications.grpc;
 
 import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardResponse;
@@ -24,8 +24,8 @@ import java.util.TreeSet;
 public class LeaderboardClient {
 
     private static final String RESPONSE_MESSAGE = "Response: {}";
-    private static final String NOTIFICATIONS_STARTED_MESSAGE = "Notifications started for contest {}";
-    private static final String NOTIFICATION_STOPPED_MESSAGE = "Notifications stopped for contest {} {}";
+    private static final String NOTIFICATIONS_STARTED_MESSAGE = "Leaderboard notifications started for contest {}";
+    private static final String NOTIFICATION_STOPPED_MESSAGE = "Leaderboard notifications stopped for contest {} {}";
     private static final String ERROR_MESSAGE = "Unable to request {}";
     private static final String COMPLETED_MESSAGE = "Completed.";
 
@@ -50,7 +50,8 @@ public class LeaderboardClient {
         sendLeaderboardUpdates(contest);
     }
 
-    public void stopLeaderboardNotifications(String contestId) {
+    public void stopLeaderboardNotifications(Contest contest) {
+        String contestId = contest.getContestId();
         final StopRequest request = StopRequest.newBuilder()
                 .setContestId(contestId)
                 .build();

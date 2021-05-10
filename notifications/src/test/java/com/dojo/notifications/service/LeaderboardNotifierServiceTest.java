@@ -134,7 +134,7 @@ public class LeaderboardNotifierServiceTest {
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getRequests()).thenReturn(requests);
-        when(flinkTableService.executeSingleQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
         when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
@@ -145,7 +145,7 @@ public class LeaderboardNotifierServiceTest {
         //Assert
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getRequests();
-        verify(flinkTableService, times(1)).executeSingleQuery(eq(SELECT_REQUEST), any());
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
         verify(userDetailsService, times(1)).getUserDetails(any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getPersonalNotifiers();
@@ -161,7 +161,7 @@ public class LeaderboardNotifierServiceTest {
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getRequests()).thenReturn(requests);
-        when(flinkTableService.executeSingleQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getPersonalNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
@@ -171,7 +171,7 @@ public class LeaderboardNotifierServiceTest {
         //Assert
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getRequests();
-        verify(flinkTableService, times(1)).executeSingleQuery(eq(SELECT_REQUEST), any());
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
         verify(notificationService, times(1)).notify(any(), any());
@@ -186,7 +186,7 @@ public class LeaderboardNotifierServiceTest {
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getRequests()).thenReturn(requests);
-        when(flinkTableService.executeSingleQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getCommonNotificationsLevel()).thenReturn(leaderBoardNotificationsType);
 
         //Act
@@ -195,7 +195,7 @@ public class LeaderboardNotifierServiceTest {
         //Assert
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getRequests();
-        verify(flinkTableService, times(1)).executeSingleQuery(eq(SELECT_REQUEST), any());
+        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getCommonNotificationsLevel();
         verify(notificationService, times(1)).notify(any(), any());

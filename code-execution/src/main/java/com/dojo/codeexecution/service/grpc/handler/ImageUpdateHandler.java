@@ -4,23 +4,23 @@ import com.dojo.codeexecution.ImageResponse;
 import io.grpc.stub.StreamObserver;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ImageUpdateHandler {
-    private final Set<StreamObserver<ImageResponse>> streamObservers;
+    private final Map<String, StreamObserver<ImageResponse>> streamObservers;
 
     public ImageUpdateHandler() {
-        this.streamObservers = new HashSet<>();
+        this.streamObservers = new HashMap<>();
     }
 
-    public void addObserver(StreamObserver<ImageResponse> observer) {
-        this.streamObservers.add(observer);
+    public void addObserver(String id, StreamObserver<ImageResponse> observer) {
+        this.streamObservers.put(id, observer);
     }
 
-    public void removeObserver(StreamObserver<ImageResponse> observer) {
-        this.streamObservers.remove(observer);
+    public StreamObserver<ImageResponse> removeObserver(String id) {
+        return this.streamObservers.remove(id);
     }
 
     public void sendUpdate(String tag, String message) {
@@ -29,6 +29,6 @@ public class ImageUpdateHandler {
                 .setMessage(message)
                 .build();
 
-        this.streamObservers.forEach(observer -> observer.onNext(response));
+        this.streamObservers.forEach((id, observer) -> observer.onNext(response));
     }
 }

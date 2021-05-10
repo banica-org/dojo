@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
+import com.dojo.notifications.grpc.UserDetailsClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +16,7 @@ public class UserDetailsServiceTest {
 
     private static final String USER_ID = "1";
     private static final String USER_EMAIL = "email@email";
+    private static final String USERNAME = "username";
 
     private UserDetails testUser;
 
@@ -45,12 +46,19 @@ public class UserDetailsServiceTest {
         assertEquals(USER_EMAIL, actual);
     }
 
+    @Test
+    public void getUserDetailsByUsernameTest() {
+        UserDetails actual = userDetailsService.getUserDetailsByUsername(USERNAME);
+        assertEquals(testUser, actual);
+    }
+
     private void addUser() {
         testUser = new UserDetails();
         testUser.setId(USER_ID);
         testUser.setEmail(USER_EMAIL);
 
-        when(userDetailsClient.getUserDetails(USER_ID)).thenReturn(testUser);
+        when(userDetailsClient.getUserDetailsById(USER_ID)).thenReturn(testUser);
+        when(userDetailsClient.getUserDetailsByUsername(USERNAME)).thenReturn(testUser);
     }
 
 }

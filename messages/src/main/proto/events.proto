@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package codenjoy;
+
 option java_package = "com.codenjoy.dojo";
 option java_multiple_files = true;
 
@@ -14,6 +16,7 @@ message EventsResponse{
 message Event{
   string roomName = 1;
   string gameName = 2;
+  string gameServerUrl = 3;
 }
 
 service EventService{

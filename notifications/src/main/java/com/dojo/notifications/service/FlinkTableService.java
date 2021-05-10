@@ -21,7 +21,7 @@ public class FlinkTableService {
 
     private static final String TABLE_NAME = "Leaderboard";
 
-    public Set<String> executeSingleQuery(SelectRequest request, List<Tuple4<String, String, Integer, Long>> changedUsers) throws Exception {
+    public Set<String> getNotifyIds(SelectRequest request, List<Tuple4<String, String, Integer, Long>> changedUsers) throws Exception {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings
                 .newInstance()
@@ -32,7 +32,7 @@ public class FlinkTableService {
 
         DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream = executionEnvironment.fromCollection(changedUsers);
 
-        Table table = executeSql(tableEnvironment,tuple4DataStream,request);
+        Table table = executeSql(tableEnvironment, tuple4DataStream, request);
 
         DataStream<Tuple4<String, String, Integer, Long>> tupleStream = tableEnvironment.toAppendStream(
                 table,
@@ -44,14 +44,13 @@ public class FlinkTableService {
     }
 
     private Set<String> convertDataStreamToSet(Iterator<Tuple4<String, String, Integer, Long>> leaderboard) {
-
         Set<String> userIds = new TreeSet<>();
 
         leaderboard.forEachRemaining(user -> userIds.add(user.f0));
         return userIds;
     }
 
-    private Table executeSql(StreamTableEnvironment tableEnvironment, DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream, SelectRequest request){
+    private Table executeSql(StreamTableEnvironment tableEnvironment, DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream, SelectRequest request) {
         Table table = tableEnvironment.fromDataStream(tuple4DataStream).as("id", "name", "place", "score");
 
         tableEnvironment.createTemporaryView(TABLE_NAME, table);

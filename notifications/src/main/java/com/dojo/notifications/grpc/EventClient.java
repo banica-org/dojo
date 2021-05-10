@@ -1,4 +1,4 @@
-package com.dojo.notifications.grpc.leaderboard;
+package com.dojo.notifications.grpc;
 
 import com.codenjoy.dojo.EventServiceGrpc;
 import com.codenjoy.dojo.EventsRequest;
@@ -7,8 +7,8 @@ import com.dojo.notifications.model.contest.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class EventClient {
@@ -20,18 +20,13 @@ public class EventClient {
         this.eventServiceBlockingStub = eventServiceBlockingStub;
     }
 
-
-    public List<Event> getAllEvents() {
+    public Map<Event, String> getAllEvents() {
         EventsRequest request = EventsRequest.newBuilder().build();
-
         EventsResponse response = eventServiceBlockingStub.getAllEvents(request);
-
-        List<Event> events = new ArrayList<>();
-
+        Map<Event, String> events = new HashMap<>();
         response.getEventList().forEach(eventResponse ->
-                events.add(new Event(eventResponse.getRoomName(), eventResponse.getGameName()))
+                events.put(new Event(eventResponse.getRoomName(), eventResponse.getGameName()), eventResponse.getGameServerUrl())
         );
-
         return events;
     }
 }

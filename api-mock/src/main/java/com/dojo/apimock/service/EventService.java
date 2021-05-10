@@ -37,6 +37,7 @@ public class EventService extends EventServiceGrpc.EventServiceImplBase {
             Event event = Event.newBuilder()
                     .setRoomName(map.get("roomName"))
                     .setGameName(map.get("gameName"))
+                    .setGameServerUrl("localhost:9091")
                     .build();
             builder.addEvent(event);
         });

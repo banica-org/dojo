@@ -1,21 +1,22 @@
 package com.dojo.notifications.service.notificationService;
 
-import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;
 import com.dojo.notifications.configuration.EmailConfig;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.notification.Notification;
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.messageGenerator.mail.MailMessageGenerator;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.mail.internet.MimeMessage;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,12 +53,13 @@ public class EmailNotificationServiceTest {
     @Mock
     private JavaMailSender emailSender;
 
-    @InjectMocks
     private EmailNotificationService emailNotificationService;
 
-    @BeforeEach
+    @Before
     public void init() {
-        emailNotificationService = new EmailNotificationService();
+        when(mailMessageGenerator.getMessageGeneratorTypeMapping()).thenReturn(NotificationType.LEADERBOARD);
+        when(notification.getType()).thenReturn(NotificationType.LEADERBOARD);
+        emailNotificationService = new EmailNotificationService(emailConfig, emailSender, Collections.singletonList(mailMessageGenerator));
     }
 
     @Test
@@ -80,6 +82,7 @@ public class EmailNotificationServiceTest {
         when(userDetails.getEmail()).thenReturn(EMAIL_FOR_USER);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(emailConfig.getUsername()).thenReturn(USERNAME_FOR_EMAILCONFIG);
+
 
         //Act
         emailNotificationService.notify(userDetails, notification, contest);

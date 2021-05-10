@@ -1,5 +1,6 @@
 package com.dojo.notifications.service.messageGenerator.mail;
 
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import org.thymeleaf.context.Context;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -30,18 +32,26 @@ public class LeaderboardMailMessageGeneratorTest {
     private LeaderboardMailMessageGenerator leaderboardMailMessageGenerator;
 
     @Test
-    public void generateMailContentTest() {
+    public void getMessageGeneratorTypeMapping() {
+        NotificationType expected = NotificationType.LEADERBOARD;
+        NotificationType actual = leaderboardMailMessageGenerator.getMessageGeneratorTypeMapping();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void generateMessageTest() {
         //Arrange
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 20);
 
-        when(templateEngine.process(eq("mailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
+        when(templateEngine.process(eq("leaderboardMailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
         //Act
         String actual = leaderboardMailMessageGenerator.generateMessage(contextParams);
 
         //Assert
         Assert.assertEquals(EXPECTED_PROCESS_RETURN_TYPE, actual);
-        verify(templateEngine, times(1)).process(eq("mailTemplate"), any(Context.class));
+        verify(templateEngine, times(1)).process(eq("leaderboardMailTemplate"), any(Context.class));
     }
 }

@@ -1,7 +1,7 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
-import com.dojo.notifications.grpc.leaderboard.UserDetailsClient;
+import com.dojo.notifications.grpc.UserDetailsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class UserDetailsService {
         UserDetails userDetails = userDetailsCache.get(userId);
         if (userDetails == null) {
 
-            userDetails = userDetailsClient.getUserDetails(userId);
+            userDetails = userDetailsClient.getUserDetailsById(userId);
 
             if (userDetails != null) {
                 userDetailsCache.put(userId, userDetails);
@@ -36,5 +36,13 @@ public class UserDetailsService {
     public String getUserEmail(String userId) {
         UserDetails userDetails = getUserDetails(userId);
         return userDetails != null ? userDetails.getEmail() : null;
+    }
+
+    public UserDetails getUserDetailsByUsername(String username) {
+        UserDetails userDetails = userDetailsClient.getUserDetailsByUsername(username);
+        if (userDetails != null) {
+            userDetailsCache.put(userDetails.getId(), userDetails);
+        }
+        return userDetails;
     }
 }

@@ -4,8 +4,9 @@ import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
-import com.dojo.notifications.model.notification.CommonLeaderboardNotification;
-import com.dojo.notifications.model.notification.PersonalLeaderboardNotification;
+import com.dojo.notifications.model.notification.ParticipantNotification;
+import com.dojo.notifications.model.notification.SenseiNotification;
+import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
@@ -72,7 +73,6 @@ public class LeaderboardNotifierService {
         lookForLeaderboardChanges(contest, newLeaderboard);
     }
 
-
     public void lookForLeaderboardChanges(final Contest contest, Leaderboard newLeaderboard) {
         Leaderboard oldLeaderboard = leaderboards.get(contest.getContestId());
 
@@ -82,7 +82,7 @@ public class LeaderboardNotifierService {
             for (SelectRequest request : selectRequestService.getRequests()) {
                 Set<String> queriedParticipants = new TreeSet<>();
                 try {
-                    queriedParticipants = flinkTableService.executeSingleQuery(request, changedUsers);
+                    queriedParticipants = flinkTableService.getNotifyIds(request, changedUsers);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -108,17 +108,19 @@ public class LeaderboardNotifierService {
             contest.getCommonNotificationsLevel().entrySet().stream()
                     .filter(entry -> entry.getValue() != null)
                     .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
+                    .forEach(entry -> notifySensei(contest, newLeaderboard, entry.getKey(), request.getMessage()));
 
         } else {
             notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
             contest.getCommonNotificationsLevel().entrySet().stream()
                     .filter(entry -> entry.getValue() != null)
                     .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifyCommon(contest, newLeaderboard, entry.getKey(), request.getMessage()));
-
+                    .forEach(entry -> notifySensei(contest, newLeaderboard, entry.getKey(), request.getMessage()));
         }
+
     }
+
+
 
 
     private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
@@ -128,14 +130,14 @@ public class LeaderboardNotifierService {
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getPersonalNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new PersonalLeaderboardNotification(userDetailsService, newLeaderboard, user, queryMessage), contest);
+                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, queryMessage, NotificationType.LEADERBOARD), contest);
             }
         }
     }
 
-    private void notifyCommon(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
+    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
         notificationServices.get(notifierType)
-                .notify(new CommonLeaderboardNotification(userDetailsService, newLeaderboard, queryMessage), contest);
+                .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
 
 }

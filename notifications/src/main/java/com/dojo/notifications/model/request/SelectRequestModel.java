@@ -13,6 +13,7 @@ public class SelectRequestModel {
     private String describingMessage;
     private String notificationMessage;
 
+
     public SelectRequestModel() {
         this.queryParameters = "*";
     }

@@ -37,7 +37,7 @@
         <th>User</th>
         <th>Score</th>
     </tr>
-    <tr th:each="user : ${leaderboard}">
+    <tr th:each="user : ${content.participants}">
         <td th:text="${user.user.name}">
         </td>
         <td th:text="${user.score}">

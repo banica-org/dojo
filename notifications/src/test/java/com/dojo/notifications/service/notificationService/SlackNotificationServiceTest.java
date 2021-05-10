@@ -1,20 +1,21 @@
 package com.dojo.notifications.service.notificationService;
 
-import com.dojo.notifications.service.messageGenerator.slack.SlackMessageGenerator;
-import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.client.CustomSlackClient;
 import com.dojo.notifications.model.client.SlackClientManager;
+import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.notification.Notification;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.messageGenerator.slack.SlackMessageGenerator;
 import com.hubspot.slack.client.methods.params.chat.ChatPostMessageParams;
 import com.hubspot.slack.client.models.blocks.Divider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
@@ -43,11 +44,11 @@ public class SlackNotificationServiceTest {
     @Mock
     private SlackMessageGenerator slackMessageGenerator;
 
-    @InjectMocks
     private SlackNotificationService slackNotificationService;
 
     @Before
     public void setUp() {
+        slackNotificationService = new SlackNotificationService(slackClientManager, Collections.singletonList(slackMessageGenerator));
         when(contest.getSlackToken()).thenReturn(TOKEN);
         when(slackClientManager.getSlackClient(TOKEN)).thenReturn(slackClient);
         chatPostMessageParams = ChatPostMessageParams.builder().addBlocks(Divider.builder().build()).setChannelId(CHANNEL).build();
