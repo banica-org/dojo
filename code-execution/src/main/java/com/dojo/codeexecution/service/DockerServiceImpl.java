@@ -11,7 +11,6 @@ import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.LogContainerCmd;
-import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.PruneType;
@@ -59,19 +58,19 @@ public class DockerServiceImpl implements DockerService {
         String containerId = createContainer(imageTag).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
-        // get the container status after it has been started
         String status = getContainerStatus(containerId);
         containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), new ArrayList<>());
-
         dockerClient.waitContainerCmd(containerId)
                 .exec(getWaitContainerExecutionCallback(containerId));
     }
 
     public String buildImage() {
+        deleteUnnecessaryContainers();
         deleteUnnecessaryImages();
         BuildImageCmd buildImage = dockerClient.buildImageCmd()
                 .withDockerfile(new File(dockerConfigProperties.getFilepath()))
                 .withRemove(true)
+                .withNoCache(true)
                 .withTags(Collections.singleton(dockerConfigProperties.getParentTag()))
                 .withBuildArg(USER_NAME, gitConfigProperties.getUser())
                 .withBuildArg(REPO_NAME, gitConfigProperties.getParentRepositoryName());
@@ -99,12 +98,11 @@ public class DockerServiceImpl implements DockerService {
     private void deleteUnnecessaryImages() {
         dockerClient.pruneCmd(PruneType.IMAGES)
                 .withDangling(true).exec();
-        try {
-            dockerClient.removeImageCmd(dockerConfigProperties.getParentTag())
-                    .withForce(true).exec();
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        }
+    }
+
+    private void deleteUnnecessaryContainers() {
+        dockerClient.pruneCmd(PruneType.CONTAINERS)
+                .withDangling(true).exec();
     }
 
     private String getImageTag(String imageId) {
@@ -144,7 +142,6 @@ public class DockerServiceImpl implements DockerService {
         return new ResultCallback.Adapter<Frame>() {
             @Override
             public void onNext(Frame item) {
-                //Parsing the container log
                 String itemValue = item.toString();
                 if (itemValue.equals(LOG_SEPARATOR)) {
                     logs.add(stringBuilder.toString());
@@ -170,6 +167,7 @@ public class DockerServiceImpl implements DockerService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                logs.forEach(System.out::println);
                 deleteContainerUsername(containerId);
                 deleteContainer(containerId);
                 super.onNext(object);

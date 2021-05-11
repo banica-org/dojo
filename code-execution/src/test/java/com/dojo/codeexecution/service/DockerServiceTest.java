@@ -124,6 +124,7 @@ public class DockerServiceTest {
 
         when(dockerConfigProperties.getFilepath()).thenReturn("code-execution/src/main/docker/Dockerfile");
         when(dockerConfigProperties.getParentTag()).thenReturn(dummyParentName);
+        when(dockerClient.pruneCmd(PruneType.CONTAINERS).withDangling(true).exec()).thenReturn(pruneResponse);
         when(dockerClient.pruneCmd(PruneType.IMAGES).withDangling(true).exec()).thenReturn(pruneResponse);
         when(dockerClient.removeImageCmd(dummyParentName).withForce(true)).thenReturn(removeImageCmd);
         doNothing().when(removeImageCmd).exec();
@@ -134,6 +135,7 @@ public class DockerServiceTest {
         when(dockerClient.buildImageCmd()
                 .withDockerfile(new File("code-execution/src/main/docker/Dockerfile"))
                 .withRemove(true)
+                .withNoCache(true)
                 .withTags(Collections.singleton(dummyParentName))
                 .withBuildArg(user_name, dummyRepoUsername)
                 .withBuildArg(repo_name, dummyRepoName))
@@ -149,7 +151,7 @@ public class DockerServiceTest {
         verify(buildImageMock, times(1)).exec(Mockito.any(ResultCallback.class));
         verify(resultCallback, times(1)).awaitImageId();
         verify(dockerConfigProperties, times(1)).getFilepath();
-        verify(dockerConfigProperties, times(2)).getParentTag();
+        verify(dockerConfigProperties, times(1)).getParentTag();
         verify(gitConfigProperties, times(1)).getUser();
         verify(gitConfigProperties, times(1)).getParentRepositoryName();
     }
