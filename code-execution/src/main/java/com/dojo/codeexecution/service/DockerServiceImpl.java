@@ -101,8 +101,7 @@ public class DockerServiceImpl implements DockerService {
     }
 
     private void deleteUnnecessaryContainers() {
-        dockerClient.pruneCmd(PruneType.CONTAINERS)
-                .withDangling(true).exec();
+        dockerClient.pruneCmd(PruneType.CONTAINERS).exec();
     }
 
     private String getImageTag(String imageId) {
