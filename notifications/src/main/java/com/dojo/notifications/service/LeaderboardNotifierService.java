@@ -114,6 +114,7 @@ public class LeaderboardNotifierService {
     }
 
 
+
     private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
@@ -130,5 +131,4 @@ public class LeaderboardNotifierService {
         notificationServices.get(notifierType)
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
-
 }

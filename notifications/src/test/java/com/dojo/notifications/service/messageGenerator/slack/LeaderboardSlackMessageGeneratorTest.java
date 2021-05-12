@@ -37,6 +37,7 @@ public class LeaderboardSlackMessageGeneratorTest {
     private static final String CHANNEL = "Channel";
     private static final String CONV_ID = "Conversation";
 
+    private static final String PERSONAL_TITLE = "Your have leaderboard changes";
     private static final String COMMON_TITLE = "Leaderboard update";
 
     private static final String CONTENT_KEY = "content";
@@ -96,6 +97,7 @@ public class LeaderboardSlackMessageGeneratorTest {
 
         assertTrue(blocks.get(2).toString().contains(USER_NAME));
         assertTrue(blocks.get(2).toString().contains(String.valueOf(USER_SCORE)));
+        assertTrue(blocks.get(2).toString().contains(COMMON_TITLE));
     }
 
     @Test

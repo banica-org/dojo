@@ -14,8 +14,7 @@
     <div class="container">
         <h2 style="text-align:center">Notification for event</h2>
         <br>
-        <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
-            <div class="form-group">
+        <form action="#" th:action="@{/event}" th:object="${newContest}" method="post">            <div class="form-group">
                 <label for="contestId">Game:</label>
                 <th:block th:if="*{contestId}">
                     <select class="form-control" id="contestId" th:field="*{contestId}" disabled>
@@ -118,6 +117,9 @@
                                 <td>
                                     <label th:text="${query.id} + ."></label>
                                     <label th:text="${query.queryDescription}"></label>
+                                </td>
+                                <td>
+                                    <button class="fa fa-trash" name="action" th:value="${query.id}"></button>
                                 </td>
                             </tr>
                         </table>
