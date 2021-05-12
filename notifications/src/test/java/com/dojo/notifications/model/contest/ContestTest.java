@@ -1,6 +1,5 @@
 package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,45 +49,30 @@ public class ContestTest {
     }
 
     @Test
-    public void slackCommonNotificationsTest() {
-        contest.setSlackCommonNotifications(CommonNotificationsLevel.ON_CHANGED_POSITION);
+    public void slackNotifierTest() {
+        contest.setSlackNotifier(true);
 
-        assertEquals(CommonNotificationsLevel.ON_CHANGED_POSITION, contest.getSlackCommonNotifications());
+        assertTrue(contest.getSlackNotifier());
     }
 
     @Test
-    public void emailCommonNotificationsTest() {
-        contest.setEmailCommonNotifications(CommonNotificationsLevel.ON_CHANGED_POSITION);
+    public void emailNotifierTest() {
+        contest.setEmailNotifier(true);
 
-        assertEquals(CommonNotificationsLevel.ON_CHANGED_POSITION, contest.getEmailCommonNotifications());
+        assertTrue(contest.getEmailNotifier());
     }
 
     @Test
-    public void personalPositionChangeSlackTest() {
-        contest.setPersonalPositionChangeSlack(true);
+    public void slackNotifierFalseTest() {
+        contest.setSlackNotifier(false);
 
-        assertTrue(contest.getPersonalPositionChangeSlack());
+        assertFalse(contest.getSlackNotifier());
     }
 
     @Test
-    public void personalPositionChangeEmailTest() {
-        contest.setPersonalPositionChangeEmail(true);
+    public void emailNotifierFalseTest() {
+        contest.setEmailNotifier(false);
 
-        assertTrue(contest.getPersonalPositionChangeEmail());
+        assertFalse(contest.getEmailNotifier());
     }
-
-    @Test
-    public void personalPositionChangeFalseSlackTest() {
-        contest.setPersonalPositionChangeSlack(false);
-
-        assertFalse(contest.getPersonalPositionChangeSlack());
-    }
-
-    @Test
-    public void personalPositionChangeFalseEmailTest() {
-        contest.setPersonalPositionChangeEmail(false);
-
-        assertFalse(contest.getPersonalPositionChangeEmail());
-    }
-
 }

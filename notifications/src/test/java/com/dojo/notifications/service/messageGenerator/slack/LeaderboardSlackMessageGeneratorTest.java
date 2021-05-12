@@ -37,14 +37,13 @@ public class LeaderboardSlackMessageGeneratorTest {
     private static final String CHANNEL = "Channel";
     private static final String CONV_ID = "Conversation";
 
-    private static final String PERSONAL_TITLE = "Your have leaderboard changes";
     private static final String COMMON_TITLE = "Leaderboard update";
 
     private static final String CONTENT_KEY = "content";
     private static final String MESSAGE_KEY = "message";
     private static final String USERDERAILS_KEY = "userDetails";
 
-    private static final int BLOCKS_EXPECTED_SIZE = 4;
+    private static final int BLOCKS_EXPECTED_SIZE = 3;
     private static final int ATTACHMENTS_EXPECTED_SIZE = 1;
 
     private Leaderboard leaderboard;
@@ -97,7 +96,6 @@ public class LeaderboardSlackMessageGeneratorTest {
 
         assertTrue(blocks.get(2).toString().contains(USER_NAME));
         assertTrue(blocks.get(2).toString().contains(String.valueOf(USER_SCORE)));
-        assertTrue(blocks.get(2).toString().contains(PERSONAL_TITLE));
     }
 
     @Test

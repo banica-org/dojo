@@ -3,9 +3,9 @@ package com.dojo.notifications.web;
 import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
-import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
+import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -105,10 +105,9 @@ public class WebUIController {
     private String setupRequestPage(Model model, SelectRequestModel newRequest) {
         model.addAttribute("newRequest", newRequest);
         model.addAttribute("queryParameters", newRequest.getQueryParameters());
+        model.addAttribute("queryTable", newRequest.getQueryTable());
         model.addAttribute("querySpecification", newRequest.getQuerySpecification());
         model.addAttribute("notify", newRequest.getReceiver());
-        model.addAttribute("eventType", newRequest.getEventType());
-        model.addAttribute("notificationLevel", newRequest.getNotificationLevel());
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
 
@@ -118,10 +117,8 @@ public class WebUIController {
     private void setupQueryUpdate(SelectRequestModel newRequest) {
         SelectRequest selectRequest = new SelectRequest();
 
-        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM Leaderboard " + newRequest.getQuerySpecification());
+        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM " + newRequest.getQueryTable().toLowerCase() + " " + newRequest.getQuerySpecification());
         selectRequest.setReceiver(newRequest.getReceiver());
-        selectRequest.setEventType(newRequest.getEventType());
-        selectRequest.setNotificationLevel(newRequest.getNotificationLevel(newRequest.getEventType()));
         selectRequest.setQueryDescription(newRequest.getDescribingMessage());
         selectRequest.setMessage(newRequest.getNotificationMessage());
 
@@ -129,7 +126,7 @@ public class WebUIController {
     }
 
     public void addDropDownOptions(Model model) {
-        List<SelectRequest> selectRequestList = selectRequestService.getRequests();
+        List<SelectRequest> selectRequestList = selectRequestService.getAllRequests();
         model.addAttribute("queries", selectRequestList);
     }
 }

@@ -1,6 +1,5 @@
 package com.dojo.notifications.model.contest;
 
-import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import lombok.Data;
 
@@ -15,15 +14,11 @@ public class Contest {
     private String slackChannel;
     private Set<String> senseiEmails;
 
-    private Map<NotifierType, CommonNotificationsLevel> commonNotificationsLevel;
-    private Set<NotifierType> personalNotifiers;
+    private Set<NotifierType> notifiers;
 
     public Contest() {
         senseiEmails = new HashSet<>();
-        commonNotificationsLevel = new HashMap<>();
-        commonNotificationsLevel.put(NotifierType.SLACK, CommonNotificationsLevel.NO_NOTIFICATIONS);
-        commonNotificationsLevel.put(NotifierType.EMAIL, CommonNotificationsLevel.NO_NOTIFICATIONS);
-        personalNotifiers = new HashSet<>();
+        notifiers = new HashSet<>();
     }
 
     public void setSenseiEmailsAsString(String emails) {
@@ -34,43 +29,27 @@ public class Contest {
         return String.join(";", senseiEmails);
     }
 
-    public void setSlackCommonNotifications(CommonNotificationsLevel level) {
-        commonNotificationsLevel.put(NotifierType.SLACK, level);
-    }
-
-    public CommonNotificationsLevel getSlackCommonNotifications() {
-        return commonNotificationsLevel.get(NotifierType.SLACK);
-    }
-
-    public void setEmailCommonNotifications(CommonNotificationsLevel level) {
-        commonNotificationsLevel.put(NotifierType.EMAIL, level);
-    }
-
-    public CommonNotificationsLevel getEmailCommonNotifications() {
-        return commonNotificationsLevel.get(NotifierType.EMAIL);
-    }
-
-    public void setPersonalPositionChangeSlack(boolean personalPositionChangeSlack) {
-        if (personalPositionChangeSlack) {
-            personalNotifiers.add(NotifierType.SLACK);
+    public void setSlackNotifier(boolean slackNotifier) {
+        if (slackNotifier) {
+            notifiers.add(NotifierType.SLACK);
         } else {
-            personalNotifiers.remove(NotifierType.SLACK);
+            notifiers.remove(NotifierType.SLACK);
         }
     }
 
-    public boolean getPersonalPositionChangeSlack() {
-        return personalNotifiers.contains(NotifierType.SLACK);
+    public boolean getSlackNotifier() {
+        return notifiers.contains(NotifierType.SLACK);
     }
 
-    public void setPersonalPositionChangeEmail(boolean personalPositionChangeEmail) {
-        if (personalPositionChangeEmail) {
-            personalNotifiers.add(NotifierType.EMAIL);
+    public void setEmailNotifier(boolean emailNotifier) {
+        if (emailNotifier) {
+            notifiers.add(NotifierType.EMAIL);
         } else {
-            personalNotifiers.remove(NotifierType.EMAIL);
+            notifiers.remove(NotifierType.EMAIL);
         }
     }
 
-    public boolean getPersonalPositionChangeEmail() {
-        return personalNotifiers.contains(NotifierType.EMAIL);
+    public boolean getEmailNotifier() {
+        return notifiers.contains(NotifierType.EMAIL);
     }
 }
