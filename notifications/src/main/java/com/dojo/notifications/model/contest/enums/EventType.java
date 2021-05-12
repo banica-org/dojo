@@ -1,9 +1,0 @@
-package com.dojo.notifications.model.contest.enums;
-
-public enum EventType {
-
-    OTHER_LEADERBOARD_CHANGE,
-    POSITION_CHANGES,
-    SCORE_CHANGES,
-    NO_NOTIFICATIONS
-}
