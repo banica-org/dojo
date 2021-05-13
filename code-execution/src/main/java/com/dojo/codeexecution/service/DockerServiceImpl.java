@@ -18,6 +18,8 @@ import com.github.dockerjava.api.model.WaitResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -41,9 +45,12 @@ public class DockerServiceImpl implements DockerService {
     private final GitConfigProperties gitConfigProperties;
     private final AtomicInteger containerCounter;
     private final Map<String, String> containerUserCache;
+    private final ExecutorService singleThreadExecutor;
 
     @Autowired
-    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties, GitConfigProperties gitConfigProperties) {
+    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler,
+                             DockerClient dockerClient, DockerConfigProperties dockerConfigProperties,
+                             GitConfigProperties gitConfigProperties) {
         this.imageUpdateHandler = imageUpdateHandler;
         this.containerUpdateHandler = containerUpdateHandler;
         this.dockerClient = dockerClient;
@@ -51,6 +58,12 @@ public class DockerServiceImpl implements DockerService {
         this.gitConfigProperties = gitConfigProperties;
         this.containerCounter = new AtomicInteger();
         this.containerUserCache = new ConcurrentHashMap<>();
+        this.singleThreadExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    @PostConstruct
+    private void setup() {
+        singleThreadExecutor.submit(this::buildImageTask);
     }
 
     public void runContainer(String imageTag) {
@@ -64,7 +77,11 @@ public class DockerServiceImpl implements DockerService {
                 .exec(getWaitContainerExecutionCallback(containerId));
     }
 
-    public String buildImage() {
+    public void buildImage() {
+        singleThreadExecutor.submit(this::buildImageTask);
+    }
+
+    private String buildImageTask() {
         deleteUnnecessaryContainers();
         deleteUnnecessaryImages();
         BuildImageCmd buildImage = dockerClient.buildImageCmd()
@@ -202,5 +219,11 @@ public class DockerServiceImpl implements DockerService {
 
     private void deleteContainerUsername(String containerId) {
         containerUserCache.remove(containerId);
+    }
+
+
+    @PreDestroy
+    private void preDestroy() {
+        singleThreadExecutor.shutdownNow();
     }
 }
