@@ -43,8 +43,6 @@ public class GitManager {
     public void buildParentWebHook() throws IOException {
         String repositoryPath = gitConfig.getUser() + "/" + gitConfig.getParentRepositoryName();
         GHRepository repository = gitHub.getRepository(repositoryPath);
-        Thread buildImageThread = new Thread(dockerService::buildImage);
-
         if (repository.getHooks().size() == 0) {
             Map<String, String> webhookConfig = new HashMap<>(gitConfig.getWebhookConfig());
             webhookConfig.put("url", gitConfig.getWebhookAddress() + PARENT_HOOK);
@@ -52,7 +50,6 @@ public class GitManager {
             repository.createHook(WEB_HOOK_PREFIX, webhookConfig,
                     Collections.singletonList(GHEvent.PUSH), true);
         }
-        buildImageThread.start();
     }
 
     @Retryable
