@@ -12,6 +12,7 @@ public class SelectRequestModel {
     private String notificationLevel;
     private String describingMessage;
     private String notificationMessage;
+    private String receivers;
 
 
     public SelectRequestModel() {
@@ -73,6 +74,14 @@ public class SelectRequestModel {
     public String getNotificationLevel(String eventType) {
         notificationLevel = determineCommunicationLevel(eventType);
         return notificationLevel;
+    }
+
+    public void setReceivers(String receivers) {
+        this.receivers = receivers;
+    }
+
+    public String getReceivers() {
+        return receivers;
     }
 
     private String determineCommunicationLevel(String eventType) {

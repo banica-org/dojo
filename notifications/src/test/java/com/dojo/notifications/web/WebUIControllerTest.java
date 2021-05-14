@@ -119,7 +119,7 @@ public class WebUIControllerTest {
     @Test
     public void requestsPageTest() {
 
-        String actual = webUIController.requestsPage(model);
+        String actual = webUIController.requestsPage(model, contest);
 
         Assert.assertEquals(REQUEST_NAME, actual);
     }
@@ -135,7 +135,7 @@ public class WebUIControllerTest {
         when(selectRequestModel.getDescribingMessage()).thenReturn("");
         when(selectRequestModel.getNotificationMessage()).thenReturn("");
 
-        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD);
+        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD,contest);
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
@@ -155,7 +155,7 @@ public class WebUIControllerTest {
     public void newRequestSubmitTest() {
         when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
-        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD);
+        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD,contest);
 
         Assert.assertEquals(CONTEST_NAME, actual);
 

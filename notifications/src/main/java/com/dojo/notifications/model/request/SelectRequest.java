@@ -40,4 +40,7 @@ public class SelectRequest {
 
     @Column(name = "MESSAGE")
     String message;
+
+    @Column(name = "RECEIVERS")
+    String receivers;
 }

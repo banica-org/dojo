@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,7 +102,9 @@ public class LeaderboardNotifierService {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         EventType eventTypeQuery = EventType.valueOf(request.getEventType());
-
+        if(request.getReceivers()!=null){
+            notifyContestants(contest,newLeaderboard,turnStringToSet(request.getReceivers()), request.getMessage());
+        }
         if (request.getReceiver().equals(RECEIVER_PARTICIPANT)) {
             notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
 
@@ -135,6 +139,10 @@ public class LeaderboardNotifierService {
     private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
         notificationServices.get(notifierType)
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
+    }
+
+    private Set<String> turnStringToSet(String users){
+        return new HashSet<>(Arrays.asList(users.split(",")));
     }
 }
 
