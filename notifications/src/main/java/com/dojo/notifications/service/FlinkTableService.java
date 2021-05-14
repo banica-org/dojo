@@ -52,7 +52,7 @@ public class FlinkTableService {
         return getUsernames(tupleStream.executeAndCollect());
     }
 
-    public Set<String> getNotifyIds(SelectRequest request, List<Tuple4<String, String, Integer, Long>> changedUsers) throws Exception {
+    public Set<String> executeLeaderboardQuery(SelectRequest request, List<Tuple4<String, String, Integer, Long>> changedUsers) throws Exception {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tableEnvironment = getStreamTableEnvironment(executionEnvironment);
 

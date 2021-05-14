@@ -33,8 +33,8 @@ public class UserDetailsServiceTest {
     }
 
     @Test
-    public void getUserDetailsTest() {
-        UserDetails actual = userDetailsService.getUserDetails(USER_ID);
+    public void getUserDetailsByIdTest() {
+        UserDetails actual = userDetailsService.getUserDetailsById(USER_ID);
 
         assertEquals(testUser, actual);
     }
