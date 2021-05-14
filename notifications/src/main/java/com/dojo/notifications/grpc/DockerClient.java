@@ -45,6 +45,10 @@ public class DockerClient {
 
     private static final String SERVER_ID = "NotificationServer";
 
+    private static final String EXECUTION_EMPTY = "";
+    private static final String EXECUTION_SUCCESS = "success";
+    private static final String EXECUTION_FAILURE = "failure";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerClient.class);
 
     private final Map<Contest, DockerServiceGrpc.DockerServiceStub> dockerServiceStubs;
@@ -96,6 +100,9 @@ public class DockerClient {
                     @Override
                     public void onNext(ImageResponse imageResponse) {
                         Image image = new Image(imageResponse.getTag(), imageResponse.getMessage());
+
+                        //image build results are always sent to sensei
+                        //not configurable
                         dockerNotifierService.notifySensei(contest, image, String.format(IMAGE_MESSAGE, contest.getContestId()), NotificationType.IMAGE);
                         LOGGER.info(RESPONSE_MESSAGE, imageResponse);
                     }
@@ -120,12 +127,8 @@ public class DockerClient {
                 .getContainerResults(request, new StreamObserver<ContainerResponse>() {
                     @Override
                     public void onNext(ContainerResponse containerResponse) {
-                        String username = containerResponse.getUsername();
-
                         Container container = getContainer(containerResponse);
-
-                        dockerNotifierService.notifyParticipant(username, contest, container, String.format(CONTAINER_MESSAGE, contest.getContestId()), NotificationType.CONTAINER);
-
+                        dockerNotifierService.executeRequests(contest, container, String.format(CONTAINER_MESSAGE, contest.getContestId()));
                         LOGGER.info(RESPONSE_MESSAGE, containerResponse);
                     }
 
@@ -149,13 +152,8 @@ public class DockerClient {
                 .getTestResults(request, new StreamObserver<TestResultResponse>() {
                     @Override
                     public void onNext(TestResultResponse testResultResponse) {
-                        String username = testResultResponse.getUsername();
-                        Map<String, String> results = new HashMap<>();
-                        testResultResponse.getFailedTestCaseList().forEach(failedTestCase -> results.put(failedTestCase.getMethodName(), failedTestCase.getExpected()));
-                        TestResults testResults = new TestResults(username, results);
-
-                        dockerNotifierService.notifyParticipant(username, contest, testResults, String.format(TEST_RESULTS_MESSAGE, contest.getContestId()), NotificationType.TEST_RESULTS);
-
+                        TestResults testResults = getTestResults(testResultResponse);
+                        dockerNotifierService.executeRequests(contest, testResults, String.format(TEST_RESULTS_MESSAGE, contest.getContestId()));
                         LOGGER.info(RESPONSE_MESSAGE, testResultResponse);
                     }
 
@@ -171,20 +169,32 @@ public class DockerClient {
                 });
     }
 
+    private TestResults getTestResults(TestResultResponse testResultResponse) {
+        String username = testResultResponse.getUsername();
+        Map<String, String> results = new HashMap<>();
+        testResultResponse.getFailedTestCaseList().forEach(failedTestCase -> results.put(failedTestCase.getMethodName(), failedTestCase.getExpected()));
+        return new TestResults(username, results);
+    }
+
     private Container getContainer(ContainerResponse containerResponse) {
         List<String> logs = new ArrayList<>();
+        String execution = EXECUTION_EMPTY;
 
         if (!containerResponse.getLogList().isEmpty()) {
             String log = containerResponse.getLog(1);
-            String regex = "^STDOUT(.*?\\[.*?\\].*?)$";
+            String regex = "^STDOUT: (.*?\\[.*?\\].*?)$";
             Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
             Matcher matcher = pattern.matcher(log);
 
             while (matcher.find()) {
                 logs.add(matcher.group(1));
             }
-            logs.add(containerResponse.getLog(2).replaceAll("STDOUT", ""));
+            execution = EXECUTION_FAILURE;
+            if (containerResponse.getLogList().size() > 2) {
+                logs.add(containerResponse.getLog(2).replaceAll("STDOUT: ", ""));
+                execution = EXECUTION_SUCCESS;
+            }
         }
-        return new Container(containerResponse.getUsername(), containerResponse.getStatus(), logs);
+        return new Container(containerResponse.getUsername(), containerResponse.getStatus(), execution, logs);
     }
 }

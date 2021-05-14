@@ -38,7 +38,7 @@ public class SelectRequestServiceTest {
         when(selectRequestRepo.findAll()).thenReturn(expected);
 
         //Act
-        List<SelectRequest> actual = selectRequestService.getRequests();
+        List<SelectRequest> actual = selectRequestService.getAllRequests();
 
         //Assert
         Assert.assertEquals(expected, actual);

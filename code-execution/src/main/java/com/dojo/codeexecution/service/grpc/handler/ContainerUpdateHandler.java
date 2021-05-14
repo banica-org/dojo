@@ -24,8 +24,8 @@ public class ContainerUpdateHandler {
         return this.streamObservers.remove(id);
     }
 
-    public void sendUpdate(String status, String username, List<String> errors) {
-        this.streamObservers.forEach((id, observer) -> observer.onNext(generateResponse(status, username, errors)));
+    public void sendUpdate(String status, String username, List<String> logs) {
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateResponse(status, username, logs)));
     }
 
     private ContainerResponse generateResponse(String status, String username, List<String> logs) {

@@ -1,7 +1,5 @@
 package com.dojo.notifications.service;
 
-
-import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
@@ -47,46 +45,6 @@ public class LeaderboardServiceTest {
         SECOND_USER_DETAILS.setId("2");
         POSITION_CHANGED_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, BETTER_FIRST_PARTICIPANT));
     }
-
-    @Test
-    public void determineEventTypePositionChangeTest() {
-
-
-        //Act
-        boolean actual = leaderboardService.isEventType(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD, EventType.POSITION_CHANGES);
-
-        //Assert
-        Assert.assertTrue(actual);
-    }
-
-    @Test
-    public void determineEventTypeScoreChangeTest() {
-        //Arrange
-        Participant scoreChange = new Participant(new UserInfo("2", "SecondUser"), 420);
-
-        TreeSet<Participant> treeSet = new TreeSet<>();
-        treeSet.add(FIRST_PARTICIPANT);
-        treeSet.add(scoreChange);
-        Leaderboard newLeaderboard = new Leaderboard(treeSet);
-
-        //Act
-        boolean actual = leaderboardService.isEventType(newLeaderboard, OLD_LEADERBOARD, EventType.SCORE_CHANGES);
-
-        //Assert
-        Assert.assertTrue(actual);
-    }
-
-    @Test
-    public void determineEventTypeOtherChangeTest() {
-        //Arrange
-
-        //Act
-        boolean actual = leaderboardService.isEventType(OLD_LEADERBOARD, OLD_LEADERBOARD, EventType.OTHER_LEADERBOARD_CHANGE);
-
-        //Assert
-        Assert.assertTrue(actual);
-    }
-
 
     @Test
     public void getUserDetailsTest() {
