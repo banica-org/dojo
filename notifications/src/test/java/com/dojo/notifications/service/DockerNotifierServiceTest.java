@@ -1,7 +1,6 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.enums.CommonNotificationsLevel;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.notification.ParticipantNotification;
@@ -18,10 +17,8 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +44,10 @@ public class DockerNotifierServiceTest {
 
     @Mock
     private UserDetailsService userDetailsService;
+    @Mock
+    private SelectRequestService selectRequestService;
+    @Mock
+    private FlinkTableService flinkTableService;
 
     @Mock
     private EmailNotificationService emailNotificationService;
@@ -63,7 +64,7 @@ public class DockerNotifierServiceTest {
         notificationServices.add(slackNotificationService);
         when(emailNotificationService.getNotificationServiceTypeMapping()).thenReturn(NotifierType.EMAIL);
         when(slackNotificationService.getNotificationServiceTypeMapping()).thenReturn(NotifierType.SLACK);
-        dockerNotifierService = new DockerNotifierService(userDetailsService, notificationServices);
+        dockerNotifierService = new DockerNotifierService(userDetailsService, selectRequestService, flinkTableService, notificationServices);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class DockerNotifierServiceTest {
         Set<NotifierType> notifiers = new HashSet<>();
         notifiers.add(NotifierType.EMAIL);
         notifiers.add(NotifierType.SLACK);
-        when(contest.getPersonalNotifiers()).thenReturn(notifiers);
+        when(contest.getNotifiers()).thenReturn(notifiers);
 
         dockerNotifierService.notifyParticipant(USERNAME, contest, container, MESSAGE, NotificationType.CONTAINER);
 
@@ -83,10 +84,10 @@ public class DockerNotifierServiceTest {
     @Test
     public void notifySenseiTest() {
 
-        Map<NotifierType, CommonNotificationsLevel> notifiers = new HashMap<>();
-        notifiers.put(NotifierType.EMAIL, CommonNotificationsLevel.NO_NOTIFICATIONS);
-        notifiers.put(NotifierType.SLACK, CommonNotificationsLevel.NO_NOTIFICATIONS);
-        when(contest.getCommonNotificationsLevel()).thenReturn(notifiers);
+        Set<NotifierType> notifiers = new HashSet<>();
+        notifiers.add(NotifierType.EMAIL);
+        notifiers.add(NotifierType.SLACK);
+        when(contest.getNotifiers()).thenReturn(notifiers);
 
         dockerNotifierService.notifySensei(contest, container, MESSAGE, NotificationType.CONTAINER);
 

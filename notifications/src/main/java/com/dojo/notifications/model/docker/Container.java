@@ -10,5 +10,6 @@ import java.util.List;
 public class Container {
     private final String username;
     private final String status;
+    private final String codeExecution;
     private final List<String> logs;
 }
