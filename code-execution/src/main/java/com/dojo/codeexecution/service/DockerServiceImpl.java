@@ -16,10 +16,10 @@ import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.PruneType;
 import com.github.dockerjava.api.model.WaitResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -50,7 +49,8 @@ public class DockerServiceImpl implements DockerService {
     @Autowired
     public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler,
                              DockerClient dockerClient, DockerConfigProperties dockerConfigProperties,
-                             GitConfigProperties gitConfigProperties) {
+                             GitConfigProperties gitConfigProperties,
+                             @Qualifier("buildImageSingleThreadExecutor") ExecutorService singleThreadExecutor) {
         this.imageUpdateHandler = imageUpdateHandler;
         this.containerUpdateHandler = containerUpdateHandler;
         this.dockerClient = dockerClient;
@@ -58,12 +58,12 @@ public class DockerServiceImpl implements DockerService {
         this.gitConfigProperties = gitConfigProperties;
         this.containerCounter = new AtomicInteger();
         this.containerUserCache = new ConcurrentHashMap<>();
-        this.singleThreadExecutor = Executors.newSingleThreadExecutor();
+        this.singleThreadExecutor = singleThreadExecutor;
     }
 
     @PostConstruct
     private void setup() {
-        singleThreadExecutor.submit(this::buildImageTask);
+        buildImage();
     }
 
     public void runContainer(String imageTag) {
@@ -78,7 +78,9 @@ public class DockerServiceImpl implements DockerService {
     }
 
     public void buildImage() {
-        singleThreadExecutor.submit(this::buildImageTask);
+        singleThreadExecutor.submit(() -> {
+            buildImageTask();
+        });
     }
 
     private String buildImageTask() {
@@ -221,9 +223,4 @@ public class DockerServiceImpl implements DockerService {
         containerUserCache.remove(containerId);
     }
 
-
-    @PreDestroy
-    private void preDestroy() {
-        singleThreadExecutor.shutdownNow();
-    }
 }
