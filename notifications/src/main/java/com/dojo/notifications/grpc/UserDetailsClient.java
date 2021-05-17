@@ -60,7 +60,7 @@ public class UserDetailsClient {
         return userDetails;
     }
 
-    public List<User> getUsers(String contestId){
+    public List<User> getUsersForContest(String contestId){
         UserRequest userRequest = UserRequest.newBuilder()
                 .setContestId(contestId).build();
         UserResponse userResponse = userDetailsServiceBlockingStub.getUsersForContest(userRequest);

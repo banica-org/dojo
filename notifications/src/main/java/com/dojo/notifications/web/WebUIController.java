@@ -37,7 +37,7 @@ public class WebUIController {
     private ContestController contestController;
 
     @Autowired
-    private UserDetailsClient userDetailsClient;
+    private UserManagement userManagement;
 
     @GetMapping("/")
     public String redirect(Model model) {
@@ -128,7 +128,7 @@ public class WebUIController {
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
         model.addAttribute("receivers", newRequest.getReceivers());
-        model.addAttribute("users", userDetailsClient.getUsers(newContest.getContestId()));
+        model.addAttribute("users", userManagement.getAllAutocomplete(newContest.getContestId()));
 
         return "request";
     }

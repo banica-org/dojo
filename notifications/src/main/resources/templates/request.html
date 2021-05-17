@@ -66,8 +66,8 @@
                                     <div>
                                         <select style="width:330px" multiple class="chosen-select" name="test" th:field="*{receivers}">
                                             <option value=""></option>
-                                            <option th:each="group : ${groups}" th:text="${group.name}" th:value="${group.f2}" th:field="*{receivers}"></option>
-                                            <option th:each="user : ${users}" th:text="${user.name}" th:value="${user.id}" th:field="*{receivers}"></option>
+<!--                                            <option th:each="group : ${groups}" th:text="${group.name}" th:value="${group.f2}" th:field="*{receivers}"></option>-->
+                                            <option th:each="user : ${users}" th:text="${user}" th:value="${user}" th:field="*{receivers}"></option>
                                         </select>
                                     </div>
                                 </div>

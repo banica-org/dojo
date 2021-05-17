@@ -50,14 +50,14 @@ public class UserDetailsService {
     }
 
     public List<String> getUserNames(String contestId){
-        List<User> userList = userDetailsClient.getUsers(contestId);
+        List<User> userList = userDetailsClient.getUsersForContest(contestId);
         return userList.stream()
                 .map(User::getGithubUserName)
                 .collect(Collectors.toList());
     }
 
     public List<String> getNames(String contestId){
-        List<User> userList = userDetailsClient.getUsers(contestId);
+        List<User> userList = userDetailsClient.getUsersForContest(contestId);
         return userList.stream()
                 .map(User::getName)
                 .collect(Collectors.toList());
