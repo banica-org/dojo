@@ -74,46 +74,46 @@ public class WebUIControllerTest {
         Event event = mock(Event.class);
         when(event.getGameName()).thenReturn(CONTEST_TITLE);
         when(eventService.getEventByRoomName(CONTEST_ID)).thenReturn(event);
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         webUIController.newContest(contest, model);
 
         verify(eventService, times(1)).getEventByRoomName(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);
-        verify(selectRequestService, times(1)).getRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test
     public void editContestTest() {
         when(eventService.getContestById(CONTEST_ID)).thenReturn(contest);
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         webUIController.editContest(CONTEST_ID, model);
 
         verify(eventService, times(1)).getContestById(CONTEST_ID);
         verify(model, times(1)).addAttribute(anyString(), eq(contest));
         verify(model, times(2)).addAttribute(anyString(), eq(Collections.emptyList()));
-        verify(selectRequestService, times(1)).getRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test
     public void stopContestTest() {
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         webUIController.stopContest(CONTEST_ID, model);
 
         verify(contestController, times(1)).stopNotifications(CONTEST_ID);
-        verify(selectRequestService, times(1)).getRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test
     public void gamesRefreshTest() {
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         webUIController.eventsRefresh(model);
 
         verify(eventService, times(1)).invalidateEventsCache();
-        verify(selectRequestService, times(1)).getRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test
@@ -126,12 +126,11 @@ public class WebUIControllerTest {
 
     @Test
     public void newRequestAddTest() {
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
         when(selectRequestModel.getQueryParameters()).thenReturn("");
+        when(selectRequestModel.getQueryTable()).thenReturn("");
         when(selectRequestModel.getQuerySpecification()).thenReturn("");
         when(selectRequestModel.getReceiver()).thenReturn("");
-        when(selectRequestModel.getEventType()).thenReturn("");
-        when(selectRequestModel.getNotificationLevel("")).thenReturn("");
         when(selectRequestModel.getDescribingMessage()).thenReturn("");
         when(selectRequestModel.getNotificationMessage()).thenReturn("");
 
@@ -139,27 +138,26 @@ public class WebUIControllerTest {
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
-        verify(selectRequestService, times(2)).getRequests();
+        verify(selectRequestService, times(2)).getAllRequests();
         verify(selectRequestModel, times(1)).getQueryParameters();
         verify(selectRequestModel, times(1)).getQuerySpecification();
         verify(selectRequestModel, times(1)).getReceiver();
-        verify(selectRequestModel, times(2)).getEventType();
-        verify(selectRequestModel, times(1)).getNotificationLevel("");
         verify(selectRequestModel, times(1)).getDescribingMessage();
         verify(selectRequestModel, times(1)).getNotificationMessage();
         verify(selectRequestService, times(1)).saveRequest(any());
-        verify(model, times(13)).addAttribute(any(), any());
+        verify(model, times(12)).addAttribute(any(), any());
     }
 
     @Test
     public void newRequestSubmitTest() {
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestModel.getQueryTable()).thenReturn("");
 
         String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD,contest);
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
-        verify(selectRequestService, times(2)).getRequests();
+        verify(selectRequestService, times(2)).getAllRequests();
     }
 
     @Test
@@ -175,7 +173,7 @@ public class WebUIControllerTest {
         Event event = mock(Event.class);
         when(event.getGameName()).thenReturn(CONTEST_TITLE);
         when(eventService.getEventByRoomName(CONTEST_ID)).thenReturn(event);
-        when(selectRequestService.getRequests()).thenReturn(DUMMY_SELECT_REQUEST);
+        when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
 
         String actual = webUIController.determineEvent(contest, model, ACTION_START);
 
@@ -183,7 +181,7 @@ public class WebUIControllerTest {
 
         verify(eventService, times(1)).getEventByRoomName(CONTEST_ID);
         verify(contestController, times(1)).subscribeForContest(contest);
-        verify(selectRequestService, times(1)).getRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test

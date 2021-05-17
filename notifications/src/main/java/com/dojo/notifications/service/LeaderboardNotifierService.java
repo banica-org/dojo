@@ -1,7 +1,6 @@
 package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.model.contest.enums.EventType;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.notification.ParticipantNotification;
@@ -81,7 +80,7 @@ public class LeaderboardNotifierService {
         List<Tuple4<String, String, Integer, Long>> changedUsers = leaderboardService.getLeaderboardChanges(oldLeaderboard, newLeaderboard);
 
         if (changedUsers.size() != 0) {
-            for (SelectRequest request : selectRequestService.getRequests()) {
+            for (SelectRequest request : selectRequestService.getRequestsForTable("leaderboard")) {
                 Set<String> queriedParticipants = new TreeSet<>();
                 try {
                     queriedParticipants = flinkTableService.getNotifyIds(request, changedUsers);
@@ -101,7 +100,6 @@ public class LeaderboardNotifierService {
     private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
-        EventType eventTypeQuery = EventType.valueOf(request.getEventType());
         if(request.getReceivers()!=null){
             notifyContestants(contest,newLeaderboard,turnStringToSet(request.getReceivers()), request.getMessage());
         }
@@ -109,27 +107,25 @@ public class LeaderboardNotifierService {
             notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
 
         } else if (request.getReceiver().equals(RECEIVER_COMMON)) {
-            contest.getCommonNotificationsLevel().entrySet().stream()
-                    .filter(entry -> entry.getValue() != null)
-                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifySensei(contest, newLeaderboard, entry.getKey(), request.getMessage()));
+            contest.getNotifiers()
+                    .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, request.getMessage()));
 
         } else {
             notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
-            contest.getCommonNotificationsLevel().entrySet().stream()
-                    .filter(entry -> entry.getValue() != null)
-                    .filter(entry -> entry.getValue().getIncludedEventTypes().contains(eventTypeQuery))
-                    .forEach(entry -> notifySensei(contest, newLeaderboard, entry.getKey(), request.getMessage()));
+            contest.getNotifiers()
+                    .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, request.getMessage()));
         }
 
     }
+
+
 
     private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
 
         for (UserDetails user : userDetails) {
-            for (NotifierType notifierType : contest.getPersonalNotifiers()) {
+            for (NotifierType notifierType : contest.getNotifiers()) {
                 notificationServices.get(notifierType)
                         .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, queryMessage, NotificationType.LEADERBOARD), contest);
             }
@@ -145,4 +141,3 @@ public class LeaderboardNotifierService {
         return new HashSet<>(Arrays.asList(users.split(",")));
     }
 }
-

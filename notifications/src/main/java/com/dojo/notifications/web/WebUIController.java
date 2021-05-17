@@ -8,6 +8,7 @@ import com.dojo.notifications.model.user.UserManagement;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
+import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -121,10 +122,9 @@ public class WebUIController {
     private String setupRequestPage(Model model, SelectRequestModel newRequest, Contest newContest) {
         model.addAttribute("newRequest", newRequest);
         model.addAttribute("queryParameters", newRequest.getQueryParameters());
+        model.addAttribute("queryTable", newRequest.getQueryTable());
         model.addAttribute("querySpecification", newRequest.getQuerySpecification());
         model.addAttribute("notify", newRequest.getReceiver());
-        model.addAttribute("eventType", newRequest.getEventType());
-        model.addAttribute("notificationLevel", newRequest.getNotificationLevel());
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
         model.addAttribute("receivers", newRequest.getReceivers());
@@ -136,10 +136,8 @@ public class WebUIController {
     private void setupQueryUpdate(SelectRequestModel newRequest) {
         SelectRequest selectRequest = new SelectRequest();
 
-        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM Leaderboard " + newRequest.getQuerySpecification());
+        selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM " + newRequest.getQueryTable().toLowerCase() + " " + newRequest.getQuerySpecification());
         selectRequest.setReceiver(newRequest.getReceiver());
-        selectRequest.setEventType(newRequest.getEventType());
-        selectRequest.setNotificationLevel(newRequest.getNotificationLevel(newRequest.getEventType()));
         selectRequest.setQueryDescription(newRequest.getDescribingMessage());
         selectRequest.setMessage(newRequest.getNotificationMessage());
         selectRequest.setReceivers(newRequest.getReceivers());
