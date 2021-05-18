@@ -22,7 +22,8 @@ ARG repo_name
 WORKDIR /app
 #COPY --from=parent-build /app/$repo_name/target/${repo_name}-1.0-SNAPSHOT-jar-with-dependencies.jar /app/${repo_name}-1.0-SNAPSHOT-jar-with-dependencies.jar
 COPY --from=parent-build /app/$repo_name/target/${repo_name}-1.0-SNAPSHOT-solution-tests.jar /app/${repo_name}-1.0-SNAPSHOT-solution-tests.jar
-COPY --from=parent-build /root/.m2 /root/.m2
+#COPY --from=parent-build /root/.m2 /root/.m2
+COPY --from=parent-build /root/.m2 /usr/share/maven/ref
 COPY run.sh run.sh
 # $0 is username, $1 is password/token for Github, $2 is child username, $3 is child repo name, $4 is parent-repo-name
 ENTRYPOINT chmod +x run.sh && ./run.sh $0 $1 $2 $3 $4 $5
