@@ -43,21 +43,15 @@
                     <td>
                         <label>Select who will be notified:  </label>
                         <br>
-                        <select style="width:330px" th:field="*{receiver}">
-                            <option value="All"  class="form-option-input" id="notifyAll" th:field="*{receiver}">All
-                            </option>
-                            <option value="Common" class="form-option-input" id="notifyCommon" th:field="*{receiver}">Only Channel/Sensei
-                            </option>
-                            <option value="Participant" class="form-option-input" id="notifyParticipant" th:field="*{receiver}">Only Participants
-                            </option>
-                        </select>
+                        <input type="checkbox" id="notifyCommon" value="Common" th:field="*{receivers}"> Notify Channel/Sensei
+                        <br>
+                        <br>
                         <div class="control-section">
                             <div class="control-wrapper">
                                 <div id='content'>
                                     <div>
                                         <select style="width:330px" multiple class="chosen-select" name="test" th:field="*{receivers}">
                                             <option value=""></option>
-<!--                                            <option th:each="group : ${groups}" th:text="${group.name}" th:value="${group.f2}" th:field="*{receivers}"></option>-->
                                             <option th:each="user : ${users}" th:text="${user}" th:value="${user}" th:field="*{receivers}"></option>
                                         </select>
                                     </div>

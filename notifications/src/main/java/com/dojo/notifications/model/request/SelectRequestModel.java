@@ -8,7 +8,6 @@ public class SelectRequestModel {
     private String queryParameters;
     private String queryTable;
     private String querySpecification;
-    private String receiver;
     private String describingMessage;
     private String notificationMessage;
     private String receivers;
@@ -56,14 +55,6 @@ public class SelectRequestModel {
 
     public String getNotificationMessage() {
         return notificationMessage;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
-    }
-
-    public String getReceiver() {
-        return receiver;
     }
 
     public void setReceivers(String receivers) {

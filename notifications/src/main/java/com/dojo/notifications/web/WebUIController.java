@@ -1,14 +1,12 @@
 package com.dojo.notifications.web;
 
 import com.dojo.notifications.api.ContestController;
-import com.dojo.notifications.grpc.UserDetailsClient;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
 import com.dojo.notifications.model.user.UserManagement;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
-import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -109,12 +107,13 @@ public class WebUIController {
     }
 
     private String setupContestsPage(Model model, Contest contest) {
-        List<SelectRequest> selectRequestList = selectRequestService.getRequests();
+        List<SelectRequest> selectRequestList = selectRequestService.getAllRequests();
 
         model.addAttribute("newContest", contest);
         model.addAttribute("events", eventService.getAllEvents());
         model.addAttribute("contests", eventService.getAllContests());
         model.addAttribute("queries", selectRequestList);
+        model.addAttribute("queryIds", contest.getQueryIds());
 
         return "contest";
     }
@@ -124,7 +123,6 @@ public class WebUIController {
         model.addAttribute("queryParameters", newRequest.getQueryParameters());
         model.addAttribute("queryTable", newRequest.getQueryTable());
         model.addAttribute("querySpecification", newRequest.getQuerySpecification());
-        model.addAttribute("notify", newRequest.getReceiver());
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
         model.addAttribute("receivers", newRequest.getReceivers());
@@ -137,7 +135,6 @@ public class WebUIController {
         SelectRequest selectRequest = new SelectRequest();
 
         selectRequest.setQuery("SELECT " + newRequest.getQueryParameters() + " FROM " + newRequest.getQueryTable().toLowerCase() + " " + newRequest.getQuerySpecification());
-        selectRequest.setReceiver(newRequest.getReceiver());
         selectRequest.setQueryDescription(newRequest.getDescribingMessage());
         selectRequest.setMessage(newRequest.getNotificationMessage());
         selectRequest.setReceivers(newRequest.getReceivers());

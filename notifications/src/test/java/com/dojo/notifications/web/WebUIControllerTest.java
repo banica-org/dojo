@@ -4,6 +4,7 @@ import com.dojo.notifications.api.ContestController;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.Event;
 import com.dojo.notifications.model.request.SelectRequestModel;
+import com.dojo.notifications.model.user.UserManagement;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.service.SelectRequestService;
@@ -56,6 +57,9 @@ public class WebUIControllerTest {
 
     @Mock
     private ContestController contestController;
+
+    @Mock
+    private UserManagement userManagement;
 
     @InjectMocks
     private WebUIController webUIController;
@@ -118,10 +122,12 @@ public class WebUIControllerTest {
 
     @Test
     public void requestsPageTest() {
+        when(userManagement.getAllAutocomplete(CONTEST_ID)).thenReturn(Collections.emptyList());
 
         String actual = webUIController.requestsPage(model, contest);
 
         Assert.assertEquals(REQUEST_NAME, actual);
+        verify(userManagement, times(1)).getAllAutocomplete(CONTEST_ID);
     }
 
     @Test
@@ -130,7 +136,6 @@ public class WebUIControllerTest {
         when(selectRequestModel.getQueryParameters()).thenReturn("");
         when(selectRequestModel.getQueryTable()).thenReturn("");
         when(selectRequestModel.getQuerySpecification()).thenReturn("");
-        when(selectRequestModel.getReceiver()).thenReturn("");
         when(selectRequestModel.getDescribingMessage()).thenReturn("");
         when(selectRequestModel.getNotificationMessage()).thenReturn("");
 
@@ -138,14 +143,13 @@ public class WebUIControllerTest {
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
-        verify(selectRequestService, times(2)).getAllRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
         verify(selectRequestModel, times(1)).getQueryParameters();
         verify(selectRequestModel, times(1)).getQuerySpecification();
-        verify(selectRequestModel, times(1)).getReceiver();
         verify(selectRequestModel, times(1)).getDescribingMessage();
         verify(selectRequestModel, times(1)).getNotificationMessage();
         verify(selectRequestService, times(1)).saveRequest(any());
-        verify(model, times(12)).addAttribute(any(), any());
+        verify(model, times(5)).addAttribute(any(), any());
     }
 
     @Test
@@ -157,15 +161,17 @@ public class WebUIControllerTest {
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
-        verify(selectRequestService, times(2)).getAllRequests();
+        verify(selectRequestService, times(1)).getAllRequests();
     }
 
     @Test
     public void determineEventAddTest() {
+        when(userManagement.getAllAutocomplete(CONTEST_ID)).thenReturn(Collections.emptyList());
 
         String actual = webUIController.determineEvent(contest, model, ACTION_ADD);
 
         Assert.assertEquals(REQUEST_NAME, actual);
+        verify(userManagement, times(1)).getAllAutocomplete(CONTEST_ID);
     }
 
     @Test

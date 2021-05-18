@@ -2,6 +2,7 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.grpc.UserDetailsClient;
+import com.dojo.notifications.model.user.UserManagement;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,13 +22,16 @@ public class UserDetailsServiceTest {
     private UserDetails testUser;
 
     @Mock
+    private UserManagement userManagement;
+
+    @Mock
     private UserDetailsClient userDetailsClient;
 
     private UserDetailsService userDetailsService;
 
     @Before
     public void init() {
-        userDetailsService = new UserDetailsService(userDetailsClient);
+        userDetailsService = new UserDetailsService(userDetailsClient, userManagement);
 
         addUser();
     }

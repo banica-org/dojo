@@ -26,9 +26,6 @@ public class SelectRequest {
     @Column(name = "QUERY")
     String query;
 
-    @Column(name = "RECEIVER")
-    String receiver;
-
     @Column(name = "QUERY_DESCRIPTION")
     String queryDescription;
 

@@ -112,7 +112,12 @@
                 <h5>Group notification rules</h5>
                 <div class="row border">
                     <div class="col">
-                        <table class="table-control" th:value="${selectRequest}">
+                        <table style="width:100%" class="table-control" th:value="${selectRequest}">
+                            <tr>
+                                <th>Query Description</th>
+                                <th>Delete</th>
+                                <th>Apply to contest</th>
+                            </tr>
                             <tr th:each="query : ${queries}">
                                 <td>
                                     <label th:text="${query.id} + ."></label>
@@ -120,6 +125,9 @@
                                 </td>
                                 <td>
                                     <button class="fa fa-trash" name="action" th:value="${query.id}"></button>
+                                </td>
+                                <td align="center">
+                                    <input type="checkbox" id="forContest" th:field="*{queryIds}" th:value="${query.id}">
                                 </td>
                             </tr>
                         </table>

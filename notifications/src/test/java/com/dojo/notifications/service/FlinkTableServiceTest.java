@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.flink.api.java.tuple.Tuple4;
 
-import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +48,7 @@ public class FlinkTableServiceTest {
         CHANGED_USERS.add(new Tuple4<>(DUMMY_STRING, DUMMY_STRING, 0, (long) 0));
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void executeSingleQueryEmptyTest() throws Exception {
         //Arrange
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));

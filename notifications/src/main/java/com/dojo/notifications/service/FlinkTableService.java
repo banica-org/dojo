@@ -67,7 +67,7 @@ public class FlinkTableService {
                 }.getTypeInfo()
         );
 
-        return convertDataStreamToSet(tupleStream.executeAndCollect());
+        return getUserIds(tupleStream.executeAndCollect());
     }
 
     private StreamTableEnvironment getStreamTableEnvironment(StreamExecutionEnvironment executionEnvironment) {
@@ -85,7 +85,7 @@ public class FlinkTableService {
         return usernames;
     }
 
-    private Set<String> convertDataStreamToSet(Iterator<Tuple4<String, String, Integer, Long>> leaderboard) {
+    private Set<String> getUserIds(Iterator<Tuple4<String, String, Integer, Long>> leaderboard) {
         Set<String> userIds = new TreeSet<>();
         leaderboard.forEachRemaining(user -> userIds.add(user.f0));
         return userIds;
