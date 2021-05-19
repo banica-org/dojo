@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.notifierService;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
@@ -8,6 +8,9 @@ import com.dojo.notifications.model.notification.SenseiNotification;
 import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.FlinkTableService;
+import com.dojo.notifications.service.SelectRequestService;
+import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.notificationService.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

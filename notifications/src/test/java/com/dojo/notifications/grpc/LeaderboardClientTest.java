@@ -4,7 +4,7 @@ import com.codenjoy.dojo.LeaderboardRequest;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.StopRequest;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.LeaderboardNotifierService;
+import com.dojo.notifications.service.notifierService.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;
 import org.junit.Test;

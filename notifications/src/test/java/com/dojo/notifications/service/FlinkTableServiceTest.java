@@ -1,18 +1,19 @@
 package com.dojo.notifications.service;
 
+import com.dojo.notifications.model.docker.Container;
+import com.dojo.notifications.model.docker.TestResults;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.flink.api.java.tuple.Tuple4;
 
-import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,16 +29,25 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FlinkTableServiceTest {
 
-    private static final String QUERY = "SELECT * FROM Leaderboard";
+    private static final String LEADERBOARD_QUERY = "SELECT * FROM leaderboard";
+    private static final String DOCKER_QUERY = "SELECT * FROM docker_events";
     private static final String BROKEN_QUERY = "SELECT";
     private static final String DUMMY_STRING = "DUMMY";
-
 
     private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
 
+    private final String CONTAINER_STATUS = "exited";
+    private final String CODE_EXECUTION = "success";
+    private final Integer FAILED_TEST_CASES = 1;
+
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());
     private final List<Tuple4<String, String, Integer, Long>> CHANGED_USERS = new ArrayList<>();
+
+    @Mock
+    private Container container;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private TestResults testResults;
 
     @Mock
     private SelectRequest selectRequest;
@@ -50,32 +61,64 @@ public class FlinkTableServiceTest {
     }
 
     @Test
-    public void executeSingleQueryEmptyTest() throws Exception {
+    public void executeLeaderboardQueryEmptyTest() throws Exception {
         //Arrange
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
         Set<String> expected = Collections.singleton(DUMMY_STRING);
-        when(selectRequest.getQuery()).thenReturn(QUERY);
+        when(selectRequest.getQuery()).thenReturn(LEADERBOARD_QUERY);
         //Act
-        Set<String> actual = flinkTableService.getNotifyIds(selectRequest, CHANGED_USERS);
+        Set<String> actual = flinkTableService.executeLeaderboardQuery(selectRequest, CHANGED_USERS);
 
         //Assert
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
 
         verify(selectRequest, times(1)).getQuery();
     }
 
     @Test(expected = Exception.class)
-    public void executeSingleQueryEmptyExceptionTest() throws Exception {
+    public void executeLeaderboardQueryEmptyExceptionTest() throws Exception {
         //Arrange
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
         Set<String> expected = Collections.emptySet();
         when(selectRequest.getQuery()).thenReturn(BROKEN_QUERY);
 
         //Act
-        Set<String> actual = flinkTableService.getNotifyIds(selectRequest, CHANGED_USERS);
+        Set<String> actual = flinkTableService.executeLeaderboardQuery(selectRequest, CHANGED_USERS);
 
         //Assert
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
 
+    }
+
+    @Test
+    public void executeDockerQueryContainerTest() throws Exception {
+        when(selectRequest.getQuery()).thenReturn(DOCKER_QUERY);
+        when(container.getUsername()).thenReturn(DUMMY_STRING);
+        when(container.getStatus()).thenReturn(CONTAINER_STATUS);
+        when(container.getCodeExecution()).thenReturn(CODE_EXECUTION);
+        List<String> expected = Collections.singletonList(DUMMY_STRING);
+
+        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, container);
+
+        verify(selectRequest, times(1)).getQuery();
+        verify(container, times(1)).getUsername();
+        verify(container, times(1)).getStatus();
+        verify(container, times(1)).getCodeExecution();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void executeDockerQueryTestResultsTest() throws Exception {
+        when(selectRequest.getQuery()).thenReturn(DOCKER_QUERY);
+        when(testResults.getUsername()).thenReturn(DUMMY_STRING);
+        when(testResults.getFailedTestCases().size()).thenReturn(FAILED_TEST_CASES);
+        List<String> expected = Collections.singletonList(DUMMY_STRING);
+
+        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, testResults);
+
+        verify(selectRequest, times(1)).getQuery();
+        verify(testResults, times(1)).getUsername();
+        verify(testResults, times(2)).getFailedTestCases();
+        assertEquals(expected, actual);
     }
 }
