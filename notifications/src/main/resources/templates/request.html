@@ -37,8 +37,10 @@
                 <td>
                     <div class="ui-widget">
                         <label for="tables">FROM </label>
-                        <input id="tables" style="width:278px" placeholder="leaderboard/docker_events"
-                               th:field="*{queryTable}">
+                        <select id="tables" style="width:278px" th:field="*{queryTable}">
+                            <option th:each="table : ${tables.keySet()}" th:value="${table}" th:text="${table}">
+                            </option>
+                        </select>
                     </div>
                 </td>
             </tr>
@@ -99,10 +101,6 @@
         </table>
     </form>
 </div>
-
-<!--<script th:inline="javascript">-->
-<!--    -->
-<!--</script>-->
 
 </body>
 </html>

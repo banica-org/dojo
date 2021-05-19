@@ -1,8 +1,4 @@
 
-    $( "#tables" ).autocomplete({
-      source: tables
-    });
-
     $( function() {
     function get_columns() {
         table = document.getElementById("tables").value;
