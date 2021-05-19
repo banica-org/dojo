@@ -102,17 +102,18 @@
       source: [[${tables.keySet()}]]
     });
 
-  $( function() {
+    $( function() {
     function get_columns() {
         var tables = [[${tables}]];
         table = document.getElementById("tables").value;
         return tables[table];
     };
-    function split( val ) {
-        return val.split( /@/ );
-    }
     function extractLast( term ) {
-        return split( term ).pop();
+        if (term.indexOf("@")!=-1){
+            var tmp=term.split("@");
+            return tmp[tmp.length-1];
+        }
+        return null;
     }
 
     $( "#column_names" )
@@ -125,14 +126,16 @@
       .autocomplete({
         minLength: 0,
         source: function( request, response ) {
-          response( $.ui.autocomplete.filter(
-            get_columns(), extractLast(request.term) ) );
+            var column = extractLast(request.term);
+            if(column==null){return;}
+            response( $.ui.autocomplete.filter(
+            get_columns(), column ) );
         },
         focus: function() {
           return false;
         },
         select: function( event, ui ) {
-          var terms = split( this.value );
+          var terms = this.value.split("@");
           terms.pop();
           terms.push( ui.item.value );
           terms.push( "" );
