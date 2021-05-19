@@ -6,6 +6,7 @@ import com.dojo.notifications.model.contest.Event;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
 import com.dojo.notifications.service.EventService;
+import com.dojo.notifications.service.FlinkTableService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,9 @@ public class WebUIController {
 
     @Autowired
     private SelectRequestService selectRequestService;
+
+    @Autowired
+    private FlinkTableService flinkTableService;
 
     @Autowired
     private EventService eventService;
@@ -124,6 +128,8 @@ public class WebUIController {
         model.addAttribute("notify", newRequest.getReceiver());
         model.addAttribute("describingMessage", newRequest.getNotificationMessage());
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
+
+        model.addAttribute("tables", flinkTableService.getTables());
 
         return "request";
     }

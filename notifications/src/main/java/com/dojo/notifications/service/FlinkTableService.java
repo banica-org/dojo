@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -26,9 +28,24 @@ public class FlinkTableService {
     private static final String LEADERBOARD = "leaderboard";
     private static final String DOCKER_EVENTS = "docker_events";
 
+    private final String[] LEADERBOARD_COLUMNS = {"id", "name", "place", "score"};
+    private final String[] DOCKER_COLUMNS = {"type", "username", "container_status", "code_execution", "failed_test_cases"};
+
     private static final String CONTAINER_TYPE = "container";
     private static final String TEST_RESULTS_TYPE = "test_results";
     private static final String EMPTY = "";
+
+    private final Map<String, String[]> tables;
+
+    public FlinkTableService() {
+        this.tables = new HashMap<>();
+        tables.put(LEADERBOARD, LEADERBOARD_COLUMNS);
+        tables.put(DOCKER_EVENTS, DOCKER_COLUMNS);
+    }
+
+    public Map<String, String[]> getTables() {
+        return Collections.unmodifiableMap(tables);
+    }
 
     public List<String> executeDockerQuery(SelectRequest request, Object object) throws Exception {
 
@@ -38,7 +55,7 @@ public class FlinkTableService {
         Tuple5<String, String, String, String, Integer> tuple5 = getTuple5(object);
 
         DataStream<Tuple5<String, String, String, String, Integer>> tuple5DataStreamSource = executionEnvironment.fromCollection(Collections.singletonList(tuple5));
-        Table table = tableEnvironment.fromDataStream(tuple5DataStreamSource).as("type", "username", "container_status", "code_execution", "failed_test_cases");
+        Table table = tableEnvironment.fromDataStream(tuple5DataStreamSource).as(tables.get(DOCKER_EVENTS)[0], tables.get(DOCKER_EVENTS)[1], tables.get(DOCKER_EVENTS)[2], tables.get(DOCKER_EVENTS)[3], tables.get(DOCKER_EVENTS)[4]);
 
         Table tableResult = executeSql(tableEnvironment, table, DOCKER_EVENTS, request);
 
@@ -57,7 +74,7 @@ public class FlinkTableService {
         StreamTableEnvironment tableEnvironment = getStreamTableEnvironment(executionEnvironment);
 
         DataStream<Tuple4<String, String, Integer, Long>> tuple4DataStream = executionEnvironment.fromCollection(changedUsers);
-        Table table = tableEnvironment.fromDataStream(tuple4DataStream).as("id", "name", "place", "score");
+        Table table = tableEnvironment.fromDataStream(tuple4DataStream).as(tables.get(LEADERBOARD)[0], tables.get(LEADERBOARD)[1], tables.get(LEADERBOARD)[2], tables.get(LEADERBOARD)[3]);
 
         Table tableResult = executeSql(tableEnvironment, table, LEADERBOARD, request);
 
