@@ -15,7 +15,10 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-    <!--    <script th:inline="javascript" type="text/javascript" th:src="@{/js/tables-autocomplete.js}"></script>-->
+    <script th:inline="javascript">
+    var tables = [[${tables}]];
+    </script>
+    <script type="text/javascript" th:src="@{/js/tables-autocomplete.js}"></script>
 </head>
 
 <body>
@@ -97,55 +100,9 @@
     </form>
 </div>
 
-<script th:inline="javascript">
-    $( "#tables" ).autocomplete({
-      source: [[${tables.keySet()}]]
-    });
-
-    $( function() {
-    function get_columns() {
-        var tables = [[${tables}]];
-        table = document.getElementById("tables").value;
-        return tables[table];
-    };
-    function extractLast( term ) {
-        if (term.indexOf("@")!=-1){
-            var tmp=term.split("@");
-            return tmp[tmp.length-1];
-        }
-        return null;
-    }
-
-    $( "#column_names" )
-      .on( "keydown", function( event ) {
-        if ( event.keyCode === $.ui.keyCode.TAB &&
-            $( this ).autocomplete( "instance" ).menu.active ) {
-          event.preventDefault();
-        }
-      })
-      .autocomplete({
-        minLength: 0,
-        source: function( request, response ) {
-            var column = extractLast(request.term);
-            if(column==null){return;}
-            response( $.ui.autocomplete.filter(
-            get_columns(), column ) );
-        },
-        focus: function() {
-          return false;
-        },
-        select: function( event, ui ) {
-          var terms = this.value.split("@");
-          terms.pop();
-          terms.push( ui.item.value );
-          terms.push( "" );
-          this.value = terms.join( "" );
-          return false;
-        }
-      });
-  } );
-
-</script>
+<!--<script th:inline="javascript">-->
+<!--    -->
+<!--</script>-->
 
 </body>
 </html>
