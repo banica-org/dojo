@@ -7,7 +7,7 @@ import com.dojo.codeexecution.StopRequest;
 import com.dojo.codeexecution.TestResultRequest;
 import com.dojo.notifications.configuration.GrpcConfig;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.DockerNotifierService;
+import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import com.dojo.notifications.service.EventService;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;

@@ -15,7 +15,7 @@ import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.docker.Image;
 import com.dojo.notifications.model.docker.TestResults;
 import com.dojo.notifications.model.notification.enums.NotificationType;
-import com.dojo.notifications.service.DockerNotifierService;
+import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import com.dojo.notifications.service.EventService;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;

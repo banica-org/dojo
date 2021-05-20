@@ -2,64 +2,61 @@ package com.dojo.notifications.service;
 
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
-import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 public class LeaderboardServiceTest {
 
-    private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
-    private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
-    private final Participant BETTER_FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 400);
-    private final Leaderboard OLD_LEADERBOARD = new Leaderboard(new TreeSet<>());
-    private final Leaderboard POSITION_CHANGED_LEADERBOARD = new Leaderboard(new TreeSet<>());
-    private final UserDetails FIRST_USER_DETAILS = new UserDetails();
-    private final UserDetails SECOND_USER_DETAILS = new UserDetails();
+    private final String FIRST_USER_ID = "1";
+    private final String SECOND_USER_ID = "2";
 
-    @Mock
-    private UserDetailsService userDetailsService;
+    private final String FIRST_USER_NAME = "FirstUser";
+    private final String SECOND_USER_NAME = "SecondUser";
+
+    private final long FIRST_USER_SCORE = 100;
+    private final long SECOND_USER_SCORE = 120;
+
+    private final long SCORE_CHANGE = 300;
+
+    private final Participant firstParticipant = new Participant(new UserInfo(FIRST_USER_ID, FIRST_USER_NAME), FIRST_USER_SCORE);
+    private final Participant secondParticipant = new Participant(new UserInfo(SECOND_USER_ID, SECOND_USER_NAME), SECOND_USER_SCORE);
+    private final Participant firstUserChanged = new Participant(new UserInfo(FIRST_USER_ID, FIRST_USER_NAME), FIRST_USER_SCORE + SCORE_CHANGE);
+
+    private final Leaderboard oldLeaderboard = new Leaderboard(new TreeSet<>());
+    private final Leaderboard newLeaderboard = new Leaderboard(new TreeSet<>());
 
     @InjectMocks
     private LeaderboardService leaderboardService;
 
     @Before
     public void init() {
-        OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
-        FIRST_USER_DETAILS.setId("1");
-        SECOND_USER_DETAILS.setId("2");
-        POSITION_CHANGED_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, BETTER_FIRST_PARTICIPANT));
+        oldLeaderboard.getParticipants().addAll(Arrays.asList(firstParticipant, secondParticipant));
+        newLeaderboard.getParticipants().addAll(Arrays.asList(secondParticipant, firstUserChanged));
     }
 
     @Test
-    public void getUserDetailsTest() {
-        //Arrange
-        List<UserDetails> expected = Arrays.asList(FIRST_USER_DETAILS, SECOND_USER_DETAILS);
+    public void getLeaderboardChangesTest() {
+        Tuple4<String, String, Integer, Long> first = new Tuple4<>(FIRST_USER_ID, FIRST_USER_NAME, 1, SCORE_CHANGE);
+        Tuple4<String, String, Integer, Long> second = new Tuple4<>(SECOND_USER_ID, SECOND_USER_NAME, -1, 0L);
 
-        when(userDetailsService.getUserDetails(OLD_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
-        when(userDetailsService.getUserDetails(OLD_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
+        List<Tuple4<String, String, Integer, Long>> expected = new ArrayList<>();
+        expected.add(first);
+        expected.add(second);
 
-        //Act
-        List<UserDetails> actual = leaderboardService.getUserDetails(POSITION_CHANGED_LEADERBOARD, OLD_LEADERBOARD);
+        List<Tuple4<String, String, Integer, Long>> actual = leaderboardService.getLeaderboardChanges(oldLeaderboard, newLeaderboard);
 
-        //Assert
         Assert.assertEquals(expected, actual);
-        verify(userDetailsService, times(2)).getUserDetails(any());
     }
-
 }

@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.notifierService;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
@@ -9,6 +9,10 @@ import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.service.FlinkTableService;
+import com.dojo.notifications.service.LeaderboardService;
+import com.dojo.notifications.service.SelectRequestService;
+import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.notificationService.NotificationService;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.slf4j.Logger;
@@ -83,7 +87,7 @@ public class LeaderboardNotifierService {
             for (SelectRequest request : contestRequests) {
                 Set<String> queriedParticipants = new TreeSet<>();
                 try {
-                    queriedParticipants = flinkTableService.getNotifyIds(request, changedUsers);
+                    queriedParticipants = flinkTableService.executeLeaderboardQuery(request, changedUsers);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -110,10 +114,10 @@ public class LeaderboardNotifierService {
 
     private void notifyListeners(Contest contest, Leaderboard newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
-        eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
+        eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         List<UserDetails> queriedUserDetails = new ArrayList<>();
-        queried.forEach(id -> queriedUserDetails.add(userDetailsService.getUserDetails(id)));
+        queried.forEach(id -> queriedUserDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
@@ -125,7 +129,7 @@ public class LeaderboardNotifierService {
 
     private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
-        userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetails(id)));
+        userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {

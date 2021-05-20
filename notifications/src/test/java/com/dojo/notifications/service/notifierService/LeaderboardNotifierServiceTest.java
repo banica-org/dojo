@@ -1,4 +1,4 @@
-package com.dojo.notifications.service;
+package com.dojo.notifications.service.notifierService;
 
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
@@ -7,6 +7,10 @@ import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.UserInfo;
+import com.dojo.notifications.service.FlinkTableService;
+import com.dojo.notifications.service.LeaderboardService;
+import com.dojo.notifications.service.SelectRequestService;
+import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.notificationService.NotificationService;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.junit.Before;
@@ -75,7 +79,7 @@ public class LeaderboardNotifierServiceTest {
     @Mock
     private NotificationService notificationService;
 
-    Map<String, Leaderboard> leaderboards;
+    private Map<String, Leaderboard> leaderboards;
 
     private LeaderboardNotifierService leaderboardNotifierService;
 
@@ -137,9 +141,9 @@ public class LeaderboardNotifierServiceTest {
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST))).thenReturn(Collections.singleton(SELECT_REQUEST));
         when(selectRequestService.getRequestsForTable(TABLE_NAME)).thenReturn(requests);
-        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
-        when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
-        when(userDetailsService.getUserDetails(NEW_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
+        when(flinkTableService.executeLeaderboardQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(userDetailsService.getUserDetailsById(NEW_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
+        when(userDetailsService.getUserDetailsById(NEW_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
         when(contest.getNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
 
         //Act
@@ -149,8 +153,8 @@ public class LeaderboardNotifierServiceTest {
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST));
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
-        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
-        verify(userDetailsService, times(1)).getUserDetails(any());
+        verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
+        verify(userDetailsService, times(1)).getUserDetailsById(any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any(), any());
@@ -165,7 +169,8 @@ public class LeaderboardNotifierServiceTest {
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST))).thenReturn(Collections.singleton(SELECT_REQUEST));
         when(selectRequestService.getRequestsForTable(TABLE_NAME)).thenReturn(requests);
-        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(flinkTableService.executeLeaderboardQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(userDetailsService.turnUsersToUserIds(SELECT_REQUEST.getReceivers())).thenReturn(Collections.singleton("1"));
         when(contest.getNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getNotifiers()).thenReturn(notifiers);
 
@@ -176,9 +181,10 @@ public class LeaderboardNotifierServiceTest {
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST));
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
-        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
+        verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
+        verify(userDetailsService, times(1)).turnUsersToUserIds(SELECT_REQUEST.getReceivers());
         verify(contest, times(2)).getContestId();
-        verify(contest, times(2)).getNotifiers();
+        verify(contest, times(3)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());
     }
 
@@ -191,7 +197,7 @@ public class LeaderboardNotifierServiceTest {
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
         when(selectRequestService.getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST))).thenReturn(Collections.singleton(SELECT_REQUEST));
         when(selectRequestService.getRequestsForTable(TABLE_NAME)).thenReturn(requests);
-        when(flinkTableService.getNotifyIds(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
+        when(flinkTableService.executeLeaderboardQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getNotifiers()).thenReturn(notifiers);
 
         //Act
@@ -201,7 +207,7 @@ public class LeaderboardNotifierServiceTest {
         verify(leaderboardService, times(1)).getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD);
         verify(selectRequestService, times(1)).getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST));
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
-        verify(flinkTableService, times(1)).getNotifyIds(eq(SELECT_REQUEST), any());
+        verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
         verify(contest, times(2)).getContestId();
         verify(contest, times(2)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());

@@ -9,7 +9,7 @@ import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
-import com.dojo.notifications.service.LeaderboardNotifierService;
+import com.dojo.notifications.service.notifierService.LeaderboardNotifierService;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

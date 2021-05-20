@@ -31,7 +31,7 @@ public class UserDetailsService {
         this.userDetailsCache = new ConcurrentHashMap<>();
     }
 
-    public UserDetails getUserDetails(String userId) {
+    public UserDetails getUserDetailsById(String userId) {
         UserDetails userDetails = userDetailsCache.get(userId);
         if (userDetails == null) {
 
@@ -45,7 +45,7 @@ public class UserDetailsService {
     }
 
     public String getUserEmail(String userId) {
-        UserDetails userDetails = getUserDetails(userId);
+        UserDetails userDetails = getUserDetailsById(userId);
         return userDetails != null ? userDetails.getEmail() : null;
     }
 
