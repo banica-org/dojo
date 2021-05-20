@@ -33,10 +33,15 @@
         select: function( event, ui ) {
           var terms = this.value.split("@");
           terms.pop();
-          terms.push( ui.item.value );
+          terms.push( ui.item.label );
           terms.push( "" );
           this.value = terms.join( "" );
           return false;
         }
-      });
+      })
+      .autocomplete( "instance" )._renderItem = function( ul, item ) {
+            return $( "<li>" )
+              .append( "<div><b>" + item.label + "</b> <i>" + item.value + "</i></div>" )
+              .appendTo( ul );
+          };
   } );
