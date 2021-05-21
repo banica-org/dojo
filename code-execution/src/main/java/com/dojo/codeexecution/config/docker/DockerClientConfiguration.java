@@ -7,6 +7,8 @@ import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +16,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
+@ConfigurationProperties
 public class DockerClientConfiguration {
+
+    private final String dockerHostAddress;
+
+    public DockerClientConfiguration(@Value("${docker.host.address}") String dockerHostAddress){
+        this.dockerHostAddress = dockerHostAddress;
+    }
 
     @Bean
     public DockerClient createDockerClient() {
@@ -23,7 +32,8 @@ public class DockerClientConfiguration {
 
     @Bean
     DockerClientConfig dockerDefaultClientConfig() {
-        return DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+        return DefaultDockerClientConfig.createDefaultConfigBuilder()
+               .withDockerHost(dockerHostAddress).build();
     }
 
     @Bean
