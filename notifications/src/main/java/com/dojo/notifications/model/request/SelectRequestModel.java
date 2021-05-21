@@ -8,9 +8,9 @@ public class SelectRequestModel {
     private String queryParameters;
     private String queryTable;
     private String querySpecification;
-    private String receiver;
     private String describingMessage;
     private String notificationMessage;
+    private String receivers;
 
 
     public SelectRequestModel() {
@@ -57,11 +57,11 @@ public class SelectRequestModel {
         return notificationMessage;
     }
 
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
+    public void setReceivers(String receivers) {
+        this.receivers = receivers;
     }
 
-    public String getReceiver() {
-        return receiver;
+    public String getReceivers() {
+        return receivers;
     }
 }
