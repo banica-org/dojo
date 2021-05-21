@@ -26,12 +26,12 @@ public class SelectRequest {
     @Column(name = "QUERY")
     String query;
 
-    @Column(name = "RECEIVER")
-    String receiver;
-
     @Column(name = "QUERY_DESCRIPTION")
     String queryDescription;
 
     @Column(name = "MESSAGE")
     String message;
+
+    @Column(name = "RECEIVERS")
+    String receivers;
 }
