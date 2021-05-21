@@ -38,6 +38,8 @@ public class DockerNotifierServiceTest {
     private static final String USERNAME = "username";
     private static final String MESSAGE = "message";
 
+    private final SelectRequest SELECT_REQUEST = new SelectRequest();
+
     @Mock
     private UserDetails userDetails;
 
@@ -80,30 +82,47 @@ public class DockerNotifierServiceTest {
 
     @Test
     public void executeRequestsParticipantTest() throws Exception {
-        when(selectRequest.getReceiver()).thenReturn("Participant");
+        when(selectRequestService.getSpecificRequests(any(), any())).thenReturn(Collections.singleton(SELECT_REQUEST));
+        when(selectRequest.getReceivers()).thenReturn("1.");
+        when(flinkTableService.executeDockerQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singletonList(USERNAME));
         executeRequestsConditions();
 
         dockerNotifierService.executeRequests(contest, container, MESSAGE);
+
+        verify(selectRequestService, times(1)).getSpecificRequests(any(), any());
+        verify(flinkTableService, times(1)).executeDockerQuery(eq(SELECT_REQUEST), any());
 
         verifyParticipantNotificationsSent();
     }
 
     @Test
     public void executeRequestsCommonTest() throws Exception {
-        when(selectRequest.getReceiver()).thenReturn("Common");
+        SELECT_REQUEST.setReceivers("Common");
+        when(selectRequestService.getSpecificRequests(any(), any())).thenReturn(Collections.singleton(SELECT_REQUEST));
+        when(selectRequest.getReceivers()).thenReturn("Common");
+        when(flinkTableService.executeDockerQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singletonList(USERNAME));
         executeRequestsConditions();
 
         dockerNotifierService.executeRequests(contest, container, MESSAGE);
+
+        verify(selectRequestService, times(1)).getSpecificRequests(any(), any());
+        verify(flinkTableService, times(1)).executeDockerQuery(eq(SELECT_REQUEST), any());
 
         verifyCommonNotificationsSent();
     }
 
     @Test
     public void executeRequestsAllTest() throws Exception {
-        when(selectRequest.getReceiver()).thenReturn("All");
+        SELECT_REQUEST.setReceivers("Common");
+        when(selectRequestService.getSpecificRequests(any(), any())).thenReturn(Collections.singleton(SELECT_REQUEST));
+        when(flinkTableService.executeDockerQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singletonList(USERNAME));
+        when(selectRequest.getReceivers()).thenReturn("1.,Common");
         executeRequestsConditions();
 
         dockerNotifierService.executeRequests(contest, container, MESSAGE);
+
+        verify(selectRequestService, times(1)).getSpecificRequests(any(), any());
+        verify(flinkTableService, times(1)).executeDockerQuery(eq(SELECT_REQUEST), any());
 
         verifyParticipantNotificationsSent();
         verifyCommonNotificationsSent();
@@ -129,6 +148,7 @@ public class DockerNotifierServiceTest {
     private void verifyParticipantNotificationsSent() {
         verify(slackNotificationService, times(1)).notify(eq(userDetails), any(ParticipantNotification.class), eq(contest));
         verify(emailNotificationService, times(1)).notify(eq(userDetails), any(ParticipantNotification.class), eq(contest));
+
     }
 
     private void verifyCommonNotificationsSent() {

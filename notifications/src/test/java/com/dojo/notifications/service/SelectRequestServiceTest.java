@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
@@ -88,5 +89,15 @@ public class SelectRequestServiceTest {
         dockerRequest.setId(REQUEST_ID);
         selectRequestService.deleteRequest(REQUEST_ID);
         verify(selectRequestRepo, times(1)).deleteById(REQUEST_ID);
+    }
+
+    @Test
+    public void getSpecificRequestsTest() {
+        leaderboardRequest.setId(1);
+        Set<SelectRequest> expected = Collections.singleton(leaderboardRequest);
+
+        Set<SelectRequest> actual = selectRequestService.getSpecificRequests(Collections.singleton(1), allRequests);
+
+        assertEquals(expected, actual);
     }
 }

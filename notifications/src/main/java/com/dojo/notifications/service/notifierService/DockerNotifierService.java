@@ -17,9 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,6 @@ public class DockerNotifierService {
 
     private static final String ERROR_MESSAGE = "Unable to execute select request %s";
 
-    private static final String RECEIVER_PARTICIPANT = "Participant";
     private static final String RECEIVER_COMMON = "Common";
 
     private static final String TABLE_NAME = "docker_events";
@@ -50,12 +51,14 @@ public class DockerNotifierService {
     }
 
     public void executeRequests(Contest contest, Object object, String message) {
-        for (SelectRequest request : selectRequestService.getRequestsForTable(TABLE_NAME)) {
+        Set<SelectRequest> contestRequests = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getRequestsForTable(TABLE_NAME));
+
+        for (SelectRequest request : contestRequests) {
             try {
                 List<String> usernames = flinkTableService.executeDockerQuery(request, object);
                 if (!usernames.isEmpty()) {
                     NotificationType finalType = (object instanceof Container) ? NotificationType.CONTAINER : NotificationType.TEST_RESULTS;
-                    usernames.forEach(username -> notify(request.getReceiver(), username, contest, object, message, finalType));
+                    usernames.forEach(username -> notify(request.getReceivers(), username, contest, object, message, finalType));
                 }
 
             } catch (Exception e) {
@@ -64,18 +67,28 @@ public class DockerNotifierService {
         }
     }
 
-    private void notify(String receiver, String username, Contest contest, Object object, String message, NotificationType notificationType) {
-        switch (receiver) {
-            case RECEIVER_PARTICIPANT:
-                notifyParticipant(username, contest, object, message, notificationType);
-                break;
-            case RECEIVER_COMMON:
+    private void notify(String receivers, String username, Contest contest, Object object, String message, NotificationType notificationType) {
+
+        notifyParticipant(username, contest, object, message, notificationType);
+
+        if (receivers != null) {
+            notifyListeners(contest, userDetailsService.turnUsersToUserIds(receivers), object, message, notificationType);
+            if (receivers.contains(RECEIVER_COMMON)) {
                 notifySensei(contest, object, message, notificationType);
-                break;
-            default:
-                notifyParticipant(username, contest, object, message, notificationType);
-                notifySensei(contest, object, message, notificationType);
-                break;
+            }
+        }
+    }
+
+
+    private void notifyListeners(Contest contest, Set<String> eventListenerIds, Object object, String queryMessage, NotificationType notificationType) {
+        List<UserDetails> userDetails = new ArrayList<>();
+        eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
+
+        for (UserDetails user : userDetails) {
+            for (NotifierType notifierType : contest.getNotifiers()) {
+                notificationServices.get(notifierType)
+                        .notify(user, new SenseiNotification(userDetailsService, object, queryMessage, notificationType), contest);
+            }
         }
     }
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SelectRequestService {
@@ -42,5 +44,11 @@ public class SelectRequestService {
 
     public void deleteRequest(@PathVariable int id) {
         selectRequestRepo.deleteById(id);
+    }
+
+    public Set<SelectRequest> getSpecificRequests(Set<Integer> ids, List<SelectRequest> selectRequests) {
+        return selectRequests.stream()
+                .filter(request -> ids.contains(request.getId()))
+                .collect(Collectors.toSet());
     }
 }

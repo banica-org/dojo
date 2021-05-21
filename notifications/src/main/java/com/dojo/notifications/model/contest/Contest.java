@@ -13,6 +13,7 @@ public class Contest {
     private String slackToken;
     private String slackChannel;
     private Set<String> senseiEmails;
+    private Set<Integer> queryIds;
 
     private Set<NotifierType> notifiers;
 
@@ -51,5 +52,13 @@ public class Contest {
 
     public boolean getEmailNotifier() {
         return notifiers.contains(NotifierType.EMAIL);
+    }
+
+    public void setQueryIds(Set<Integer> queryIds) {
+        this.queryIds = queryIds;
+    }
+
+    public Set<Integer> getQueryIds() {
+        return queryIds;
     }
 }

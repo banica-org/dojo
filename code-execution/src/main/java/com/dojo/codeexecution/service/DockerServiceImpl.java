@@ -222,5 +222,4 @@ public class DockerServiceImpl implements DockerService {
     private void deleteContainerUsername(String containerId) {
         containerUserCache.remove(containerId);
     }
-
 }

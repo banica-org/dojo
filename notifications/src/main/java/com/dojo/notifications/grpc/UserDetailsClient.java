@@ -4,12 +4,18 @@ import com.codenjoy.dojo.UserDetailsIdRequest;
 import com.codenjoy.dojo.UserDetailsResponse;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.codenjoy.dojo.UserDetailsUsernameRequest;
+import com.codenjoy.dojo.UserRequest;
+import com.codenjoy.dojo.UserResponse;
+import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDetailsClient {
@@ -52,5 +58,15 @@ public class UserDetailsClient {
         userDetails.setEmail(response.getEmail());
 
         return userDetails;
+    }
+
+    public List<User> getUsersForContest(String contestId){
+        UserRequest userRequest = UserRequest.newBuilder()
+                .setContestId(contestId).build();
+        UserResponse userResponse = userDetailsServiceBlockingStub.getUsersForContest(userRequest);
+
+        return userResponse.getUserList().stream().map(user -> {
+            return new User(user.getId(),user.getUsername(),user.getName(), user.getRole());
+        }).collect(Collectors.toList());
     }
 }
