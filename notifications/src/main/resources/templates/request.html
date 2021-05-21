@@ -2,22 +2,29 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
     <title>Game Notifications</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script th:inline="javascript">
+    var tables = [[${tables}]];
+    </script>
+    <script type="text/javascript" th:src="@{/js/tables-autocomplete.js}"></script>
+
     <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
     <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
-
 </head>
 
 <body>
-    <h2 style="text-align:center">Custom query for leaderboard</h2>
+    <h2 style="text-align:center">Custom query for notifications</h2>
     <div class="container">
         <form action="#" th:action="@{/request}"  th:object="${newRequest}" method="post">
             <table align="center">
@@ -30,14 +37,22 @@
                 </tr>
                 <tr>
                     <td>
-                        <label>FROM</label>
-                        <input type="text" style="width:282px" th:field="*{queryTable}" placeholder="leaderboard/docker_events"/>
+                        <div class="ui-widget">
+                            <label for="tables">FROM </label>
+                            <select id="tables" style="width:278px" th:field="*{queryTable}">
+                                <option th:each="table : ${tables.keySet()}" th:value="${table}" th:text="${table}">
+                                </option>
+                            </select>
+                        </div>
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="text" style="width:330px" th:field="*{querySpecification}" placeholder="WHERE/LIMIT/ETC."/></td>
-                </tr>
-                <tr>
+                    <td>
+                        <div class="ui-widget">
+                            <input id="column_names" style="width:330px" placeholder="WHERE/LIMIT..."
+                                   th:field="*{querySpecification}">
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>

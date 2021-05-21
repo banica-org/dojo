@@ -7,6 +7,8 @@ import com.dojo.notifications.model.user.UserManagement;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
+import com.dojo.notifications.service.EventService;
+import com.dojo.notifications.service.FlinkTableService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,9 @@ public class WebUIController {
 
     @Autowired
     private SelectRequestService selectRequestService;
+
+    @Autowired
+    private FlinkTableService flinkTableService;
 
     @Autowired
     private EventService eventService;
@@ -81,7 +86,7 @@ public class WebUIController {
         return setupContestsPage(model, new Contest());
     }
 
-    @GetMapping("/games/refresh")
+    @GetMapping("/events/refresh")
     public String eventsRefresh(Model model) {
         eventService.invalidateEventsCache();
         return contestsPage(model);
@@ -127,6 +132,8 @@ public class WebUIController {
         model.addAttribute("notificationMessage", newRequest.getDescribingMessage());
         model.addAttribute("receivers", newRequest.getReceivers());
         model.addAttribute("users", userManagement.getAllAutocomplete(newContest.getContestId()));
+
+        model.addAttribute("tables", flinkTableService.getTables());
 
         return "request";
     }
