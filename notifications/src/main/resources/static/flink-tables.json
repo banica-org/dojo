@@ -1,0 +1,42 @@
+{
+  "leaderboard": [
+    {
+      "label": "id",
+      "value": "string"
+    },
+    {
+      "label": "name",
+      "value": "string"
+    },
+    {
+      "label": "place",
+      "value": "integer"
+    },
+    {
+      "label": "score",
+      "value": "long"
+    }
+  ],
+  "docker_events" : [
+    {
+      "label": "type",
+      "value": "'container'/'test_results'"
+    },
+    {
+      "label": "username",
+      "value": "string"
+    },
+    {
+      "label": "container_status",
+      "value": "'running'/'exited'"
+    },
+    {
+      "label": "code_execution",
+      "value": "'success'/'failure'"
+    },
+    {
+      "label": "test_results",
+      "value": "integer"
+    }
+  ]
+}
