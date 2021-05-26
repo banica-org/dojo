@@ -1,5 +1,6 @@
 package com.dojo.notifications.model.user;
 
+import com.dojo.notifications.model.user.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class User {
     String id;
     String githubUserName;
     String name;
-    String role;
+    UserRole role;
 
     @Override
     public boolean equals(Object o) {

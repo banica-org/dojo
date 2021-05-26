@@ -67,7 +67,7 @@ public class DockerServiceImpl implements DockerService {
     }
 
     public void runContainer(String imageTag) {
-        String username = "kaloyan_dutsolov6";
+        String username = "kaloyan-dutsolov6";
         String containerId = createContainer(imageTag).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);

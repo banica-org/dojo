@@ -1,6 +1,7 @@
 package com.dojo.notifications.model.user;
 
 import com.dojo.notifications.grpc.UserDetailsClient;
+import com.dojo.notifications.model.user.enums.UserRole;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class UserManagement {
     }
 
     public Set<Tuple3<String, String, List<User>>> getGroupNames(String contestId) {
-        setParticipantsGroup(contestId);
+        setUserGroups(contestId);
         return groups.stream()
                 .filter(group -> group.f0.equals(contestId))
                 .collect(Collectors.toSet());
@@ -56,10 +57,12 @@ public class UserManagement {
         return users.isPresent() ? users.get().f2 : Collections.emptyList();
     }
 
-    private void setParticipantsGroup(String contestId) {
+    private void setUserGroups(String contestId) {
+        for (UserRole role:UserRole.values()) {
         List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
-                .filter(user -> user.getRole().equals(USER))
+                .filter(user -> user.getRole().equals(role))
                 .collect(Collectors.toList());
-        groups.add(new Tuple3<>(contestId, "All participants group", participants));
+        groups.add(new Tuple3<>(contestId, "All " + role.toString().toLowerCase() + " group", participants));
+        }
     }
 }

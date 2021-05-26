@@ -26,4 +26,9 @@ public class UserInfo {
     public int hashCode() {
         return Objects.hash(id, name);
     }
+
+    @Override
+    public String toString(){
+        return this.getId() + " " + this.getName();
+    }
 }

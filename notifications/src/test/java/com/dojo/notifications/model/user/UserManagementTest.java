@@ -1,6 +1,7 @@
 package com.dojo.notifications.model.user;
 
 import com.dojo.notifications.grpc.UserDetailsClient;
+import com.dojo.notifications.model.user.enums.UserRole;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +48,7 @@ public class UserManagementTest {
         when(userDetailsClient.getUsersForContest(CONTEST_ID)).thenReturn(Collections.singletonList(user));
         when(user.getId()).thenReturn(USER_ID);
         when(user.getName()).thenReturn(USER_NAME);
-        when(user.getRole()).thenReturn(USER_ROLE);
+        when(user.getRole()).thenReturn(UserRole.valueOf(USER_ROLE));
         List<String> expected = Arrays.asList("1.username", "All participants group");
 
         List<String> actual = userManagement.getAllAutocomplete(CONTEST_ID);
@@ -61,7 +62,7 @@ public class UserManagementTest {
 
     @Test
     public void getGroupNamesTest() {
-        when(user.getRole()).thenReturn(USER_ROLE);
+        when(user.getRole()).thenReturn(UserRole.valueOf(USER_ROLE));
         when(userDetailsClient.getUsersForContest(CONTEST_ID)).thenReturn(Collections.singletonList(user));
 
         Set<Tuple3<String, String, List<User>>> expected = Collections.singleton(new Tuple3<>(CONTEST_ID, "All participants group", Collections.singletonList(user)));
