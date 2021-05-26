@@ -120,7 +120,7 @@ public class LeaderboardNotifierService {
         queried.forEach(id -> queriedUserDetails.add(userDetailsService.getUserDetailsById(id)));
 
         List<UserDetails> userDetails = new ArrayList<>();
-        eventListenerIds.stream().filter(id-> !queried.contains(id))
+        eventListenerIds.stream().filter(id -> !queried.contains(id))
                 .forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
@@ -152,11 +152,11 @@ public class LeaderboardNotifierService {
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
 
-    private String formatMessage(Leaderboard newLeaderboard, String message, String id){
-        if(message.contains("%s")){
-            return String.format(message,newLeaderboard.getParticipants().stream()
-            .filter(participant -> participant.getUser().getId().equals(id))
-            .findFirst().get().getUser().toString());
+    private String formatMessage(Leaderboard newLeaderboard, String message, String id) {
+        if (message.contains("%s")) {
+            return String.format(message, newLeaderboard.getParticipants().stream()
+                    .filter(participant -> participant.getUser().getId().equals(id))
+                    .findFirst().get().getUser().toString());
         }
         return message;
     }

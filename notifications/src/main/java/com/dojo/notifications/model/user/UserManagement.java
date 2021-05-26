@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 @Service
 public class UserManagement {
 
-    private static final String USER = "ROLE_USER";
-
     private final Set<Tuple3<String, String, List<User>>> groups;
     private final UserDetailsClient userDetailsClient;
 
@@ -58,11 +56,13 @@ public class UserManagement {
     }
 
     private void setUserGroups(String contestId) {
-        for (UserRole role:UserRole.values()) {
-        List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
-                .filter(user -> user.getRole().equals(role))
-                .collect(Collectors.toList());
-        groups.add(new Tuple3<>(contestId, "All " + role.toString().toLowerCase() + " group", participants));
+        for (UserRole role : UserRole.values()) {
+            List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
+                    .filter(user -> user.getRole().equals(role))
+                    .collect(Collectors.toList());
+            if(!participants.equals(Collections.emptyList())) {
+                groups.add(new Tuple3<>(contestId, "All " + role.toString().toLowerCase() + " group", participants));
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ public class UserInfo {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.getId() + " " + this.getName();
     }
 }
