@@ -15,6 +15,7 @@ import com.dojo.notifications.service.SelectRequestService;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.notificationService.NotificationService;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.table.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,10 +97,40 @@ public class LeaderboardNotifierService {
                 }
             }
         }
+
+        try {
+            notifyAboutJoinQuery(contest, changedUsers);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
-    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutJoinQuery(Contest contest, List<Tuple4<String, String, Integer, Long>> changedUsers) {
+        Set<SelectRequest> contestJoinQueries = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getJoinSelectRequestsForTable(TABLE_NAME));
+
+        for (SelectRequest request : contestJoinQueries) {
+            Table result = flinkTableService
+                    .executeLeaderboardJoinQuery(request, changedUsers);
+
+            for (NotifierType notifierType : contest.getNotifiers()) {
+                if (request.getReceivers()!=null) {
+                    userDetailsService
+                            .turnUsersToUserIds(request.getReceivers())
+                            .forEach(listenerId -> {
+                                UserDetails listenerDetails = userDetailsService.getUserDetailsById(listenerId);
+                                notificationServices.get(notifierType)
+                                        .notify(listenerDetails, new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
+                            });
+                }
+                notificationServices.get(notifierType)
+                        .notify(new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
+            }
+        }
+    }
+
+    private void notifyAboutCondition(Contest contest, SelectRequest
+            request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
@@ -112,7 +143,8 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifyListeners(Contest contest, Leaderboard newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
+    private void notifyListeners(Contest contest, Leaderboard
+            newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
         eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
@@ -127,7 +159,8 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
+    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String
+            queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
@@ -139,9 +172,9 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
+    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String
+            queryMessage) {
         notificationServices.get(notifierType)
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
-
 }

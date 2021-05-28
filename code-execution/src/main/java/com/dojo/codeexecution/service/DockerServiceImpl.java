@@ -2,7 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
 import com.dojo.codeexecution.config.github.GitConfigProperties;
-import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
+import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import com.dojo.codeexecution.service.grpc.handler.ImageUpdateHandler;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -37,7 +37,7 @@ public class DockerServiceImpl implements DockerService {
     private static final String LOG_SEPARATOR = "STDOUT: build-log-separator";
 
     private final ImageUpdateHandler imageUpdateHandler;
-    private final ContainerUpdateHandler containerUpdateHandler;
+    private final DockerEventUpdateHandler dockerEventUpdateHandler;
 
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
@@ -47,12 +47,12 @@ public class DockerServiceImpl implements DockerService {
     private final ExecutorService singleThreadExecutor;
 
     @Autowired
-    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler, ContainerUpdateHandler containerUpdateHandler,
-                             DockerClient dockerClient, DockerConfigProperties dockerConfigProperties,
+    public DockerServiceImpl(ImageUpdateHandler imageUpdateHandler,
+                             DockerEventUpdateHandler dockerEventUpdateHandler, DockerClient dockerClient, DockerConfigProperties dockerConfigProperties,
                              GitConfigProperties gitConfigProperties,
                              @Qualifier("buildImageSingleThreadExecutor") ExecutorService singleThreadExecutor) {
         this.imageUpdateHandler = imageUpdateHandler;
-        this.containerUpdateHandler = containerUpdateHandler;
+        this.dockerEventUpdateHandler = dockerEventUpdateHandler;
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
@@ -67,12 +67,12 @@ public class DockerServiceImpl implements DockerService {
     }
 
     public void runContainer(String imageTag) {
-        String username = "kaloyan_dutsolov6";
+        String username = "kaloyan-dutsolov6";
         String containerId = createContainer(imageTag).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
         String status = getContainerStatus(containerId);
-        containerUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), new ArrayList<>());
+        dockerEventUpdateHandler.sendUpdate(status, containerUserCache.get(containerId), new ArrayList<>());
         dockerClient.waitContainerCmd(containerId)
                 .exec(getWaitContainerExecutionCallback(containerId));
     }
@@ -180,7 +180,7 @@ public class DockerServiceImpl implements DockerService {
                 List<String> logs = new ArrayList<>();
                 String status = getContainerStatus(containerId);
                 try {
-                    containerUpdateHandler.sendUpdate(status,
+                    dockerEventUpdateHandler.sendUpdate(status,
                             containerUserCache.get(containerId), getContainerLog(containerId, logs));
                 } catch (InterruptedException e) {
                     e.printStackTrace();

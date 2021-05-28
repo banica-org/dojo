@@ -6,18 +6,25 @@ import com.dojo.notifications.model.leaderboard.Leaderboard;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,6 +41,8 @@ public class FlinkTableServiceTest {
     private static final String BROKEN_QUERY = "SELECT";
     private static final String DUMMY_STRING = "DUMMY";
 
+    private static final String ID = "1";
+
     private final Participant FIRST_PARTICIPANT = new Participant(new UserInfo("1", "FirstUser"), 100);
     private final Participant SECOND_PARTICIPANT = new Participant(new UserInfo("2", "SecondUser"), 120);
 
@@ -43,6 +52,9 @@ public class FlinkTableServiceTest {
 
     private final Leaderboard NEW_LEADERBOARD = new Leaderboard(new TreeSet<>());
     private final List<Tuple4<String, String, Integer, Long>> CHANGED_USERS = new ArrayList<>();
+
+    @Value("classpath:static/flink-tables.json")
+    private Resource flinkTables;
 
     @Mock
     private Container container;
@@ -55,8 +67,10 @@ public class FlinkTableServiceTest {
     private FlinkTableService flinkTableService;
 
     @Before
-    public void init() {
+    public void init() throws IOException {
         flinkTableService = new FlinkTableService();
+        ReflectionTestUtils.setField(flinkTableService, "tables", new ObjectMapper().readValue(flinkTables.getFile(), new TypeReference<Map<String, List<Map<String, String>>>>() {
+        }));
         CHANGED_USERS.add(new Tuple4<>(DUMMY_STRING, DUMMY_STRING, 0, (long) 0));
     }
 
@@ -96,9 +110,9 @@ public class FlinkTableServiceTest {
         when(container.getUsername()).thenReturn(DUMMY_STRING);
         when(container.getStatus()).thenReturn(CONTAINER_STATUS);
         when(container.getCodeExecution()).thenReturn(CODE_EXECUTION);
-        List<String> expected = Collections.singletonList(DUMMY_STRING);
+        List<String> expected = Collections.singletonList(ID);
 
-        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, container);
+        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, container, ID);
 
         verify(selectRequest, times(1)).getQuery();
         verify(container, times(1)).getUsername();
@@ -112,9 +126,9 @@ public class FlinkTableServiceTest {
         when(selectRequest.getQuery()).thenReturn(DOCKER_QUERY);
         when(testResults.getUsername()).thenReturn(DUMMY_STRING);
         when(testResults.getFailedTestCases().size()).thenReturn(FAILED_TEST_CASES);
-        List<String> expected = Collections.singletonList(DUMMY_STRING);
+        List<String> expected = Collections.singletonList(ID);
 
-        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, testResults);
+        List<String> actual = flinkTableService.executeDockerQuery(selectRequest, testResults, ID);
 
         verify(selectRequest, times(1)).getQuery();
         verify(testResults, times(1)).getUsername();

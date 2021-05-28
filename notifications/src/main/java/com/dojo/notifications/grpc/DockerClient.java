@@ -1,13 +1,13 @@
 package com.dojo.notifications.grpc;
 
-import com.dojo.codeexecution.ContainerRequest;
 import com.dojo.codeexecution.ContainerResponse;
+import com.dojo.codeexecution.DockerEventRequest;
+import com.dojo.codeexecution.DockerEventResponse;
 import com.dojo.codeexecution.DockerServiceGrpc;
 import com.dojo.codeexecution.ImageRequest;
 import com.dojo.codeexecution.ImageResponse;
 import com.dojo.codeexecution.StopRequest;
 import com.dojo.codeexecution.StopResponse;
-import com.dojo.codeexecution.TestResultRequest;
 import com.dojo.codeexecution.TestResultResponse;
 import com.dojo.notifications.configuration.GrpcConfig;
 import com.dojo.notifications.model.contest.Contest;
@@ -15,8 +15,9 @@ import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.docker.Image;
 import com.dojo.notifications.model.docker.TestResults;
 import com.dojo.notifications.model.notification.enums.NotificationType;
-import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import com.dojo.notifications.service.EventService;
+import com.dojo.notifications.service.UserDetailsService;
+import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +55,15 @@ public class DockerClient {
     private final Map<Contest, DockerServiceGrpc.DockerServiceStub> dockerServiceStubs;
     private final EventService eventService;
     private final DockerNotifierService dockerNotifierService;
+    private final UserDetailsService userDetailsService;
 
     private final GrpcConfig grpcConfig;
 
     @Autowired
-    public DockerClient(EventService eventService, DockerNotifierService dockerNotifierService, GrpcConfig grpcConfig) {
+    public DockerClient(EventService eventService, DockerNotifierService dockerNotifierService, UserDetailsService userDetailsService, GrpcConfig grpcConfig) {
         this.eventService = eventService;
         this.dockerNotifierService = dockerNotifierService;
+        this.userDetailsService = userDetailsService;
         this.grpcConfig = grpcConfig;
         this.dockerServiceStubs = new HashMap<>();
     }
@@ -76,8 +79,7 @@ public class DockerClient {
             LOGGER.info(NOTIFICATIONS_STARTED_MESSAGE, contestId);
 
             getImageResults(contest);
-            getContainerResults(contest);
-            getTestResults(contest);
+            getDockerEvents(contest);
         }
     }
 
@@ -119,42 +121,24 @@ public class DockerClient {
                 });
     }
 
-    private void getContainerResults(Contest contest) {
-        ContainerRequest request = ContainerRequest.newBuilder().setId(SERVER_ID).build();
+    private void getDockerEvents(Contest contest) {
+        DockerEventRequest request = DockerEventRequest.newBuilder().setId(SERVER_ID).build();
 
         dockerServiceStubs
                 .get(contest)
-                .getContainerResults(request, new StreamObserver<ContainerResponse>() {
+                .getDockerEvents(request, new StreamObserver<DockerEventResponse>() {
                     @Override
-                    public void onNext(ContainerResponse containerResponse) {
-                        Container container = getContainer(containerResponse);
-                        dockerNotifierService.executeRequests(contest, container, String.format(CONTAINER_MESSAGE, contest.getContestId()));
-                        LOGGER.info(RESPONSE_MESSAGE, containerResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        LOGGER.error(ERROR_MESSAGE, throwable);
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        LOGGER.info(COMPLETED_MESSAGE);
-                    }
-                });
-    }
-
-    private void getTestResults(Contest contest) {
-        TestResultRequest request = TestResultRequest.newBuilder().setId(SERVER_ID).build();
-
-        dockerServiceStubs
-                .get(contest)
-                .getTestResults(request, new StreamObserver<TestResultResponse>() {
-                    @Override
-                    public void onNext(TestResultResponse testResultResponse) {
-                        TestResults testResults = getTestResults(testResultResponse);
-                        dockerNotifierService.executeRequests(contest, testResults, String.format(TEST_RESULTS_MESSAGE, contest.getContestId()));
-                        LOGGER.info(RESPONSE_MESSAGE, testResultResponse);
+                    public void onNext(DockerEventResponse dockerEventResponse) {
+                        if (dockerEventResponse.hasContainer()) {
+                            Container container = getContainer(dockerEventResponse.getContainer());
+                            String id = userDetailsService.getUserDetailsByUsername(container.getUsername()).getId();
+                            dockerNotifierService.executeRequests(contest, id, container, String.format(CONTAINER_MESSAGE, contest.getContestId()));
+                        } else {
+                            TestResults testResults = getTestResults(dockerEventResponse.getTestResults());
+                            String id = userDetailsService.getUserDetailsByUsername(testResults.getUsername()).getId();
+                            dockerNotifierService.executeRequests(contest, id, testResults, String.format(TEST_RESULTS_MESSAGE, contest.getContestId()));
+                        }
+                        LOGGER.info(RESPONSE_MESSAGE, dockerEventResponse);
                     }
 
                     @Override

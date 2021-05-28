@@ -1,14 +1,13 @@
 package com.dojo.notifications.grpc;
 
-import com.dojo.codeexecution.ContainerRequest;
 import com.dojo.codeexecution.DockerServiceGrpc;
 import com.dojo.codeexecution.ImageRequest;
 import com.dojo.codeexecution.StopRequest;
-import com.dojo.codeexecution.TestResultRequest;
 import com.dojo.notifications.configuration.GrpcConfig;
 import com.dojo.notifications.model.contest.Contest;
-import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import com.dojo.notifications.service.EventService;
+import com.dojo.notifications.service.UserDetailsService;
+import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +35,8 @@ public class DockerClientTest {
     private EventService eventService;
     @Mock
     private DockerNotifierService dockerNotifierService;
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @Mock
     private GrpcConfig grpcConfig;
@@ -49,7 +50,7 @@ public class DockerClientTest {
 
     @Before
     public void init() {
-        dockerClient = new DockerClient(eventService, dockerNotifierService, grpcConfig);
+        dockerClient = new DockerClient(eventService, dockerNotifierService, userDetailsService, grpcConfig);
         when(contest.getContestId()).thenReturn(CONTEST_ID);
         when(eventService.getGameServerForContest(CONTEST_ID)).thenReturn(GAME_SERVER);
     }
@@ -58,14 +59,10 @@ public class DockerClientTest {
     public void startDockerNotificationsTest() {
         when(grpcConfig.getDockerServiceStub(GAME_SERVER)).thenReturn(dockerServiceStub);
         ImageRequest imageRequest = ImageRequest.newBuilder().setId(SERVER_ID).build();
-        ContainerRequest containerRequest = ContainerRequest.newBuilder().setId(SERVER_ID).build();
-        TestResultRequest testResultRequest = TestResultRequest.newBuilder().setId(SERVER_ID).build();
 
         dockerClient.startDockerNotifications(contest);
 
         verify(dockerServiceStub, times(1)).getImageResults(eq(imageRequest), any(StreamObserver.class));
-        verify(dockerServiceStub, times(1)).getContainerResults(eq(containerRequest), any(StreamObserver.class));
-        verify(dockerServiceStub, times(1)).getTestResults(eq(testResultRequest), any(StreamObserver.class));
     }
 
     @Test
