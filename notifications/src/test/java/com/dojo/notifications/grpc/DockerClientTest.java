@@ -1,5 +1,6 @@
 package com.dojo.notifications.grpc;
 
+import com.dojo.codeexecution.DockerEventRequest;
 import com.dojo.codeexecution.DockerServiceGrpc;
 import com.dojo.codeexecution.ImageRequest;
 import com.dojo.codeexecution.StopRequest;
@@ -59,10 +60,12 @@ public class DockerClientTest {
     public void startDockerNotificationsTest() {
         when(grpcConfig.getDockerServiceStub(GAME_SERVER)).thenReturn(dockerServiceStub);
         ImageRequest imageRequest = ImageRequest.newBuilder().setId(SERVER_ID).build();
+        DockerEventRequest dockerEventRequest = DockerEventRequest.newBuilder().setId(SERVER_ID).build();
 
         dockerClient.startDockerNotifications(contest);
 
         verify(dockerServiceStub, times(1)).getImageResults(eq(imageRequest), any(StreamObserver.class));
+        verify(dockerServiceStub, times(1)).getDockerEvents(eq(dockerEventRequest), any(StreamObserver.class));
     }
 
     @Test

@@ -3,11 +3,16 @@ package com.dojo.notifications.service;
 import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.docker.TestResults;
 import com.dojo.notifications.model.leaderboard.Leaderboard;
+import com.dojo.notifications.model.leaderboard.SlackNotificationUtils;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.user.Participant;
 import com.dojo.notifications.model.user.UserInfo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hubspot.slack.client.models.blocks.objects.Text;
+import com.hubspot.slack.client.models.blocks.objects.TextType;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableColumn;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +44,7 @@ public class FlinkTableServiceTest {
 
     private static final String LEADERBOARD_QUERY = "SELECT * FROM leaderboard";
     private static final String DOCKER_QUERY = "SELECT * FROM docker_events";
+    private static final String JOIN_QUERY = "SELECT * FROM leaderboard join docker_events on leaderboard.user_id=docker_events.user_id";
     private static final String BROKEN_QUERY = "SELECT";
     private static final String DUMMY_STRING = "DUMMY";
 
@@ -57,12 +64,16 @@ public class FlinkTableServiceTest {
     private Resource flinkTables;
 
     @Mock
+    private TableColumn tableColumn;
+    @Mock
     private Container container;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private TestResults testResults;
 
     @Mock
     private SelectRequest selectRequest;
+
+    Map<String, List<Object>> dockerEvents;
 
     private FlinkTableService flinkTableService;
 
@@ -72,6 +83,9 @@ public class FlinkTableServiceTest {
         ReflectionTestUtils.setField(flinkTableService, "tables", new ObjectMapper().readValue(flinkTables.getFile(), new TypeReference<Map<String, List<Map<String, String>>>>() {
         }));
         CHANGED_USERS.add(new Tuple4<>(DUMMY_STRING, DUMMY_STRING, 0, (long) 0));
+
+        dockerEvents = new HashMap<>();
+        dockerEvents.put(DUMMY_STRING, Collections.singletonList(container));
     }
 
     @Test
@@ -133,6 +147,44 @@ public class FlinkTableServiceTest {
         verify(selectRequest, times(1)).getQuery();
         verify(testResults, times(1)).getUsername();
         verify(testResults, times(2)).getFailedTestCases();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void executeLeaderboardJoinQueryTest() {
+        when(selectRequest.getQuery()).thenReturn(JOIN_QUERY);
+
+        when(container.getUsername()).thenReturn(DUMMY_STRING);
+        when(container.getStatus()).thenReturn(CONTAINER_STATUS);
+        when(container.getCodeExecution()).thenReturn(CODE_EXECUTION);
+
+        List<String> expectedRow = Arrays.asList(DUMMY_STRING, DUMMY_STRING, "0", "0", "container", DUMMY_STRING, DUMMY_STRING, CONTAINER_STATUS, CODE_EXECUTION, "-1");
+
+        Table actual = flinkTableService.executeLeaderboardJoinQuery(selectRequest, CHANGED_USERS, dockerEvents);
+        List<TableColumn> tableColumns = flinkTableService.getTableColumns(actual);
+        List<List<String>> tableRows = flinkTableService.getTableRows(actual);
+
+        assertEquals(10, tableColumns.size());
+        assertEquals(1, tableRows.size());
+        assertEquals(expectedRow, tableRows.get(0));
+    }
+
+    @Test
+    public void buildColumnNamesTest() {
+        when(tableColumn.getName()).thenReturn(DUMMY_STRING);
+        Text expected = Text.of(TextType.MARKDOWN, SlackNotificationUtils.makeBold(DUMMY_STRING) + "\n");
+
+        Text actual = flinkTableService.buildColumnNames(Collections.singletonList(tableColumn));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void buildFieldsTest() {
+        Text expected = Text.of(TextType.MARKDOWN, DUMMY_STRING + "\n");
+
+        Text actual = flinkTableService.buildFields(Collections.singletonList(DUMMY_STRING));
+
         assertEquals(expected, actual);
     }
 }
