@@ -114,7 +114,7 @@ public class LeaderboardNotifierService {
 
         // when we have more than two tables, here we should check which is the other table from the query
         Map<String, List<Object>> dockerEvents = dockerNotifierService.getDockerEvents();
-        if (dockerEvents.size()!=0) {
+        if (dockerEvents.size() != 0) {
             for (SelectRequest request : contestJoinQueries) {
                 Table result = flinkTableService
                         .executeLeaderboardJoinQuery(request, changedUsers, dockerEvents);
@@ -136,8 +136,7 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifyAboutCondition(Contest contest, SelectRequest
-            request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
         notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
@@ -150,8 +149,7 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifyListeners(Contest contest, Leaderboard
-            newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
+    private void notifyListeners(Contest contest, Leaderboard newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
         List<UserDetails> userDetails = new ArrayList<>();
         eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
