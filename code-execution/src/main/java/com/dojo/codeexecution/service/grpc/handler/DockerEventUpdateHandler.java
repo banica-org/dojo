@@ -28,25 +28,28 @@ public class DockerEventUpdateHandler {
     }
 
     public void sendUpdate(String status, String username, List<String> logs) {
-        this.streamObservers.forEach((id, observer) -> observer.onNext(generateResponse(status, username, logs)));
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateContainerResponse(status, username, logs)));
     }
 
-    private DockerEventResponse generateResponse(String status, String username, List<String> logs) {
+    public void sendUpdate(String username, List<FailedTestCase> failedTestCases) {
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateTestResultsResponse(username, failedTestCases)));
+    }
+
+    private DockerEventResponse generateContainerResponse(String status, String username, List<String> logs) {
         ContainerResponse.Builder responseBuilder = ContainerResponse.newBuilder()
                 .setStatus(status)
                 .setUsername(username);
 
         logs.forEach(responseBuilder::addLog);
-
         return DockerEventResponse.newBuilder().setContainer(responseBuilder.build()).build();
     }
 
-    public void sendUpdate(String username, List<FailedTestCase> failedTestCases) {
+    private DockerEventResponse generateTestResultsResponse(String username, List<FailedTestCase> failedTestCases) {
         TestResultResponse.Builder responseBuilder = TestResultResponse.newBuilder()
                 .setUsername(username);
 
         failedTestCases.forEach(failedTestCase -> responseBuilder.addFailedTestCase(convertToFailedTestCase(failedTestCase)));
-        this.streamObservers.forEach((id, observer) -> observer.onNext(DockerEventResponse.newBuilder().setTestResults(responseBuilder.build()).build()));
+        return DockerEventResponse.newBuilder().setTestResults(responseBuilder.build()).build();
     }
 
     private com.dojo.codeexecution.FailedTestCase convertToFailedTestCase(FailedTestCase failedTestCase) {
