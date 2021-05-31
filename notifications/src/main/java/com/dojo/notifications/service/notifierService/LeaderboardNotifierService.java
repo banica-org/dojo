@@ -177,8 +177,7 @@ public class LeaderboardNotifierService {
         }
     }
 
-    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String
-            queryMessage) {
+    private void notifySensei(Contest contest, Leaderboard newLeaderboard, NotifierType notifierType, String queryMessage) {
         notificationServices.get(notifierType)
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
