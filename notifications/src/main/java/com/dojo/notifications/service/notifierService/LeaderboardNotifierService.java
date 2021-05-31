@@ -45,16 +45,18 @@ public class LeaderboardNotifierService {
     private final LeaderboardService leaderboardService;
     private final SelectRequestService selectRequestService;
     private final FlinkTableService flinkTableService;
+    private final DockerNotifierService dockerNotifierService;
     private final Map<NotifierType, NotificationService> notificationServices;
     private final Map<String, Leaderboard> leaderboards;
 
     @Autowired
     public LeaderboardNotifierService(UserDetailsService userDetailsService, LeaderboardService leaderboardService,
-                                      SelectRequestService selectRequestService, FlinkTableService flinkTableService, Collection<NotificationService> notificationServices) {
+                                      SelectRequestService selectRequestService, FlinkTableService flinkTableService, DockerNotifierService dockerNotifierService, Collection<NotificationService> notificationServices) {
         this.userDetailsService = userDetailsService;
         this.leaderboardService = leaderboardService;
         this.selectRequestService = selectRequestService;
         this.flinkTableService = flinkTableService;
+        this.dockerNotifierService = dockerNotifierService;
         this.leaderboards = new ConcurrentHashMap<>();
         this.notificationServices = notificationServices.stream()
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
@@ -96,35 +98,40 @@ public class LeaderboardNotifierService {
                     notifyAboutCondition(contest, request, queriedParticipants, newLeaderboard);
                 }
             }
+
+            try {
+                notifyAboutJoinQuery(contest, changedUsers);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        try {
-            notifyAboutJoinQuery(contest, changedUsers);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
     private void notifyAboutJoinQuery(Contest contest, List<Tuple4<String, String, Integer, Long>> changedUsers) {
         Set<SelectRequest> contestJoinQueries = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getJoinSelectRequestsForTable(TABLE_NAME));
 
-        for (SelectRequest request : contestJoinQueries) {
-            Table result = flinkTableService
-                    .executeLeaderboardJoinQuery(request, changedUsers);
+        // when we have more than two tables, here we should check which is the other table from the query
+        Map<String, List<Object>> dockerEvents = dockerNotifierService.getDockerEvents();
+        if (dockerEvents.size()!=0) {
+            for (SelectRequest request : contestJoinQueries) {
+                Table result = flinkTableService
+                        .executeLeaderboardJoinQuery(request, changedUsers, dockerEvents);
 
-            for (NotifierType notifierType : contest.getNotifiers()) {
-                if (request.getReceivers()!=null) {
-                    userDetailsService
-                            .turnUsersToUserIds(request.getReceivers())
-                            .forEach(listenerId -> {
-                                UserDetails listenerDetails = userDetailsService.getUserDetailsById(listenerId);
-                                notificationServices.get(notifierType)
-                                        .notify(listenerDetails, new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
-                            });
+                for (NotifierType notifierType : contest.getNotifiers()) {
+                    if (request.getReceivers() != null) {
+                        userDetailsService
+                                .turnUsersToUserIds(request.getReceivers())
+                                .forEach(listenerId -> {
+                                    UserDetails listenerDetails = userDetailsService.getUserDetailsById(listenerId);
+                                    notificationServices.get(notifierType)
+                                            .notify(listenerDetails, new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
+                                });
+                    }
+                    notificationServices.get(notifierType)
+                            .notify(new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
                 }
-                notificationServices.get(notifierType)
-                        .notify(new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
             }
         }
     }

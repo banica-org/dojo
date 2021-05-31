@@ -4,7 +4,6 @@ import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.docker.TestResults;
 import com.dojo.notifications.model.leaderboard.SlackNotificationUtils;
 import com.dojo.notifications.model.request.SelectRequest;
-import com.dojo.notifications.service.notifierService.DockerNotifierService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hubspot.slack.client.models.blocks.objects.Text;
@@ -18,7 +17,6 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableColumn;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -48,9 +46,6 @@ public class FlinkTableService {
 
     @Value("classpath:static/flink-tables.json")
     private Resource flinkTables;
-
-    @Autowired
-    public DockerNotifierService dockerNotifierService;
 
     @PostConstruct
     private void load() throws IOException {
@@ -125,16 +120,13 @@ public class FlinkTableService {
         return getLeaderboardUserIds(tupleStream.executeAndCollect());
     }
 
-    public Table executeLeaderboardJoinQuery(SelectRequest selectRequest, List<Tuple4<String, String, Integer, Long>> changedUsers) {
+    public Table executeLeaderboardJoinQuery(SelectRequest selectRequest, List<Tuple4<String, String, Integer, Long>> changedUsers, Map<String, List<Object>> dockerEvents) {
 
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tableEnvironment = getStreamTableEnvironment(executionEnvironment);
 
         Table leaderboardTable = getLeaderboardTable(executionEnvironment, tableEnvironment, changedUsers);
 
-        // TODO
-        // when we have more than two tables, here we should check which is the other table from the query
-        Map<String, List<Object>> dockerEvents = dockerNotifierService.getDockerEvents();
         List<Tuple6<String, String, String, String, String, Integer>> dockerTuples = new ArrayList<>();
         dockerEvents.forEach((id, list) -> {
             for (Object object : list) {
