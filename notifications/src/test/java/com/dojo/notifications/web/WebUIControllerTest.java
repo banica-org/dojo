@@ -139,10 +139,12 @@ public class WebUIControllerTest {
     @Test
     public void requestsPageTest() {
         when(userManagement.getAllAutocomplete(CONTEST_ID)).thenReturn(Collections.emptyList());
+        when(flinkTableService.getTables()).thenReturn(Collections.emptyMap());
 
         String actual = webUIController.requestsPage(model, contest);
 
         Assert.assertEquals(REQUEST_NAME, actual);
+        verify(flinkTableService, times(1)).getTables();
         verify(userManagement, times(1)).getAllAutocomplete(CONTEST_ID);
     }
 
@@ -155,7 +157,7 @@ public class WebUIControllerTest {
         when(selectRequestModel.getDescribingMessage()).thenReturn("");
         when(selectRequestModel.getNotificationMessage()).thenReturn("");
 
-        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD,contest);
+        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD, contest);
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
@@ -173,7 +175,7 @@ public class WebUIControllerTest {
         when(selectRequestService.getAllRequests()).thenReturn(DUMMY_SELECT_REQUEST);
         when(selectRequestModel.getQueryTable()).thenReturn("");
 
-        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD,contest);
+        String actual = webUIController.newRequest(selectRequestModel, model, ACTION_ADD, contest);
 
         Assert.assertEquals(CONTEST_NAME, actual);
 
@@ -183,10 +185,11 @@ public class WebUIControllerTest {
     @Test
     public void determineEventAddTest() {
         when(userManagement.getAllAutocomplete(CONTEST_ID)).thenReturn(Collections.emptyList());
-
+        when(flinkTableService.getTables()).thenReturn(Collections.emptyMap());
         String actual = webUIController.determineEvent(contest, model, ACTION_ADD);
 
         Assert.assertEquals(REQUEST_NAME, actual);
+        verify(flinkTableService, times(1)).getTables();
         verify(userManagement, times(1)).getAllAutocomplete(CONTEST_ID);
     }
 

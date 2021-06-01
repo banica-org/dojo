@@ -8,6 +8,7 @@ import com.codenjoy.dojo.UserRequest;
 import com.codenjoy.dojo.UserResponse;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
+import com.dojo.notifications.model.user.enums.UserRole;
 import io.grpc.StatusRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class UserDetailsClient {
         UserResponse userResponse = userDetailsServiceBlockingStub.getUsersForContest(userRequest);
 
         return userResponse.getUserList().stream().map(user -> {
-            return new User(user.getId(),user.getUsername(),user.getName(), user.getRole());
+            return new User(user.getId(),user.getUsername(),user.getName(), UserRole.valueOf(user.getRole().replace("ROLE_","")));
         }).collect(Collectors.toList());
     }
 }
