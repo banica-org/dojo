@@ -69,8 +69,7 @@ public class UserDetailsService {
         Set<String> userIds = new TreeSet<>();
         Arrays.stream(users.split(","))
                 .forEach(entry -> {
-                    boolean num = isNumber(entry.split("\\.")[0]);
-                    if (num) {
+                    if (isParticipant(entry.split("\\.")[0])) {
                         userIds.add(entry.split("\\.")[0]);
                     } else {
                         group.addAll(userManagement.findUsersByGroupName(entry));
@@ -80,12 +79,7 @@ public class UserDetailsService {
         return userIds;
     }
 
-    private boolean isNumber(String id) {
-        try {
-            Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
+    private boolean isParticipant(String id) {
+        return getUserDetailsById(id) != null;
     }
 }

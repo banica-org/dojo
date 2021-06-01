@@ -105,7 +105,7 @@ public class FlinkTableService {
     }
 
     private String[] getElementsFromFirstIndex(List<String> columns) {
-        String[] columnsWithoutFirst = new String[columns.size()-1];
+        String[] columnsWithoutFirst = new String[columns.size() - 1];
         if (columns.size() > 1) {
             columnsWithoutFirst = columns.subList(1, columns.size()).toArray(columnsWithoutFirst);
         }

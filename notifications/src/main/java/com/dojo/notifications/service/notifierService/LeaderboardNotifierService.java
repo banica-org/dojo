@@ -99,42 +99,50 @@ public class LeaderboardNotifierService {
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
-    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> userIds, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
-        notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
+        notifyQueried(contest, newLeaderboard, userIds, request);
         if (request.getReceivers() != null) {
-            notifyListeners(contest, newLeaderboard, userDetailsService.turnUsersToUserIds(request.getReceivers()), queriedParticipants, request.getMessage());
+            notifyListeners(contest, newLeaderboard, userDetailsService.turnUsersToUserIds(request.getReceivers()), userIds, request.getMessage());
             if (request.getReceivers().contains(RECEIVER_COMMON)) {
-                contest.getNotifiers()
-                        .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, request.getMessage()));
+                for (String id : userIds) {
+                    String message = formatMessage(newLeaderboard, request.getMessage(), id);
+                    contest.getNotifiers()
+                            .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, message));
+                }
             }
         }
     }
 
     private void notifyListeners(Contest contest, Leaderboard newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
-        List<UserDetails> userDetails = new ArrayList<>();
-        eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
-
         List<UserDetails> queriedUserDetails = new ArrayList<>();
         queried.forEach(id -> queriedUserDetails.add(userDetailsService.getUserDetailsById(id)));
 
+        List<UserDetails> userDetails = new ArrayList<>();
+        eventListenerIds.stream().filter(id -> !queried.contains(id))
+                .forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
+
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
-                queriedUserDetails.forEach(changedUserDetail -> notificationServices.get(notifierType)
-                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, changedUserDetail, queryMessage, NotificationType.LEADERBOARD), contest));
+                queriedUserDetails.forEach(changedUserDetail -> {
+                    String message = formatMessage(newLeaderboard, queryMessage, changedUserDetail.getId());
+                    notificationServices.get(notifierType)
+                            .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, changedUserDetail, message, NotificationType.LEADERBOARD), contest);
+                });
             }
         }
     }
 
-    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
+    private void notifyQueried(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, SelectRequest request) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
+                String message = formatMessage(newLeaderboard, request.getMessage(), user.getId());
                 notificationServices.get(notifierType)
-                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, queryMessage, NotificationType.LEADERBOARD), contest);
+                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, message, NotificationType.LEADERBOARD), contest);
             }
         }
     }
@@ -144,4 +152,12 @@ public class LeaderboardNotifierService {
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
 
+    private String formatMessage(Leaderboard newLeaderboard, String message, String id) {
+        if (message.contains("%s")) {
+            return String.format(message, newLeaderboard.getParticipants().stream()
+                    .filter(participant -> participant.getUser().getId().equals(id))
+                    .findFirst().get().getUser().toString());
+        }
+        return message;
+    }
 }

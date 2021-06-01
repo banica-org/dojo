@@ -1,6 +1,7 @@
 package com.dojo.notifications.model.user;
 
 import com.dojo.notifications.grpc.UserDetailsClient;
+import com.dojo.notifications.model.user.enums.UserRole;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserManagement {
-
-    private static final String USER = "ROLE_USER";
 
     private final Set<Tuple3<String, String, List<User>>> groups;
     private final UserDetailsClient userDetailsClient;
@@ -39,7 +38,7 @@ public class UserManagement {
     }
 
     public Set<Tuple3<String, String, List<User>>> getGroupNames(String contestId) {
-        setParticipantsGroup(contestId);
+        setUserGroups(contestId);
         return groups.stream()
                 .filter(group -> group.f0.equals(contestId))
                 .collect(Collectors.toSet());
@@ -56,10 +55,14 @@ public class UserManagement {
         return users.isPresent() ? users.get().f2 : Collections.emptyList();
     }
 
-    private void setParticipantsGroup(String contestId) {
-        List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
-                .filter(user -> user.getRole().equals(USER))
-                .collect(Collectors.toList());
-        groups.add(new Tuple3<>(contestId, "All participants group", participants));
+    private void setUserGroups(String contestId) {
+        for (UserRole role : UserRole.values()) {
+            List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
+                    .filter(user -> user.getRole().equals(role))
+                    .collect(Collectors.toList());
+            if(!participants.equals(Collections.emptyList())) {
+                groups.add(new Tuple3<>(contestId, "All " + role.toString().toLowerCase() + " group", participants));
+            }
+        }
     }
 }
