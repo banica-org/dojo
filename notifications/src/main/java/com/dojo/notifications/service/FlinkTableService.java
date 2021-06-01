@@ -6,6 +6,8 @@ import com.dojo.notifications.model.leaderboard.SlackNotificationUtils;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -17,12 +19,12 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableColumn;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,12 +46,9 @@ public class FlinkTableService {
 
     private Map<String, List<Map<String, String>>> tables;
 
-    @Value("classpath:static/flink-tables.json")
-    private Resource flinkTables;
-
     @PostConstruct
     private void load() throws IOException {
-        this.tables = new ObjectMapper().readValue(flinkTables.getFile(), new TypeReference<Map<String, List<Map<String, String>>>>() {
+        this.tables = new ObjectMapper().readValue(getFlinkTablesFile(), new TypeReference<Map<String, List<Map<String, String>>>>() {
         });
     }
 
@@ -226,5 +225,17 @@ public class FlinkTableService {
         tableEnvironment.dropTemporaryView(firstTableName);
         tableEnvironment.dropTemporaryView(secondTableName);
         return firstTable;
+    }
+
+    private File getFlinkTablesFile() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("static/flink-tables.json");
+        File flinkTablesFile = File.createTempFile("flink-tables", ".json");
+        try {
+            FileUtils.copyInputStreamToFile(inputStream, flinkTablesFile);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+        return flinkTablesFile;
     }
 }
