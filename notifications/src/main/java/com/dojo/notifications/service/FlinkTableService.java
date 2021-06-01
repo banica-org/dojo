@@ -15,9 +15,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -164,7 +161,7 @@ public class FlinkTableService {
 
     private File getFlinkTablesFile() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("static/flink-tables.json") ;
+        InputStream inputStream = classLoader.getResourceAsStream("static/flink-tables.json");
         File flinkTablesFile = File.createTempFile("flink-tables", ".json");
         try {
             FileUtils.copyInputStreamToFile(inputStream, flinkTablesFile);
