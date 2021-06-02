@@ -22,6 +22,7 @@
         "backoffMultiplier": 4,
         "retryableStatusCodes": [
           "UNAVAILABLE",
+          "CANCELLED",
           "NOT_FOUND",
           "DEADLINE_EXCEEDED",
           "DATA_LOSS"

@@ -78,6 +78,8 @@ public class LeaderboardNotifierServiceTest {
 
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private DockerNotifierService dockerNotifierService;
 
     private Map<String, Leaderboard> leaderboards;
 
@@ -91,7 +93,7 @@ public class LeaderboardNotifierServiceTest {
         OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
 
-        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, Collections.singletonList(notificationService));
+        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, dockerNotifierService, Collections.singletonList(notificationService));
 
         leaderboards = new ConcurrentHashMap<>();
         leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);

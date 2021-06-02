@@ -26,9 +26,11 @@ public class SelectRequestServiceTest {
     private static final String TABLE_NAME = "leaderboard";
     private static final String LEADERBOARD_QUERY = "SELECT * FROM leaderboard";
     private static final String DOCKER_QUERY = "SELECT * FROM docker_events";
+    private static final String JOIN_QUERY = "SELECT * FROM leaderboard join docker_events";
 
     private final SelectRequest leaderboardRequest = new SelectRequest();
     private final SelectRequest dockerRequest = new SelectRequest();
+    private final SelectRequest joinQuery = new SelectRequest();
     private final List<SelectRequest> allRequests = new ArrayList<>();
 
 
@@ -42,9 +44,11 @@ public class SelectRequestServiceTest {
         selectRequestService = new SelectRequestService(selectRequestRepo);
         leaderboardRequest.setQuery(LEADERBOARD_QUERY);
         dockerRequest.setQuery(DOCKER_QUERY);
+        joinQuery.setQuery(JOIN_QUERY);
 
         allRequests.add(leaderboardRequest);
         allRequests.add(dockerRequest);
+        allRequests.add(joinQuery);
 
         when(selectRequestRepo.findAll()).thenReturn(allRequests);
     }
@@ -93,11 +97,21 @@ public class SelectRequestServiceTest {
 
     @Test
     public void getSpecificRequestsTest() {
-        leaderboardRequest.setId(1);
+        leaderboardRequest.setId(REQUEST_ID);
         Set<SelectRequest> expected = Collections.singleton(leaderboardRequest);
 
-        Set<SelectRequest> actual = selectRequestService.getSpecificRequests(Collections.singleton(1), allRequests);
+        Set<SelectRequest> actual = selectRequestService.getSpecificRequests(Collections.singleton(REQUEST_ID), allRequests);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getJoinSelectRequestsForTableTest() {
+        List<SelectRequest> expected = Collections.singletonList(joinQuery);
+
+        List<SelectRequest> actual = selectRequestService.getJoinSelectRequestsForTable(TABLE_NAME);
+
+        assertEquals(expected, actual);
+        verify(selectRequestRepo, times(1)).findAll();
     }
 }
