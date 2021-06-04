@@ -66,9 +66,8 @@ public class DockerServiceImpl implements DockerService {
         buildImage();
     }
 
-    public void runContainer(String imageTag) {
-        String username = "kaloyan-dutsolov6";
-        String containerId = createContainer(imageTag).getId();
+    public void runContainer(String imageTag, String username) {
+        String containerId = createContainer(imageTag, username).getId();
         dockerClient.startContainerCmd(containerId).exec();
         addContainerUsername(containerId, username);
         String status = getContainerStatus(containerId);
@@ -129,11 +128,13 @@ public class DockerServiceImpl implements DockerService {
                 .get(0);
     }
 
-    private CreateContainerResponse createContainer(String imageTag) {
+    private CreateContainerResponse createContainer(String imageTag, String username) {
         incrementContainerCounter();
         String containerName = imageTag.split(":")[0] + this.getContainerCounter();
+        List<String> shellArgs = new ArrayList<>(dockerConfigProperties.getShellArguments());
+        shellArgs.add(username);
         return dockerClient.createContainerCmd(imageTag)
-                .withCmd(dockerConfigProperties.getShellArguments())
+                .withCmd(shellArgs)
                 .withName(containerName).exec();
     }
 

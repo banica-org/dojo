@@ -13,7 +13,9 @@ import java.util.Map;
 @RestController
 public class GitEventReceiver {
     public static final String PAYLOAD_FIELD = "repository";
-    public static final String PAYLOAD_KEY = "name";
+    public static final String IMAGE_TAG_KEY = "name";
+    public static final String REPO_KEY = "full_name";
+    private static final String REPO_PREFIX = "gamified-hiring-";
 
     @Autowired
     DockerService dockerService;
@@ -45,8 +47,10 @@ public class GitEventReceiver {
     @GetMapping(path = "/run")
     public String runContainer(@RequestBody Map<String, Object> payload) {
         Object imageTag = new JSONObject(payload).getJSONObject(PAYLOAD_FIELD)
-                .get(PAYLOAD_KEY);
-        dockerService.runContainer((String) imageTag);
+                .get(IMAGE_TAG_KEY);
+        Object username = new JSONObject(payload).getJSONObject(PAYLOAD_FIELD)
+                .get(REPO_KEY);
+        dockerService.runContainer((String) imageTag, ((String) username).split("/")[1].replace(REPO_PREFIX, ""));
         return "OK";
     }
 }
