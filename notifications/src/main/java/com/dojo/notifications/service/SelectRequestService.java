@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SelectRequestService {
+    private static final String JOIN = "join";
+
     private final SelectRequestRepo selectRequestRepo;
 
     @Autowired
@@ -31,7 +33,17 @@ public class SelectRequestService {
     public List<SelectRequest> getRequestsForTable(String tableName) {
         List<SelectRequest> requests = new ArrayList<>();
         selectRequestRepo.findAll().forEach(request -> {
-            if (request.getQuery().contains(tableName)) {
+            if (request.getQuery().contains(tableName) && !request.getQuery().contains(JOIN)) {
+                requests.add(request);
+            }
+        });
+        return requests;
+    }
+
+    public List<SelectRequest> getJoinSelectRequestsForTable(String tableName) {
+        List<SelectRequest> requests = new ArrayList<>();
+        selectRequestRepo.findAll().forEach(request -> {
+            if (request.getQuery().contains(tableName) && request.getQuery().contains(JOIN)) {
                 requests.add(request);
             }
         });

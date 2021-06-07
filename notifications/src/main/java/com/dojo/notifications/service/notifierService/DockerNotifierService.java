@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +31,7 @@ import java.util.stream.Collectors;
 public class DockerNotifierService {
 
     private static final String ERROR_MESSAGE = "Unable to execute select request %s";
-
     private static final String RECEIVER_COMMON = "Common";
-
     private static final String TABLE_NAME = "docker_events";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerNotifierService.class);
@@ -40,6 +40,7 @@ public class DockerNotifierService {
     private final SelectRequestService selectRequestService;
     private final FlinkTableService flinkTableService;
     private final Map<NotifierType, NotificationService> notificationServices;
+    private final Map<String, List<Object>> dockerEvents;
 
     @Autowired
     public DockerNotifierService(UserDetailsService userDetailsService, SelectRequestService selectRequestService, FlinkTableService flinkTableService, Collection<NotificationService> notificationServices) {
@@ -48,17 +49,30 @@ public class DockerNotifierService {
         this.flinkTableService = flinkTableService;
         this.notificationServices = notificationServices.stream()
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
+        this.dockerEvents = new HashMap<>();
     }
 
-    public void executeRequests(Contest contest, Object object, String message) {
-        Set<SelectRequest> contestRequests = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getRequestsForTable(TABLE_NAME));
+    public Map<String, List<Object>> getDockerEvents() {
+        return Collections.unmodifiableMap(this.dockerEvents);
+    }
 
+    public void executeRequests(Contest contest, String id, Object object, String message) {
+
+        if (object instanceof Container) {
+            Container container = (Container) object;
+            if (container.getStatus().equals("running")) {
+                this.dockerEvents.put(id, new ArrayList<>());
+            }
+        }
+        this.dockerEvents.get(id).add(object);
+
+        Set<SelectRequest> contestRequests = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getRequestsForTable(TABLE_NAME));
         for (SelectRequest request : contestRequests) {
             try {
-                List<String> usernames = flinkTableService.executeDockerQuery(request, object);
-                if (!usernames.isEmpty()) {
+                List<String> queriedIds = flinkTableService.executeDockerQuery(request, object, id);
+                if (!queriedIds.isEmpty()) {
                     NotificationType finalType = (object instanceof Container) ? NotificationType.CONTAINER : NotificationType.TEST_RESULTS;
-                    usernames.forEach(username -> notify(request.getReceivers(), username, contest, object, message, finalType));
+                    queriedIds.forEach(queriedId -> notify(request.getReceivers(), queriedId, contest, object, message, finalType));
                 }
 
             } catch (Exception e) {
@@ -67,9 +81,9 @@ public class DockerNotifierService {
         }
     }
 
-    private void notify(String receivers, String username, Contest contest, Object object, String message, NotificationType notificationType) {
+    private void notify(String receivers, String id, Contest contest, Object object, String message, NotificationType notificationType) {
 
-        notifyParticipant(username, contest, object, message, notificationType);
+        notifyParticipant(id, contest, object, message, notificationType);
 
         if (receivers != null) {
             notifyListeners(contest, userDetailsService.turnUsersToUserIds(receivers), object, message, notificationType);
@@ -78,7 +92,6 @@ public class DockerNotifierService {
             }
         }
     }
-
 
     private void notifyListeners(Contest contest, Set<String> eventListenerIds, Object object, String queryMessage, NotificationType notificationType) {
         List<UserDetails> userDetails = new ArrayList<>();
@@ -92,8 +105,8 @@ public class DockerNotifierService {
         }
     }
 
-    public void notifyParticipant(String username, Contest contest, Object object, String message, NotificationType type) {
-        UserDetails userDetails = userDetailsService.getUserDetailsByUsername(username);
+    public void notifyParticipant(String id, Contest contest, Object object, String message, NotificationType type) {
+        UserDetails userDetails = userDetailsService.getUserDetailsById(id);
         for (NotifierType notifierType : contest.getNotifiers()) {
             notificationServices.get(notifierType)
                     .notify(userDetails, new ParticipantNotification(userDetailsService, object, userDetails, message, type), contest);

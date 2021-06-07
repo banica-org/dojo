@@ -9,17 +9,23 @@ import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.service.FlinkTableService;
 import com.dojo.notifications.service.SelectRequestService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.ui.Model;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,6 +47,9 @@ public class WebUIControllerTest {
     private static final String ACTION_DELETE = "1";
 
     private static final List<SelectRequest> DUMMY_SELECT_REQUEST = Collections.singletonList(new SelectRequest());
+
+    @Value("classpath:static/flink-tables.json")
+    private Resource flinkTables;
 
     private Contest contest;
 
@@ -69,12 +78,15 @@ public class WebUIControllerTest {
     private WebUIController webUIController;
 
     @Before
-    public void init() {
+    public void init() throws IOException {
         contest = new Contest();
         contest.setContestId(CONTEST_ID);
 
         when(eventService.getAllEvents()).thenReturn(Collections.emptyList());
         when(eventService.getAllContests()).thenReturn(Collections.emptyList());
+
+        when(flinkTableService.getTables()).thenReturn(new ObjectMapper().readValue(flinkTables.getFile(), new TypeReference<Map<String, List<Map<String, String>>>>() {
+        }));
     }
 
     @Test

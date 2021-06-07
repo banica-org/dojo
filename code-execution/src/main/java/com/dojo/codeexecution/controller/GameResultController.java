@@ -2,7 +2,7 @@ package com.dojo.codeexecution.controller;
 
 import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
-import com.dojo.codeexecution.service.grpc.handler.TestResultUpdateHandler;
+import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,14 +15,14 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class GameResultController {
-    private final TestResultUpdateHandler testResultUpdateHandler;
+    private final DockerEventUpdateHandler dockerEventUpdateHandler;
 
     private final RestTemplate restTemplate;
     private final CodenjoyConfigProperties codenjoyConfigProperties;
 
     @Autowired
-    public GameResultController(TestResultUpdateHandler testResultUpdateHandler, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
-        this.testResultUpdateHandler = testResultUpdateHandler;
+    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
+        this.dockerEventUpdateHandler = dockerEventUpdateHandler;
         this.restTemplate = restTemplate;
         this.codenjoyConfigProperties = codenjoyConfigProperties;
     }
@@ -39,6 +39,6 @@ public class GameResultController {
         HttpEntity<Double> entity = new HttpEntity(points, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        testResultUpdateHandler.sendUpdate(username, testResult.getFailedTestCases());
+        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases());
     }
 }

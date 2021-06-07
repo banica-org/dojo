@@ -4,7 +4,8 @@ public enum NotificationType {
     LEADERBOARD("Leaderboard change for "),
     IMAGE("Image build for "),
     CONTAINER("Container run for "),
-    TEST_RESULTS("Test results for ");
+    TEST_RESULTS("Test results for "),
+    QUERY_RESULT("Query result for ");
 
     private String message;
 
