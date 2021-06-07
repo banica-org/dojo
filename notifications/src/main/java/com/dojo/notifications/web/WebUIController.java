@@ -7,7 +7,6 @@ import com.dojo.notifications.model.user.UserManagement;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.request.SelectRequest;
 import com.dojo.notifications.model.request.SelectRequestModel;
-import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.FlinkTableService;
 import com.dojo.notifications.service.SelectRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-public class WebUIController {
+public class WebUIController  {
 
     private final static String ACTION_ADD = "add";
     private final static String ACTION_START = "start";

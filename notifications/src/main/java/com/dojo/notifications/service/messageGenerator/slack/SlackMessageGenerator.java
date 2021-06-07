@@ -8,6 +8,8 @@ import com.hubspot.slack.client.models.blocks.Divider;
 import com.hubspot.slack.client.models.blocks.Section;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -27,9 +29,18 @@ public abstract class SlackMessageGenerator {
     }
 
     protected ChatPostMessageParams.Builder getChatPostMessageParams(Object object, String slackChannel, String message) {
+        //        MarkdownToHTML
+        //        message = message.replace("~~","~");
+
+        //HTML to MarkDown
+        MutableDataSet options = new MutableDataSet();
+        String markdown = FlexmarkHtmlConverter.builder(options).build().convert(message);
+        markdown = markdown.replace("*", "_");
+        markdown = markdown.replace("__", "*");
+
         return ChatPostMessageParams.builder()
                 .setChannelId(slackChannel)
                 .addBlocks(Divider.builder().build())
-                .addBlocks(Section.of(Text.of(TextType.MARKDOWN, message)));
+                .addBlocks(Section.of(Text.of(TextType.MARKDOWN, markdown)));
     }
 }
