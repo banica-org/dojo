@@ -97,7 +97,7 @@ public class DockerServiceTest {
         when(dockerClient.waitContainerCmd(dummyId)).thenReturn(waitContainerMock);
         when(waitContainerMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallback);
 
-        dockerServiceImpl.runContainer(dummyImageTag);
+        dockerServiceImpl.runContainer(dummyImageTag, dummyRepoUsername);
 
         //Assert
         verify(createContainerResponseMock, times(1)).getId();
