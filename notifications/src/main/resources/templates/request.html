@@ -17,119 +17,116 @@
     <script th:inline="javascript">
     var tables = [[${tables}]];
     var table_names = [[${tables.keySet()}]];
+
     </script>
     <script type="text/javascript" th:src="@{/js/tables-autocomplete.js}"></script>
 
     <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
     <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.min.css">
-
-    <script src="https://cdn.tiny.cloud/1/7jskbgsz8mrwjpo1tx79rdeze16d6y2riqwzlnto2be0nx7l/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/7jskbgsz8mrwjpo1tx79rdeze16d6y2riqwzlnto2be0nx7l/tinymce/5/tinymce.min.js"
+            referrerpolicy="origin"></script>
 </head>
 
 <body>
-    <h2 style="text-align:center">Custom query for notifications</h2>
-    <div class="container">
-        <form action="#" th:action="@{/request}"  th:object="${newRequest}" method="post">
-            <table align="center">
-                <tr>
-                    <td>
-                        <br>
-                        <label>SELECT</label>
-                        <input type="text" style="width:275px" th:field="*{queryParameters}" value="*"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="ui-widget">
-                            <label for="table_names">FROM </label>
-                            <input id="table_names" style="width:278px" th:field="*{queryTable}">
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="ui-widget">
-                            <input id="column_names" style="width:330px" placeholder="WHERE/LIMIT..."
-                                   th:field="*{querySpecification}">
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label>Select who will be notified:  </label>
-                        <br>
-                        <input type="checkbox" id="notifyCommon" value="Common" th:field="*{receivers}"> Notify Channel/Sensei
-                        <br>
-                        <br>
-                        <div class="control-section">
-                            <div class="control-wrapper">
-                                <div id='content'>
-                                    <div>
-                                        <select style="width:330px" multiple class="chosen-select" name="test" th:field="*{receivers}">
-                                            <option value=""></option>
-                                            <option th:each="user : ${users}" th:text="${user}" th:value="${user}" th:field="*{receivers}"></option>
-                                        </select>
-                                    </div>
+<h2 style="text-align:center">Custom query for notifications</h2>
+<div class="container">
+    <form action="#" th:action="@{/request}" th:object="${newRequest}" method="post">
+        <table align="center">
+            <tr>
+                <td>
+                    <br>
+                    <label>SELECT</label>
+                    <input type="text" style="width:275px" th:field="*{queryParameters}" value="*"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="ui-widget">
+                        <label for="table_names">FROM </label>
+                        <input id="table_names" style="width:278px" th:field="*{queryTable}">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="ui-widget">
+                        <input id="column_names" style="width:330px" placeholder="WHERE/LIMIT..."
+                               th:field="*{querySpecification}">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Select who will be notified: </label>
+                    <br>
+                    <input type="checkbox" id="notifyCommon" value="Common" th:field="*{receivers}"> Notify
+                    Channel/Sensei
+                    <br>
+                    <br>
+                    <div class="control-section">
+                        <div class="control-wrapper">
+                            <div id='content'>
+                                <div>
+                                    <select style="width:330px" multiple class="chosen-select" name="test"
+                                            th:field="*{receivers}">
+                                        <option value=""></option>
+                                        <option th:each="user : ${users}" th:text="${user}" th:value="${user}"
+                                                th:field="*{receivers}"></option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label>Describe your query:  </label>
-                        <br>
-                        <input type="text" style="width:330px" th:field="*{describingMessage}" required placeholder="Enter a description here"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label>Notification message:  </label>
-                        <br>
-                        <textarea id="message-format" th:field="*{notificationMessage}" placeholder="Enter a message here"></textarea>
-                        <textarea id="emojis" th:field="*{notificationMessage}" placeholder="Enter emojis"></textarea>
-<!--                        <textarea id="mytextarea" th:field="*{notificationMessage}" placeholder="Enter a message here"></textarea>-->
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <br>
-                        <button type="submit" style="text-align:left"  class="btn btn-primary" name="action" value="add"/>Add</button>
-                        <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
-                            <button type="submit" style="margin-left:215px;" class="btn btn-primary" name="action" value="back" formnovalidate/>Back</button>
-                        </form>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Describe your query: </label>
+                    <br>
+                    <input type="text" style="width:330px" th:field="*{describingMessage}" required
+                           placeholder="Enter a description here"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Notification message: </label>
+                    <br>
+                    <textarea id="mytextarea" type="text" th:field="*{notificationMessage}"
+                              placeholder="Enter a message here"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <br>
+                    <button type="submit" style="text-align:left" class="btn btn-primary" name="action" value="add"/>
+                    Add</button>
+                    <form action="#" th:action="@{/contest}" th:object="${newContest}" method="post">
+                        <button type="submit" style="margin-left:215px;" class="btn btn-primary" name="action"
+                                value="back" formnovalidate/>
+                        Back</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
 
-    <script>
+<script>
     $(".chosen-select").chosen({
         no_results_text: "No such user in the contest!"
     })
-    </script>
 
-<!--    <script>-->
-<!--  tinymce.init({-->
-<!--    selector: "#mytextarea",-->
-<!--    plugins: "emoticons",-->
-<!--    toolbar: "emoticons",-->
-<!--  });-->
-<!--</script>-->
+</script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.min.js"></script>
-    <script>
-        $('#emojis').emojioneArea({
-            pickerPosition: 'bottom'
-        })
-    </script>
-    <script type="text/javascript" th:src="@{/js/message-format.js}"></script>
+<script>
+  tinymce.init({
+    selector: "#mytextarea",
+    plugins: "emoticons",
+    toolbar: "emoticons",
+  });
+
+</script>
 
 </body>
 </html>

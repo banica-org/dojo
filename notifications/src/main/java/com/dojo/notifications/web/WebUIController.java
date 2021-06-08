@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-public class WebUIController  {
+public class WebUIController {
 
     private final static String ACTION_ADD = "add";
     private final static String ACTION_START = "start";

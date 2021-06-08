@@ -9,7 +9,6 @@ import com.hubspot.slack.client.models.blocks.Section;
 import com.hubspot.slack.client.models.blocks.objects.Text;
 import com.hubspot.slack.client.models.blocks.objects.TextType;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -29,18 +28,18 @@ public abstract class SlackMessageGenerator {
     }
 
     protected ChatPostMessageParams.Builder getChatPostMessageParams(Object object, String slackChannel, String message) {
-        //        MarkdownToHTML
-        //        message = message.replace("~~","~");
-
-        //HTML to MarkDown
-        MutableDataSet options = new MutableDataSet();
-        String markdown = FlexmarkHtmlConverter.builder(options).build().convert(message);
-        markdown = markdown.replace("*", "_");
-        markdown = markdown.replace("__", "*");
-
+        message = convertHTMLToMarkDown(message);
         return ChatPostMessageParams.builder()
                 .setChannelId(slackChannel)
                 .addBlocks(Divider.builder().build())
-                .addBlocks(Section.of(Text.of(TextType.MARKDOWN, markdown)));
+                .addBlocks(Section.of(Text.of(TextType.MARKDOWN, message)));
+    }
+
+    private String convertHTMLToMarkDown(String message) {
+        String strike = FlexmarkHtmlConverter.STRIKE_NODE;
+        message = message.replace("span style=\"text-decoration: line-through;\"", strike).replace("/span", "/" + strike);
+
+        String markdown = FlexmarkHtmlConverter.builder().build().convert(message);
+        return markdown.replace("*", "_").replace("__", "*").replace("~~", "~");
     }
 }
