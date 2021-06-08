@@ -29,6 +29,9 @@ public class Participant implements Comparable<Participant> {
 
     @Override
     public int compareTo(Participant o) {
+        if(o.getScore() - this.getScore()==0){
+            return o.getUser().getId().compareTo(this.getUser().getId());
+        }
         return (int) (o.getScore() - this.getScore());
     }
 }
