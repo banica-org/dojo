@@ -23,6 +23,7 @@
         <module>notifications</module>
         <module>messages</module>
         <module>common</module>
+        <module>performance-tests</module>
     </modules>
 
     <properties>
