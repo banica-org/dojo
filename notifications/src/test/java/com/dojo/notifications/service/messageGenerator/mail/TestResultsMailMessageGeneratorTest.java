@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 public class TestResultsMailMessageGeneratorTest {
 
     private final String EXPECTED_PROCESS_RETURN_TYPE = "PROCESSED";
+    private final String MESSAGE = "message";
 
     @Mock
     private ITemplateEngine iTemplateEngine;
@@ -47,6 +48,7 @@ public class TestResultsMailMessageGeneratorTest {
     public void generateMessageTest() {
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 20);
+        contextParams.put(MESSAGE, "html");
         when(iTemplateEngine.process(eq("testResultsMailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
         String actual = testResultsMailMessageGenerator.generateMessage(contextParams);
