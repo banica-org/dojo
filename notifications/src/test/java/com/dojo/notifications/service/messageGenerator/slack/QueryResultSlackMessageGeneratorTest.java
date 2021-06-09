@@ -76,7 +76,7 @@ public class QueryResultSlackMessageGeneratorTest {
         List<Block> blocks = content.getBlocks();
 
         assertEquals(4, blocks.size());
-        assertTrue(blocks.get(1).toString().contains(MESSAGE));
+        assertTrue(blocks.get(2).toString().contains(MESSAGE));
         assertTrue(blocks.get(2).toString().contains(TABLE_COLUMN));
         assertTrue(blocks.get(2).toString().contains(TABLE_FIELD));
     }
