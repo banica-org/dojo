@@ -498,7 +498,7 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">Authorization</stringProp>
-                  <stringProp name="Header.value">Bearer xoxb-1837278287027-1834138967157-m4WSjYs9fRlPRHbQ0vZpTpeN</stringProp>
+                  <stringProp name="Header.value">Bearer **insert slack tocken here**</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -570,7 +570,7 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
               <stringProp name="host">imap.googlemail.com</stringProp>
               <stringProp name="port">993</stringProp>
               <stringProp name="username">dojotest2021@gmail.com</stringProp>
-              <stringProp name="password">dojopass123</stringProp>
+              <stringProp name="password">**insert gmail account password here**</stringProp>
               <intProp name="num_messages">-1</intProp>
               <boolProp name="delete">false</boolProp>
               <boolProp name="storeMimeMessage">true</boolProp>
