@@ -2,7 +2,7 @@ package com.dojo.notifications.model.user;
 
 import com.dojo.notifications.grpc.UserDetailsClient;
 import com.dojo.notifications.model.user.enums.UserRole;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public class UserManagementTest {
     private static final String USER_NAME = "username";
     private static final String USER_ROLE = "USER";
 
-    private final Set<Tuple3<String, String, List<User>>> groups = new HashSet<>();
+    private final HashMap<String, Tuple2<String, List<User>>> groups = new HashMap<>();
 
     @Mock
     private User user;
@@ -67,9 +67,9 @@ public class UserManagementTest {
         when(user.getRole()).thenReturn(UserRole.valueOf(USER_ROLE));
         when(userDetailsClient.getUsersForContest(CONTEST_ID)).thenReturn(Collections.singletonList(user));
 
-        Tuple3<String, String, List<User>> expected = new Tuple3<>(CONTEST_ID, "All user group", Collections.singletonList(user));
+        Tuple2<String, List<User>> expected = new Tuple2<>("All user group", Collections.singletonList(user));
 
-        Set<Tuple3<String, String, List<User>>> actual = userManagement.getGroupNames(CONTEST_ID);
+        Set<Tuple2<String, List<User>>> actual = userManagement.getGroupNames(CONTEST_ID);
 
         Assert.assertTrue(actual.stream().anyMatch(tuple -> tuple.equals(expected)));
 
@@ -90,7 +90,7 @@ public class UserManagementTest {
 
     @Test
     public void findUsersByGroupNameTest() {
-        groups.add(new Tuple3<>(CONTEST_ID, USER_NAME, Collections.singletonList(user)));
+        groups.putIfAbsent(CONTEST_ID, new Tuple2<>(USER_NAME, Collections.singletonList(user)));
 
         List<User> actual = userManagement.findUsersByGroupName(USER_NAME);
 
