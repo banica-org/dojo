@@ -1,4 +1,4 @@
-<!-- UNCOMMENT WHILE CONTROLLERS AND ADD VALID MAIL DETAILS AND SLACK TOKEN -->
+<!-- ADD VALID MAIL DETAILS, SLACK TOKEN AND USER DATA -->
 
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.1">
@@ -449,10 +449,10 @@
             <boolProp name="TransactionController.parent">true</boolProp>
           </TransactionController>
           <hashTree>
-<!--             <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true"> -->
-<!--               <stringProp name="TestPlan.comments">while score is updated in db</stringProp> -->
-<!--               <stringProp name="WhileController.condition">${__javaScript(${score} == &quot;0&quot;)}</stringProp> -->
-<!--             </WhileController> -->
+            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+              <stringProp name="TestPlan.comments">while score is updated in db</stringProp>
+              <stringProp name="WhileController.condition">${__javaScript(${score} == &quot;0&quot;)}</stringProp>
+            </WhileController>
             <hashTree>
               <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Get points from DB" enabled="true">
                 <stringProp name="dataSource">codenjoy</stringProp>
@@ -492,9 +492,9 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-<!--           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true"> -->
-<!--             <stringProp name="WhileController.condition">${__javaScript(${slack_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp> -->
-<!--           </WhileController> -->
+          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+            <stringProp name="WhileController.condition">${__javaScript(${slack_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
+          </WhileController>
           <hashTree>
             <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
               <collectionProp name="HeaderManager.headers">
@@ -562,9 +562,9 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-<!--           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true"> -->
-<!--             <stringProp name="WhileController.condition">${__javaScript(${mail_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp> -->
-<!--           </WhileController> -->
+          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+            <stringProp name="WhileController.condition">${__javaScript(${mail_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
+          </WhileController>
           <hashTree>
             <MailReaderSampler guiclass="MailReaderSamplerGui" testclass="MailReaderSampler" testname="Get all mail messages" enabled="true">
               <stringProp name="host_type">imaps</stringProp>
