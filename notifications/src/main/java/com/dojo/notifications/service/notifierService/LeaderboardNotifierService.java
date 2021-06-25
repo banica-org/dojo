@@ -191,9 +191,9 @@ public class LeaderboardNotifierService {
 
     private String formatMessage(Leaderboard newLeaderboard, String message, String id) {
         if (message.contains("%s")) {
-            return String.format(message, newLeaderboard.getParticipants().stream()
+            return String.format(message, " " + newLeaderboard.getParticipants().stream()
                     .filter(participant -> participant.getUser().getId().equals(id))
-                    .findFirst().get().getUser().toString());
+                    .findFirst().get().getUser().toString() + " ");
         }
         return message;
     }
