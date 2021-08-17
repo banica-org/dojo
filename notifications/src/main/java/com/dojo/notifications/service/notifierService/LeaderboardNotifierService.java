@@ -15,6 +15,7 @@ import com.dojo.notifications.service.SelectRequestService;
 import com.dojo.notifications.service.UserDetailsService;
 import com.dojo.notifications.service.notificationService.NotificationService;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.table.api.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +45,18 @@ public class LeaderboardNotifierService {
     private final LeaderboardService leaderboardService;
     private final SelectRequestService selectRequestService;
     private final FlinkTableService flinkTableService;
+    private final DockerNotifierService dockerNotifierService;
     private final Map<NotifierType, NotificationService> notificationServices;
     private final Map<String, Leaderboard> leaderboards;
 
     @Autowired
     public LeaderboardNotifierService(UserDetailsService userDetailsService, LeaderboardService leaderboardService,
-                                      SelectRequestService selectRequestService, FlinkTableService flinkTableService, Collection<NotificationService> notificationServices) {
+                                      SelectRequestService selectRequestService, FlinkTableService flinkTableService, DockerNotifierService dockerNotifierService, Collection<NotificationService> notificationServices) {
         this.userDetailsService = userDetailsService;
         this.leaderboardService = leaderboardService;
         this.selectRequestService = selectRequestService;
         this.flinkTableService = flinkTableService;
+        this.dockerNotifierService = dockerNotifierService;
         this.leaderboards = new ConcurrentHashMap<>();
         this.notificationServices = notificationServices.stream()
                 .collect(Collectors.toMap(NotificationService::getNotificationServiceTypeMapping, Function.identity()));
@@ -95,46 +98,88 @@ public class LeaderboardNotifierService {
                     notifyAboutCondition(contest, request, queriedParticipants, newLeaderboard);
                 }
             }
+
+            try {
+                notifyAboutJoinQuery(contest, changedUsers);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         leaderboards.put(contest.getContestId(), newLeaderboard);
     }
 
-    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> queriedParticipants, Leaderboard newLeaderboard) {
+    private void notifyAboutJoinQuery(Contest contest, List<Tuple4<String, String, Integer, Long>> changedUsers) {
+        Set<SelectRequest> contestJoinQueries = selectRequestService.getSpecificRequests(contest.getQueryIds(), selectRequestService.getJoinSelectRequestsForTable(TABLE_NAME));
+
+        // when we have more than two tables, here we should check which is the other table from the query
+        Map<String, List<Object>> dockerEvents = dockerNotifierService.getDockerEvents();
+        if (dockerEvents.size() != 0) {
+            for (SelectRequest request : contestJoinQueries) {
+                Table result = flinkTableService
+                        .executeLeaderboardJoinQuery(request, changedUsers, dockerEvents);
+
+                for (NotifierType notifierType : contest.getNotifiers()) {
+                    if (request.getReceivers() != null) {
+                        userDetailsService
+                                .turnUsersToUserIds(request.getReceivers())
+                                .forEach(listenerId -> {
+                                    UserDetails listenerDetails = userDetailsService.getUserDetailsById(listenerId);
+                                    notificationServices.get(notifierType)
+                                            .notify(listenerDetails, new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
+                                });
+                    }
+                    notificationServices.get(notifierType)
+                            .notify(new SenseiNotification(userDetailsService, result, request.getMessage(), NotificationType.QUERY_RESULT), contest);
+                }
+            }
+        }
+    }
+
+    private void notifyAboutCondition(Contest contest, SelectRequest request, Set<String> userIds, Leaderboard newLeaderboard) {
         LOGGER.info(NOTIFYING_MESSAGE);
 
-        notifyContestants(contest, newLeaderboard, queriedParticipants, request.getMessage());
+        notifyQueried(contest, newLeaderboard, userIds, request);
         if (request.getReceivers() != null) {
-            notifyListeners(contest, newLeaderboard, userDetailsService.turnUsersToUserIds(request.getReceivers()), queriedParticipants, request.getMessage());
+            notifyListeners(contest, newLeaderboard, userDetailsService.turnUsersToUserIds(request.getReceivers()), userIds, request.getMessage());
             if (request.getReceivers().contains(RECEIVER_COMMON)) {
-                contest.getNotifiers()
-                        .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, request.getMessage()));
+                for (String id : userIds) {
+                    String message = formatMessage(newLeaderboard, request.getMessage(), id);
+                    contest.getNotifiers()
+                            .forEach(notifierType -> notifySensei(contest, newLeaderboard, notifierType, message));
+                }
             }
         }
     }
 
     private void notifyListeners(Contest contest, Leaderboard newLeaderboard, Set<String> eventListenerIds, Set<String> queried, String queryMessage) {
-        List<UserDetails> userDetails = new ArrayList<>();
-        eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
-
         List<UserDetails> queriedUserDetails = new ArrayList<>();
         queried.forEach(id -> queriedUserDetails.add(userDetailsService.getUserDetailsById(id)));
 
+        List<UserDetails> userDetails = new ArrayList<>();
+        eventListenerIds.stream().filter(id -> !queried.contains(id))
+                .forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
+
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
-                queriedUserDetails.forEach(changedUserDetail -> notificationServices.get(notifierType)
-                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, changedUserDetail, queryMessage, NotificationType.LEADERBOARD), contest));
+                queriedUserDetails.forEach(changedUserDetail -> {
+                    String message = formatMessage(newLeaderboard, queryMessage, changedUserDetail.getId());
+                    notificationServices.get(notifierType)
+                            .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, changedUserDetail, message, NotificationType.LEADERBOARD), contest);
+                });
             }
         }
     }
 
-    private void notifyContestants(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, String queryMessage) {
+    private void notifyQueried(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, SelectRequest request) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
+                String message = formatMessage(newLeaderboard, request.getMessage(), user.getId());
                 notificationServices.get(notifierType)
-                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, queryMessage, NotificationType.LEADERBOARD), contest);
+                        .notify(user, new ParticipantNotification(userDetailsService, newLeaderboard, user, message, NotificationType.LEADERBOARD), contest);
             }
         }
     }
@@ -144,4 +189,12 @@ public class LeaderboardNotifierService {
                 .notify(new SenseiNotification(userDetailsService, newLeaderboard, queryMessage, NotificationType.LEADERBOARD), contest);
     }
 
+    private String formatMessage(Leaderboard newLeaderboard, String message, String id) {
+        if (message.contains("%s")) {
+            return String.format(message, " " + newLeaderboard.getParticipants().stream()
+                    .filter(participant -> participant.getUser().getId().equals(id))
+                    .findFirst().get().getUser().toString() + " ");
+        }
+        return message;
+    }
 }

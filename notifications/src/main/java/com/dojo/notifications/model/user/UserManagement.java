@@ -1,13 +1,16 @@
 package com.dojo.notifications.model.user;
 
 import com.dojo.notifications.grpc.UserDetailsClient;
-import org.apache.flink.api.java.tuple.Tuple3;
+import com.dojo.notifications.model.user.enums.UserRole;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,13 +18,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserManagement {
 
-    private static final String USER = "ROLE_USER";
-
-    private final Set<Tuple3<String, String, List<User>>> groups;
+    private final HashMap<String, Tuple2<String, List<User>>> groups;
     private final UserDetailsClient userDetailsClient;
 
     @Autowired
-    public UserManagement(Set<Tuple3<String, String, List<User>>> groups, UserDetailsClient userDetailsClient) {
+    public UserManagement(HashMap<String, Tuple2<String, List<User>>> groups, UserDetailsClient userDetailsClient) {
         this.groups = groups;
         this.userDetailsClient = userDetailsClient;
     }
@@ -33,15 +34,16 @@ public class UserManagement {
                 .collect(Collectors.toList()));
 
         autocomplete.addAll(getGroupNames(contestId).stream()
-                .map(group -> group.f1)
+                .map(group -> group.f0)
                 .collect(Collectors.toList()));
         return autocomplete;
     }
 
-    public Set<Tuple3<String, String, List<User>>> getGroupNames(String contestId) {
-        setParticipantsGroup(contestId);
-        return groups.stream()
-                .filter(group -> group.f0.equals(contestId))
+    public Set<Tuple2<String, List<User>>> getGroupNames(String contestId) {
+        setUserGroups(contestId);
+        return groups.entrySet().stream()
+                .filter(group -> group.getKey().equals(contestId))
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
     }
 
@@ -50,16 +52,20 @@ public class UserManagement {
     }
 
     public List<User> findUsersByGroupName(String name) {
-        Optional<Tuple3<String, String, List<User>>> users = groups.stream()
-                .filter(group -> group.f1.equals(name))
+        Optional<Tuple2<String, List<User>>> users = groups.values().stream()
+                .filter(group -> group.f0.equals(name))
                 .findFirst();
-        return users.isPresent() ? users.get().f2 : Collections.emptyList();
+        return users.isPresent() ? users.get().f1 : Collections.emptyList();
     }
 
-    private void setParticipantsGroup(String contestId) {
-        List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
-                .filter(user -> user.getRole().equals(USER))
-                .collect(Collectors.toList());
-        groups.add(new Tuple3<>(contestId, "All participants group", participants));
+    private void setUserGroups(String contestId) {
+        for (UserRole role : UserRole.values()) {
+            List<User> participants = userDetailsClient.getUsersForContest(contestId).stream()
+                    .filter(user -> user.getRole().equals(role))
+                    .collect(Collectors.toList());
+            if (!participants.equals(Collections.emptyList())) {
+                groups.put(contestId, new Tuple2<>("All " + role.toString().toLowerCase() + " group", participants));
+            }
+        }
     }
 }

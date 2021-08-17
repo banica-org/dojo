@@ -2,7 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
-import com.dojo.codeexecution.service.grpc.handler.ContainerUpdateHandler;
+import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
@@ -53,7 +53,7 @@ public class DockerServiceTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DockerClient dockerClient;
     @Mock
-    private ContainerUpdateHandler containerUpdateHandler;
+    private DockerEventUpdateHandler dockerEventUpdateHandler;
     @Mock
     private ExecutorService singleThreadExecutor;
 
@@ -97,7 +97,7 @@ public class DockerServiceTest {
         when(dockerClient.waitContainerCmd(dummyId)).thenReturn(waitContainerMock);
         when(waitContainerMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallback);
 
-        dockerServiceImpl.runContainer(dummyImageTag);
+        dockerServiceImpl.runContainer(dummyImageTag, dummyRepoUsername);
 
         //Assert
         verify(createContainerResponseMock, times(1)).getId();

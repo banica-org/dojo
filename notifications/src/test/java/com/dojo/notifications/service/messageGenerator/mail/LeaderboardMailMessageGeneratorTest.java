@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 public class LeaderboardMailMessageGeneratorTest {
 
     private final String EXPECTED_PROCESS_RETURN_TYPE = "PROCESSED";
+    private final String MESSAGE = "message";
 
     @Mock
     private ITemplateEngine templateEngine;
@@ -44,7 +45,7 @@ public class LeaderboardMailMessageGeneratorTest {
         //Arrange
         Map<String, Object> contextParams = new HashMap<>();
         contextParams.put(EXPECTED_PROCESS_RETURN_TYPE, 20);
-
+        contextParams.put(MESSAGE, "html");
         when(templateEngine.process(eq("leaderboardMailTemplate"), any(Context.class))).thenReturn(EXPECTED_PROCESS_RETURN_TYPE);
 
         //Act

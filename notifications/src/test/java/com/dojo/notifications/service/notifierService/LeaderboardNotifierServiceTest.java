@@ -78,6 +78,8 @@ public class LeaderboardNotifierServiceTest {
 
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private DockerNotifierService dockerNotifierService;
 
     private Map<String, Leaderboard> leaderboards;
 
@@ -91,7 +93,7 @@ public class LeaderboardNotifierServiceTest {
         OLD_LEADERBOARD.getParticipants().addAll(Arrays.asList(FIRST_PARTICIPANT, SECOND_PARTICIPANT));
         NEW_LEADERBOARD.getParticipants().addAll(Arrays.asList(SECOND_PARTICIPANT, FIRST_PARTICIPANT, THIRD_PARTICIPANT));
 
-        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, Collections.singletonList(notificationService));
+        leaderboardNotifierService = new LeaderboardNotifierService(userDetailsService, leaderboardService, selectRequestService, flinkTableService, dockerNotifierService, Collections.singletonList(notificationService));
 
         leaderboards = new ConcurrentHashMap<>();
         leaderboards.put(DUMMY_CONTEST_ID, OLD_LEADERBOARD);
@@ -136,6 +138,7 @@ public class LeaderboardNotifierServiceTest {
     @Test
     public void notifyPersonalChangesTest() throws Exception {
         //Arrange
+        SELECT_REQUEST.setMessage("");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
@@ -145,6 +148,7 @@ public class LeaderboardNotifierServiceTest {
         when(userDetailsService.getUserDetailsById(NEW_LEADERBOARD.getUserIdByPosition(0))).thenReturn(FIRST_USER_DETAILS);
         when(userDetailsService.getUserDetailsById(NEW_LEADERBOARD.getUserIdByPosition(1))).thenReturn(SECOND_USER_DETAILS);
         when(contest.getNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
+        when(userDetailsService.getUserDetailsById(any())).thenReturn(FIRST_USER_DETAILS);
 
         //Act
         leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
@@ -158,12 +162,14 @@ public class LeaderboardNotifierServiceTest {
         verify(contest, times(2)).getContestId();
         verify(contest, times(1)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any(), any());
+        verify(userDetailsService, times(1)).getUserDetailsById(any());
     }
 
     @Test
     public void notifyAllChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setReceivers("1.,Common");
+        SELECT_REQUEST.setMessage("");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
@@ -173,6 +179,7 @@ public class LeaderboardNotifierServiceTest {
         when(userDetailsService.turnUsersToUserIds(SELECT_REQUEST.getReceivers())).thenReturn(Collections.singleton("1"));
         when(contest.getNotifiers()).thenReturn(Collections.singleton(NotifierType.EMAIL));
         when(contest.getNotifiers()).thenReturn(notifiers);
+        when(userDetailsService.getUserDetailsById(any())).thenReturn(FIRST_USER_DETAILS);
 
         //Act
         leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
@@ -186,12 +193,14 @@ public class LeaderboardNotifierServiceTest {
         verify(contest, times(2)).getContestId();
         verify(contest, times(3)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());
+        verify(userDetailsService, times(3)).getUserDetailsById(any());
     }
 
     @Test
     public void notifyCommonChangesTest() throws Exception {
         //Arrange
         SELECT_REQUEST.setReceivers("Common");
+        SELECT_REQUEST.setMessage("");
         List<SelectRequest> requests = new ArrayList<>(Collections.singletonList(SELECT_REQUEST));
 
         when(leaderboardService.getLeaderboardChanges(OLD_LEADERBOARD, NEW_LEADERBOARD)).thenReturn(CHANGED_USERS);
@@ -199,6 +208,7 @@ public class LeaderboardNotifierServiceTest {
         when(selectRequestService.getRequestsForTable(TABLE_NAME)).thenReturn(requests);
         when(flinkTableService.executeLeaderboardQuery(eq(SELECT_REQUEST), any())).thenReturn(Collections.singleton(USER_ID));
         when(contest.getNotifiers()).thenReturn(notifiers);
+        when(userDetailsService.getUserDetailsById(any())).thenReturn(FIRST_USER_DETAILS);
 
         //Act
         leaderboardNotifierService.lookForLeaderboardChanges(contest, NEW_LEADERBOARD);
@@ -211,5 +221,6 @@ public class LeaderboardNotifierServiceTest {
         verify(contest, times(2)).getContestId();
         verify(contest, times(2)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());
+        verify(userDetailsService, times(2)).getUserDetailsById(any());
     }
 }

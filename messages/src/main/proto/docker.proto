@@ -14,18 +14,21 @@ message ImageResponse{
   string message = 2;
 }
 
-message ContainerRequest{
+message DockerEventRequest{
   string id = 1;
+}
+
+message DockerEventResponse{
+  oneof events {
+    ContainerResponse container = 1;
+    TestResultResponse testResults = 2;
+  }
 }
 
 message ContainerResponse{
   string status = 1;
   string username = 2;
   repeated string log = 3;
-}
-
-message TestResultRequest{
-  string id = 1;
 }
 
 message TestResultResponse{
@@ -48,7 +51,6 @@ message StopResponse{
 
 service DockerService {
   rpc getImageResults(ImageRequest) returns (stream ImageResponse);
-  rpc getContainerResults(ContainerRequest) returns (stream ContainerResponse);
-  rpc getTestResults(TestResultRequest) returns (stream TestResultResponse);
+  rpc getDockerEvents(DockerEventRequest) returns (stream DockerEventResponse);
   rpc stopNotifications(StopRequest) returns (StopResponse);
 }
