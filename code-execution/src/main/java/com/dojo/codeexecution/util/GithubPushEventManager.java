@@ -14,11 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class GithubPushEventManager {
 
-    private final ExecutorService executorService;
-
-    public GithubPushEventManager() {
-        this.executorService = Executors.newSingleThreadExecutor();
-    }
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public String executeRunContainer(DockerService dockerService, Map<String, Object> payload) {
         String result = "";
