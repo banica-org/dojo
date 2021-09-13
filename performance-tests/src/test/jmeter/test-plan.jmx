@@ -9,14 +9,14 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
-      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+      <stringProp name="TestPlan.user_define_classpath">C:\Users\Nikola_Nguen\JMeter\apache-jmeter-5.4.1\lib\postgresql-42.2.23 (1).jar</stringProp>
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">4</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
@@ -36,7 +36,7 @@
           <stringProp name="driver">org.postgresql.Driver</stringProp>
           <stringProp name="initQuery"></stringProp>
           <boolProp name="keepAlive">true</boolProp>
-          <stringProp name="password">1234</stringProp>
+          <stringProp name="password">root</stringProp>
           <stringProp name="poolMax">0</stringProp>
           <boolProp name="preinit">false</boolProp>
           <stringProp name="timeout">10000</stringProp>
@@ -53,6 +53,28 @@
             </elementProp>
           </collectionProp>
         </HeaderManager>
+        <hashTree/>
+        <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="true">
+          <collectionProp name="AuthManager.auth_list">
+            <elementProp name="" elementType="Authorization">
+              <stringProp name="Authorization.url">http://localhost:8090/login</stringProp>
+              <stringProp name="Authorization.username">dojoadmin</stringProp>
+              <stringProp name="Authorization.password">dojopass</stringProp>
+              <stringProp name="Authorization.domain"></stringProp>
+              <stringProp name="Authorization.realm"></stringProp>
+              <stringProp name="Authorization.mechanism">BASIC_DIGEST</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="Authorization">
+              <stringProp name="Authorization.url">http://localhost:8080/codenjoy-contest/rest/admin/player/1/remove</stringProp>
+              <stringProp name="Authorization.username">postgres</stringProp>
+              <stringProp name="Authorization.password">root</stringProp>
+              <stringProp name="Authorization.domain"></stringProp>
+              <stringProp name="Authorization.realm"></stringProp>
+              <stringProp name="Authorization.mechanism">BASIC_DIGEST</stringProp>
+            </elementProp>
+          </collectionProp>
+          <boolProp name="AuthManager.controlledByThreadGroup">false</boolProp>
+        </AuthManager>
         <hashTree/>
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
           <stringProp name="delimiter">,</stringProp>
@@ -86,7 +108,7 @@
           </collectionProp>
         </Arguments>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Open notifications UI" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -96,7 +118,7 @@
             <stringProp name="HTTPSampler.port">8090</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/</stringProp>
+            <stringProp name="HTTPSampler.path">/login</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -108,7 +130,7 @@
           </HTTPSamplerProxy>
           <hashTree/>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create player" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -204,7 +226,7 @@
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Join player in game" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -263,7 +285,7 @@
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="1880047364">https://github.com/giivanov722/gamified-hiring-${USERNAME}</stringProp>
+                <stringProp name="-1573705087">https://github.com/nikolanguen/gamified-hiring-${USERNAME}</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message"></stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -273,7 +295,7 @@
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Push solution to github" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -282,146 +304,146 @@
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
-  &quot;zen&quot;: &quot;It&apos;s not fully shipped until it&apos;s fast.&quot;,&#xd;
-  &quot;hook_id&quot;: 292189930,&#xd;
-  &quot;hook&quot;: {&#xd;
-    &quot;type&quot;: &quot;Repository&quot;,&#xd;
-    &quot;id&quot;: 292189930,&#xd;
-    &quot;name&quot;: &quot;web&quot;,&#xd;
-    &quot;active&quot;: true,&#xd;
-    &quot;events&quot;: [&#xd;
-      &quot;push&quot;&#xd;
-    ],&#xd;
-    &quot;config&quot;: {&#xd;
-      &quot;content_type&quot;: &quot;json&quot;,&#xd;
-      &quot;insecure_ssl&quot;: &quot;0&quot;,&#xd;
-      &quot;url&quot;: &quot;http://212.75.31.225:8081/run&quot;&#xd;
-    },&#xd;
-    &quot;updated_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
-    &quot;created_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
-    &quot;url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930&quot;,&#xd;
-    &quot;test_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/test&quot;,&#xd;
-    &quot;ping_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/pings&quot;,&#xd;
-    &quot;last_response&quot;: {&#xd;
-      &quot;code&quot;: null,&#xd;
-      &quot;status&quot;: &quot;unused&quot;,&#xd;
-      &quot;message&quot;: null&#xd;
-    }&#xd;
-  },&#xd;
-  &quot;repository&quot;: {&#xd;
-    &quot;id&quot;: 358211712,&#xd;
-    &quot;node_id&quot;: &quot;MDEwOlJlcG9zaXRvcnkzNTgyMTE3MTI=&quot;,&#xd;
-    &quot;name&quot;: &quot;parent-tag&quot;,&#xd;
-    &quot;full_name&quot;: &quot;DenisKirilov/gamified-hiring-${USERNAME}&quot;,&#xd;
-    &quot;private&quot;: true,&#xd;
-    &quot;owner&quot;: {&#xd;
-      &quot;login&quot;: &quot;DenisKirilov&quot;,&#xd;
-      &quot;id&quot;: 38264680,&#xd;
-      &quot;node_id&quot;: &quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
-      &quot;avatar_url&quot;: &quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
-      &quot;gravatar_id&quot;: &quot;&quot;,&#xd;
-      &quot;url&quot;: &quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
-      &quot;html_url&quot;: &quot;https://github.com/DenisKirilov&quot;,&#xd;
-      &quot;followers_url&quot;: &quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
-      &quot;following_url&quot;: &quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
-      &quot;gists_url&quot;: &quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
-      &quot;starred_url&quot;: &quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
-      &quot;subscriptions_url&quot;: &quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
-      &quot;organizations_url&quot;: &quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
-      &quot;repos_url&quot;: &quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
-      &quot;events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
-      &quot;received_events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
-      &quot;type&quot;: &quot;User&quot;,&#xd;
-      &quot;site_admin&quot;: false&#xd;
-    },&#xd;
-    &quot;html_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
-    &quot;description&quot;: null,&#xd;
-    &quot;fork&quot;: false,&#xd;
-    &quot;url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
-    &quot;forks_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/forks&quot;,&#xd;
-    &quot;keys_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/keys{/key_id}&quot;,&#xd;
-    &quot;collaborators_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/collaborators{/collaborator}&quot;,&#xd;
-    &quot;teams_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/teams&quot;,&#xd;
-    &quot;hooks_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks&quot;,&#xd;
-    &quot;issue_events_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/events{/number}&quot;,&#xd;
-    &quot;events_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/events&quot;,&#xd;
-    &quot;assignees_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/assignees{/user}&quot;,&#xd;
-    &quot;branches_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/branches{/branch}&quot;,&#xd;
-    &quot;tags_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/tags&quot;,&#xd;
-    &quot;blobs_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/blobs{/sha}&quot;,&#xd;
-    &quot;git_tags_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/tags{/sha}&quot;,&#xd;
-    &quot;git_refs_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/refs{/sha}&quot;,&#xd;
-    &quot;trees_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/trees{/sha}&quot;,&#xd;
-    &quot;statuses_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/statuses/{sha}&quot;,&#xd;
-    &quot;languages_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/languages&quot;,&#xd;
-    &quot;stargazers_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/stargazers&quot;,&#xd;
-    &quot;contributors_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contributors&quot;,&#xd;
-    &quot;subscribers_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscribers&quot;,&#xd;
-    &quot;subscription_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscription&quot;,&#xd;
-    &quot;commits_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/commits{/sha}&quot;,&#xd;
-    &quot;git_commits_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/commits{/sha}&quot;,&#xd;
-    &quot;comments_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/comments{/number}&quot;,&#xd;
-    &quot;issue_comment_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/comments{/number}&quot;,&#xd;
-    &quot;contents_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contents/{+path}&quot;,&#xd;
-    &quot;compare_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/compare/{base}...{head}&quot;,&#xd;
-    &quot;merges_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/merges&quot;,&#xd;
-    &quot;archive_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/{archive_format}{/ref}&quot;,&#xd;
-    &quot;downloads_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/downloads&quot;,&#xd;
-    &quot;issues_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues{/number}&quot;,&#xd;
-    &quot;pulls_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/pulls{/number}&quot;,&#xd;
-    &quot;milestones_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/milestones{/number}&quot;,&#xd;
-    &quot;notifications_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/notifications{?since,all,participating}&quot;,&#xd;
-    &quot;labels_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/labels{/name}&quot;,&#xd;
-    &quot;releases_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/releases{/id}&quot;,&#xd;
-    &quot;deployments_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/deployments&quot;,&#xd;
-    &quot;created_at&quot;: &quot;2021-04-15T10:03:35Z&quot;,&#xd;
-    &quot;updated_at&quot;: &quot;2021-04-15T10:03:35Z&quot;,&#xd;
-    &quot;pushed_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
-    &quot;git_url&quot;: &quot;git://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
-    &quot;ssh_url&quot;: &quot;git@github.com:DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
-    &quot;clone_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
-    &quot;svn_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
-    &quot;homepage&quot;: null,&#xd;
-    &quot;size&quot;: 0,&#xd;
-    &quot;stargazers_count&quot;: 0,&#xd;
-    &quot;watchers_count&quot;: 0,&#xd;
-    &quot;language&quot;: null,&#xd;
-    &quot;has_issues&quot;: true,&#xd;
-    &quot;has_projects&quot;: true,&#xd;
-    &quot;has_downloads&quot;: true,&#xd;
-    &quot;has_wiki&quot;: true,&#xd;
-    &quot;has_pages&quot;: false,&#xd;
-    &quot;forks_count&quot;: 0,&#xd;
-    &quot;mirror_url&quot;: null,&#xd;
-    &quot;archived&quot;: false,&#xd;
-    &quot;disabled&quot;: false,&#xd;
-    &quot;open_issues_count&quot;: 0,&#xd;
-    &quot;license&quot;: null,&#xd;
-    &quot;forks&quot;: 0,&#xd;
-    &quot;open_issues&quot;: 0,&#xd;
-    &quot;watchers&quot;: 0,&#xd;
-    &quot;default_branch&quot;: &quot;main&quot;&#xd;
-  },&#xd;
-  &quot;sender&quot;: {&#xd;
-    &quot;login&quot;: &quot;DenisKirilov&quot;,&#xd;
-    &quot;id&quot;: 38264680,&#xd;
-    &quot;node_id&quot;: &quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
-    &quot;avatar_url&quot;: &quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
-    &quot;gravatar_id&quot;: &quot;&quot;,&#xd;
-    &quot;url&quot;: &quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
-    &quot;html_url&quot;: &quot;https://github.com/DenisKirilov&quot;,&#xd;
-    &quot;followers_url&quot;: &quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
-    &quot;following_url&quot;: &quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
-    &quot;gists_url&quot;: &quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
-    &quot;starred_url&quot;: &quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
-    &quot;subscriptions_url&quot;: &quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
-    &quot;organizations_url&quot;: &quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
-    &quot;repos_url&quot;: &quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
-    &quot;events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
-    &quot;received_events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
-    &quot;type&quot;: &quot;User&quot;,&#xd;
-    &quot;site_admin&quot;: false&#xd;
-  }&#xd;
+   &quot;zen&quot;:&quot;It&apos;s not fully shipped until it&apos;s fast.&quot;,&#xd;
+   &quot;hook_id&quot;:292189930,&#xd;
+   &quot;hook&quot;:{&#xd;
+      &quot;type&quot;:&quot;Repository&quot;,&#xd;
+      &quot;id&quot;:292189930,&#xd;
+      &quot;name&quot;:&quot;web&quot;,&#xd;
+      &quot;active&quot;:true,&#xd;
+      &quot;events&quot;:[&#xd;
+         &quot;push&quot;&#xd;
+      ],&#xd;
+      &quot;config&quot;:{&#xd;
+         &quot;content_type&quot;:&quot;json&quot;,&#xd;
+         &quot;insecure_ssl&quot;:&quot;0&quot;,&#xd;
+         &quot;url&quot;:&quot;http://212.75.31.225:8081/run&quot;&#xd;
+      },&#xd;
+      &quot;updated_at&quot;:&quot;2021-04-15T10:03:36Z&quot;,&#xd;
+      &quot;created_at&quot;:&quot;2021-04-15T10:03:36Z&quot;,&#xd;
+      &quot;url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930&quot;,&#xd;
+      &quot;test_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/test&quot;,&#xd;
+      &quot;ping_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/pings&quot;,&#xd;
+      &quot;last_response&quot;:{&#xd;
+         &quot;code&quot;:null,&#xd;
+         &quot;status&quot;:&quot;unused&quot;,&#xd;
+         &quot;message&quot;:null&#xd;
+      }&#xd;
+   },&#xd;
+   &quot;repository&quot;:{&#xd;
+      &quot;id&quot;:358211712,&#xd;
+      &quot;node_id&quot;:&quot;MDEwOlJlcG9zaXRvcnkzNTgyMTE3MTI=&quot;,&#xd;
+      &quot;name&quot;:&quot;parent-tag&quot;,&#xd;
+      &quot;full_name&quot;:&quot;nikolanguen/gamified-hiring-${USERNAME}&quot;,&#xd;
+      &quot;private&quot;:true,&#xd;
+      &quot;owner&quot;:{&#xd;
+         &quot;login&quot;:&quot;DenisKirilov&quot;,&#xd;
+         &quot;id&quot;:38264680,&#xd;
+         &quot;node_id&quot;:&quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
+         &quot;avatar_url&quot;:&quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
+         &quot;gravatar_id&quot;:&quot;&quot;,&#xd;
+         &quot;url&quot;:&quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
+         &quot;html_url&quot;:&quot;https://github.com/DenisKirilov&quot;,&#xd;
+         &quot;followers_url&quot;:&quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
+         &quot;following_url&quot;:&quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
+         &quot;gists_url&quot;:&quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
+         &quot;starred_url&quot;:&quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
+         &quot;subscriptions_url&quot;:&quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
+         &quot;organizations_url&quot;:&quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
+         &quot;repos_url&quot;:&quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
+         &quot;events_url&quot;:&quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
+         &quot;received_events_url&quot;:&quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
+         &quot;type&quot;:&quot;User&quot;,&#xd;
+         &quot;site_admin&quot;:false&#xd;
+      },&#xd;
+      &quot;html_url&quot;:&quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+      &quot;description&quot;:null,&#xd;
+      &quot;fork&quot;:false,&#xd;
+      &quot;url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+      &quot;forks_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/forks&quot;,&#xd;
+      &quot;keys_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/keys{/key_id}&quot;,&#xd;
+      &quot;collaborators_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/collaborators{/collaborator}&quot;,&#xd;
+      &quot;teams_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/teams&quot;,&#xd;
+      &quot;hooks_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks&quot;,&#xd;
+      &quot;issue_events_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/events{/number}&quot;,&#xd;
+      &quot;events_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/events&quot;,&#xd;
+      &quot;assignees_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/assignees{/user}&quot;,&#xd;
+      &quot;branches_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/branches{/branch}&quot;,&#xd;
+      &quot;tags_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/tags&quot;,&#xd;
+      &quot;blobs_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/blobs{/sha}&quot;,&#xd;
+      &quot;git_tags_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/tags{/sha}&quot;,&#xd;
+      &quot;git_refs_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/refs{/sha}&quot;,&#xd;
+      &quot;trees_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/trees{/sha}&quot;,&#xd;
+      &quot;statuses_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/statuses/{sha}&quot;,&#xd;
+      &quot;languages_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/languages&quot;,&#xd;
+      &quot;stargazers_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/stargazers&quot;,&#xd;
+      &quot;contributors_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contributors&quot;,&#xd;
+      &quot;subscribers_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscribers&quot;,&#xd;
+      &quot;subscription_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscription&quot;,&#xd;
+      &quot;commits_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/commits{/sha}&quot;,&#xd;
+      &quot;git_commits_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/commits{/sha}&quot;,&#xd;
+      &quot;comments_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/comments{/number}&quot;,&#xd;
+      &quot;issue_comment_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/comments{/number}&quot;,&#xd;
+      &quot;contents_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contents/{+path}&quot;,&#xd;
+      &quot;compare_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/compare/{base}...{head}&quot;,&#xd;
+      &quot;merges_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/merges&quot;,&#xd;
+      &quot;archive_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/{archive_format}{/ref}&quot;,&#xd;
+      &quot;downloads_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/downloads&quot;,&#xd;
+      &quot;issues_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues{/number}&quot;,&#xd;
+      &quot;pulls_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/pulls{/number}&quot;,&#xd;
+      &quot;milestones_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/milestones{/number}&quot;,&#xd;
+      &quot;notifications_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/notifications{?since,all,participating}&quot;,&#xd;
+      &quot;labels_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/labels{/name}&quot;,&#xd;
+      &quot;releases_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/releases{/id}&quot;,&#xd;
+      &quot;deployments_url&quot;:&quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/deployments&quot;,&#xd;
+      &quot;created_at&quot;:&quot;2021-04-15T10:03:35Z&quot;,&#xd;
+      &quot;updated_at&quot;:&quot;2021-04-15T10:03:35Z&quot;,&#xd;
+      &quot;pushed_at&quot;:&quot;2021-04-15T10:03:36Z&quot;,&#xd;
+      &quot;git_url&quot;:&quot;git://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+      &quot;ssh_url&quot;:&quot;git@github.com:DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+      &quot;clone_url&quot;:&quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+      &quot;svn_url&quot;:&quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+      &quot;homepage&quot;:null,&#xd;
+      &quot;size&quot;:0,&#xd;
+      &quot;stargazers_count&quot;:0,&#xd;
+      &quot;watchers_count&quot;:0,&#xd;
+      &quot;language&quot;:null,&#xd;
+      &quot;has_issues&quot;:true,&#xd;
+      &quot;has_projects&quot;:true,&#xd;
+      &quot;has_downloads&quot;:true,&#xd;
+      &quot;has_wiki&quot;:true,&#xd;
+      &quot;has_pages&quot;:false,&#xd;
+      &quot;forks_count&quot;:0,&#xd;
+      &quot;mirror_url&quot;:null,&#xd;
+      &quot;archived&quot;:false,&#xd;
+      &quot;disabled&quot;:false,&#xd;
+      &quot;open_issues_count&quot;:0,&#xd;
+      &quot;license&quot;:null,&#xd;
+      &quot;forks&quot;:0,&#xd;
+      &quot;open_issues&quot;:0,&#xd;
+      &quot;watchers&quot;:0,&#xd;
+      &quot;default_branch&quot;:&quot;main&quot;&#xd;
+   },&#xd;
+   &quot;sender&quot;:{&#xd;
+      &quot;login&quot;:&quot;DenisKirilov&quot;,&#xd;
+      &quot;id&quot;:38264680,&#xd;
+      &quot;node_id&quot;:&quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
+      &quot;avatar_url&quot;:&quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
+      &quot;gravatar_id&quot;:&quot;&quot;,&#xd;
+      &quot;url&quot;:&quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
+      &quot;html_url&quot;:&quot;https://github.com/DenisKirilov&quot;,&#xd;
+      &quot;followers_url&quot;:&quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
+      &quot;following_url&quot;:&quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
+      &quot;gists_url&quot;:&quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
+      &quot;starred_url&quot;:&quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
+      &quot;subscriptions_url&quot;:&quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
+      &quot;organizations_url&quot;:&quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
+      &quot;repos_url&quot;:&quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
+      &quot;events_url&quot;:&quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
+      &quot;received_events_url&quot;:&quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
+      &quot;type&quot;:&quot;User&quot;,&#xd;
+      &quot;site_admin&quot;:false&#xd;
+   }&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -441,6 +463,12 @@
             <stringProp name="HTTPSampler.connect_timeout"></stringProp>
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
+          <hashTree/>
+          <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 2000ms" enabled="false">
+            <intProp name="ActionProcessor.action">1</intProp>
+            <intProp name="ActionProcessor.target">0</intProp>
+            <stringProp name="ActionProcessor.duration">2000</stringProp>
+          </TestAction>
           <hashTree/>
           <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Points update in DB" enabled="true">
             <boolProp name="TransactionController.includeTimers">false</boolProp>
@@ -485,6 +513,53 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
             </hashTree>
           </hashTree>
         </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Mail messages recieved" enabled="false">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+          <boolProp name="TransactionController.parent">true</boolProp>
+        </TransactionController>
+        <hashTree>
+          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+            <stringProp name="WhileController.condition">${__javaScript(${mail_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
+          </WhileController>
+          <hashTree>
+            <MailReaderSampler guiclass="MailReaderSamplerGui" testclass="MailReaderSampler" testname="Get all mail messages" enabled="true">
+              <stringProp name="host_type">imaps</stringProp>
+              <stringProp name="folder">INBOX</stringProp>
+              <stringProp name="host">imap.googlemail.com</stringProp>
+              <stringProp name="port">993</stringProp>
+              <stringProp name="username">dojotest2021</stringProp>
+              <stringProp name="password">dojopass123</stringProp>
+              <intProp name="num_messages">-1</intProp>
+              <boolProp name="delete">false</boolProp>
+              <boolProp name="storeMimeMessage">true</boolProp>
+              <stringProp name="SMTPSampler.useSSL">true</stringProp>
+              <stringProp name="SMTPSampler.useStartTLS">false</stringProp>
+              <stringProp name="SMTPSampler.trustAllCerts">false</stringProp>
+              <stringProp name="SMTPSampler.enforceStartTLS">false</stringProp>
+              <stringProp name="SMTPSampler.useLocalTrustStore">false</stringProp>
+              <stringProp name="SMTPSampler.trustStoreToUse"></stringProp>
+              <stringProp name="SMTPSampler.tlsProtocols"></stringProp>
+            </MailReaderSampler>
+            <hashTree>
+              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
+                <stringProp name="RegexExtractor.useHeaders">unescaped</stringProp>
+                <stringProp name="RegexExtractor.refname">mail_message</stringProp>
+                <stringProp name="RegexExtractor.regex">(This is a test message for ${ID} ${NAME})</stringProp>
+                <stringProp name="RegexExtractor.template">&quot;$1$&quot;</stringProp>
+                <stringProp name="RegexExtractor.default">&quot;&quot;</stringProp>
+                <stringProp name="RegexExtractor.match_number">1</stringProp>
+                <stringProp name="Sample.scope">children</stringProp>
+              </RegexExtractor>
+              <hashTree/>
+            </hashTree>
+            <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 5000ms" enabled="true">
+              <intProp name="ActionProcessor.action">1</intProp>
+              <intProp name="ActionProcessor.target">0</intProp>
+              <stringProp name="ActionProcessor.duration">5000</stringProp>
+            </TestAction>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Slack messages recieved" enabled="false">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
           <boolProp name="TransactionController.parent">true</boolProp>
@@ -498,7 +573,7 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">Authorization</stringProp>
-                  <stringProp name="Header.value">Bearer SLACK TOKEN</stringProp>
+                  <stringProp name="Header.value">Bearer xoxb-1837278287027-1834138967157-u6D4WxcVXoNfEENhAoLeO3A9</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -540,8 +615,8 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
               <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
                 <stringProp name="RegexExtractor.useHeaders">false</stringProp>
                 <stringProp name="RegexExtractor.refname">slack_message</stringProp>
-                <stringProp name="RegexExtractor.regex">(&quot;This is a test message for ${ID} ${NAME}&quot;)</stringProp>
-                <stringProp name="RegexExtractor.template">$1$</stringProp>
+                <stringProp name="RegexExtractor.regex">(This is a test message for ${ID} ${NAME})</stringProp>
+                <stringProp name="RegexExtractor.template">&quot;$1$&quot;</stringProp>
                 <stringProp name="RegexExtractor.default">&quot;&quot;</stringProp>
                 <stringProp name="RegexExtractor.match_number">1</stringProp>
               </RegexExtractor>
@@ -555,52 +630,36 @@ on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&ap
             <hashTree/>
           </hashTree>
         </hashTree>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Mail messages recieved" enabled="false">
-          <boolProp name="TransactionController.includeTimers">false</boolProp>
-          <boolProp name="TransactionController.parent">true</boolProp>
-        </TransactionController>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
         <hashTree>
-          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
-            <stringProp name="WhileController.condition">${__javaScript(${mail_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
-          </WhileController>
-          <hashTree>
-            <MailReaderSampler guiclass="MailReaderSamplerGui" testclass="MailReaderSampler" testname="Get all mail messages" enabled="true">
-              <stringProp name="host_type">imaps</stringProp>
-              <stringProp name="folder">INBOX</stringProp>
-              <stringProp name="host">imap.googlemail.com</stringProp>
-              <stringProp name="port">993</stringProp>
-              <stringProp name="username">GMAIL ACCOUNT</stringProp>
-              <stringProp name="password">GMAIL PASSWORD</stringProp>
-              <intProp name="num_messages">-1</intProp>
-              <boolProp name="delete">false</boolProp>
-              <boolProp name="storeMimeMessage">true</boolProp>
-              <stringProp name="SMTPSampler.useSSL">true</stringProp>
-              <stringProp name="SMTPSampler.useStartTLS">false</stringProp>
-              <stringProp name="SMTPSampler.trustAllCerts">false</stringProp>
-              <stringProp name="SMTPSampler.enforceStartTLS">false</stringProp>
-              <stringProp name="SMTPSampler.useLocalTrustStore">false</stringProp>
-              <stringProp name="SMTPSampler.trustStoreToUse"></stringProp>
-              <stringProp name="SMTPSampler.tlsProtocols"></stringProp>
-            </MailReaderSampler>
-            <hashTree>
-              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
-                <stringProp name="RegexExtractor.useHeaders">unescaped</stringProp>
-                <stringProp name="RegexExtractor.refname">mail_message</stringProp>
-                <stringProp name="RegexExtractor.regex">(This is a test message for ${ID} ${NAME})</stringProp>
-                <stringProp name="RegexExtractor.template">&quot;$1$&quot;</stringProp>
-                <stringProp name="RegexExtractor.default">&quot;&quot;</stringProp>
-                <stringProp name="RegexExtractor.match_number">1</stringProp>
-                <stringProp name="Sample.scope">children</stringProp>
-              </RegexExtractor>
-              <hashTree/>
-            </hashTree>
-            <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 5000ms" enabled="true">
-              <intProp name="ActionProcessor.action">1</intProp>
-              <intProp name="ActionProcessor.target">0</intProp>
-              <stringProp name="ActionProcessor.duration">5000</stringProp>
-            </TestAction>
-            <hashTree/>
-          </hashTree>
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Delete record from users table" enabled="true">
+            <stringProp name="dataSource">codenjoy</stringProp>
+            <stringProp name="queryType">Callable Statement</stringProp>
+            <stringProp name="query">DELETE FROM public.users
+WHERE id =&apos;${ID}&apos;;</stringProp>
+            <stringProp name="queryArguments"></stringProp>
+            <stringProp name="queryArgumentsTypes"></stringProp>
+            <stringProp name="variableNames"></stringProp>
+            <stringProp name="resultVariable"></stringProp>
+            <stringProp name="queryTimeout"></stringProp>
+            <stringProp name="resultSetMaxRows"></stringProp>
+            <stringProp name="resultSetHandler">Store as String</stringProp>
+          </JDBCSampler>
+          <hashTree/>
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Delete record from saves table" enabled="true">
+            <stringProp name="dataSource">codenjoy</stringProp>
+            <stringProp name="queryType">Callable Statement</stringProp>
+            <stringProp name="query">DELETE FROM public.saves
+WHERE player_id =&apos;${ID}&apos;;</stringProp>
+            <stringProp name="queryArguments"></stringProp>
+            <stringProp name="queryArgumentsTypes"></stringProp>
+            <stringProp name="variableNames"></stringProp>
+            <stringProp name="resultVariable"></stringProp>
+            <stringProp name="queryTimeout"></stringProp>
+            <stringProp name="resultSetMaxRows"></stringProp>
+            <stringProp name="resultSetHandler">Store as String</stringProp>
+          </JDBCSampler>
+          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table - All" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
