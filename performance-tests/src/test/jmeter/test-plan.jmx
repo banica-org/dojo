@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="test-plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">4</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
+          <boolProp name="autocommit">true</boolProp>
+          <stringProp name="checkQuery"></stringProp>
+          <stringProp name="connectionAge">5000</stringProp>
+          <stringProp name="connectionProperties"></stringProp>
+          <stringProp name="dataSource">codenjoy</stringProp>
+          <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/codenjoy</stringProp>
+          <stringProp name="driver">org.postgresql.Driver</stringProp>
+          <stringProp name="initQuery"></stringProp>
+          <boolProp name="keepAlive">true</boolProp>
+          <stringProp name="password">1234</stringProp>
+          <stringProp name="poolMax">0</stringProp>
+          <boolProp name="preinit">false</boolProp>
+          <stringProp name="timeout">10000</stringProp>
+          <stringProp name="transactionIsolation">DEFAULT</stringProp>
+          <stringProp name="trimInterval">60000</stringProp>
+          <stringProp name="username">postgres</stringProp>
+        </JDBCDataSource>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="fileEncoding"></stringProp>
+          <stringProp name="filename">user-data.csv</stringProp>
+          <boolProp name="ignoreFirstLine">false</boolProp>
+          <boolProp name="quotedData">false</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+          <boolProp name="stopThread">false</boolProp>
+          <stringProp name="variableNames">ID,NAME,EMAIL,USERNAME</stringProp>
+        </CSVDataSet>
+        <hashTree/>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="score" elementType="Argument">
+              <stringProp name="Argument.name">score</stringProp>
+              <stringProp name="Argument.value">0</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="slack_message" elementType="Argument">
+              <stringProp name="Argument.name">slack_message</stringProp>
+              <stringProp name="Argument.value">&quot;&quot;</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="mail_message" elementType="Argument">
+              <stringProp name="Argument.name">mail_message</stringProp>
+              <stringProp name="Argument.value">&quot;&quot;</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Open notifications UI" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8090</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create player" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;id&quot;: &quot;${ID}&quot;,&#xd;
+    &quot;readableName&quot;: &quot;${NAME}&quot;,&#xd;
+    &quot;callbackUrl&quot;: &quot;127.0.0.1&quot;,&#xd;
+    &quot;game&quot;: &quot;kata&quot;,&#xd;
+    &quot;room&quot;: &quot;kata&quot;,&#xd;
+    &quot;score&quot;: &quot;0&quot;,&#xd;
+    &quot;save&quot;: &quot;{}&quot;,&#xd;
+    &quot;multiplayer&quot;: {&#xd;
+        &quot;type&quot;: &quot;kata&quot;,&#xd;
+        &quot;roomSize&quot;: &quot;10&quot;,&#xd;
+        &quot;levelsCount&quot;: &quot;10&quot;&#xd;
+    },&#xd;
+    &quot;hero&quot;: {&#xd;
+        &quot;additionalData&quot;: &quot;&quot;,&#xd;
+        &quot;coordinate&quot;: {&#xd;
+            &quot;x&quot;: &quot;1&quot;,&#xd;
+            &quot;y&quot;: &quot;1&quot;&#xd;
+        },&#xd;
+        &quot;multiplayer&quot;: &quot;true&quot;,&#xd;
+        &quot;level&quot;: &quot;0&quot;&#xd;
+    },&#xd;
+    &quot;progress&quot;: {&#xd;
+        &quot;total&quot;: &quot;0&quot;,&#xd;
+        &quot;current&quot;: &quot;0&quot;,&#xd;
+        &quot;passed&quot;: &quot;0&quot;&#xd;
+    },&#xd;
+    &quot;group&quot;: [&#xd;
+        &quot;group&quot;&#xd;
+    ],&#xd;
+    &quot;registration&quot;: {&#xd;
+        &quot;email&quot;: &quot;${EMAIL}&quot;,&#xd;
+        &quot;id&quot;: &quot;${ID}&quot;,&#xd;
+        &quot;readableName&quot;: &quot;${NAME}&quot;,&#xd;
+        &quot;approved&quot;: &quot;1&quot;,&#xd;
+        &quot;code&quot;: &quot;${ID}&quot;,&#xd;
+        &quot;data&quot;: &quot;{}&quot;,&#xd;
+        &quot;password&quot;: &quot;$2a$10$QO6K8KPKilTPQtea0ckMTeSuzoXopQP.41RuDztMNnotesj1k3Lz.&quot;,&#xd;
+        &quot;roles&quot;: [&#xd;
+            &quot;ROLE_USER&quot;&#xd;
+        ],&#xd;
+        &quot;gitHubUsername&quot;: &quot;${USERNAME}&quot;&#xd;
+    }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8080</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/codenjoy-contest/rest/player/create</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Check id in DB" enabled="true">
+            <stringProp name="dataSource">codenjoy</stringProp>
+            <stringProp name="query">select id from public.users;</stringProp>
+            <stringProp name="queryArguments"></stringProp>
+            <stringProp name="queryArgumentsTypes"></stringProp>
+            <stringProp name="queryTimeout"></stringProp>
+            <stringProp name="queryType">Select Statement</stringProp>
+            <stringProp name="resultSetHandler">Store as String</stringProp>
+            <stringProp name="resultSetMaxRows"></stringProp>
+            <stringProp name="resultVariable"></stringProp>
+            <stringProp name="variableNames"></stringProp>
+          </JDBCSampler>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="36983435">${ID}</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Join player in game" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+&#xd;
+        &quot;email&quot;:&quot;${EMAIL}&quot;,&#xd;
+&#xd;
+        &quot;id&quot;:&quot;${ID}&quot;,&#xd;
+&#xd;
+        &quot;readableName&quot;:&quot;${NAME}&quot;,&#xd;
+&#xd;
+        &quot;approved&quot;:&quot;1&quot;,&#xd;
+&#xd;
+        &quot;code&quot;:&quot;${ID}&quot;,&#xd;
+&#xd;
+        &quot;data&quot;:&quot;{}&quot;,&#xd;
+&#xd;
+        &quot;gitHubUsername&quot;:&quot;${USERNAME}&quot;&#xd;
+&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8080</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/codenjoy-contest/rest/room/kata/game/kata/join</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Check reponame in DB" enabled="true">
+            <stringProp name="dataSource">codenjoy</stringProp>
+            <stringProp name="queryType">Select Statement</stringProp>
+            <stringProp name="query">select repository_url from public.saves;</stringProp>
+            <stringProp name="queryArguments"></stringProp>
+            <stringProp name="queryArgumentsTypes"></stringProp>
+            <stringProp name="variableNames"></stringProp>
+            <stringProp name="resultVariable"></stringProp>
+            <stringProp name="queryTimeout"></stringProp>
+            <stringProp name="resultSetMaxRows"></stringProp>
+            <stringProp name="resultSetHandler">Store as String</stringProp>
+          </JDBCSampler>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1880047364">https://github.com/giivanov722/gamified-hiring-${USERNAME}</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="false"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Push solution to github" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;zen&quot;: &quot;It&apos;s not fully shipped until it&apos;s fast.&quot;,&#xd;
+  &quot;hook_id&quot;: 292189930,&#xd;
+  &quot;hook&quot;: {&#xd;
+    &quot;type&quot;: &quot;Repository&quot;,&#xd;
+    &quot;id&quot;: 292189930,&#xd;
+    &quot;name&quot;: &quot;web&quot;,&#xd;
+    &quot;active&quot;: true,&#xd;
+    &quot;events&quot;: [&#xd;
+      &quot;push&quot;&#xd;
+    ],&#xd;
+    &quot;config&quot;: {&#xd;
+      &quot;content_type&quot;: &quot;json&quot;,&#xd;
+      &quot;insecure_ssl&quot;: &quot;0&quot;,&#xd;
+      &quot;url&quot;: &quot;http://212.75.31.225:8081/run&quot;&#xd;
+    },&#xd;
+    &quot;updated_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
+    &quot;created_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
+    &quot;url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930&quot;,&#xd;
+    &quot;test_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/test&quot;,&#xd;
+    &quot;ping_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks/292189930/pings&quot;,&#xd;
+    &quot;last_response&quot;: {&#xd;
+      &quot;code&quot;: null,&#xd;
+      &quot;status&quot;: &quot;unused&quot;,&#xd;
+      &quot;message&quot;: null&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;repository&quot;: {&#xd;
+    &quot;id&quot;: 358211712,&#xd;
+    &quot;node_id&quot;: &quot;MDEwOlJlcG9zaXRvcnkzNTgyMTE3MTI=&quot;,&#xd;
+    &quot;name&quot;: &quot;parent-tag&quot;,&#xd;
+    &quot;full_name&quot;: &quot;DenisKirilov/gamified-hiring-${USERNAME}&quot;,&#xd;
+    &quot;private&quot;: true,&#xd;
+    &quot;owner&quot;: {&#xd;
+      &quot;login&quot;: &quot;DenisKirilov&quot;,&#xd;
+      &quot;id&quot;: 38264680,&#xd;
+      &quot;node_id&quot;: &quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
+      &quot;avatar_url&quot;: &quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
+      &quot;gravatar_id&quot;: &quot;&quot;,&#xd;
+      &quot;url&quot;: &quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
+      &quot;html_url&quot;: &quot;https://github.com/DenisKirilov&quot;,&#xd;
+      &quot;followers_url&quot;: &quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
+      &quot;following_url&quot;: &quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
+      &quot;gists_url&quot;: &quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
+      &quot;starred_url&quot;: &quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
+      &quot;subscriptions_url&quot;: &quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
+      &quot;organizations_url&quot;: &quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
+      &quot;repos_url&quot;: &quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
+      &quot;events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
+      &quot;received_events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
+      &quot;type&quot;: &quot;User&quot;,&#xd;
+      &quot;site_admin&quot;: false&#xd;
+    },&#xd;
+    &quot;html_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+    &quot;description&quot;: null,&#xd;
+    &quot;fork&quot;: false,&#xd;
+    &quot;url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+    &quot;forks_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/forks&quot;,&#xd;
+    &quot;keys_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/keys{/key_id}&quot;,&#xd;
+    &quot;collaborators_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/collaborators{/collaborator}&quot;,&#xd;
+    &quot;teams_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/teams&quot;,&#xd;
+    &quot;hooks_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/hooks&quot;,&#xd;
+    &quot;issue_events_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/events{/number}&quot;,&#xd;
+    &quot;events_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/events&quot;,&#xd;
+    &quot;assignees_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/assignees{/user}&quot;,&#xd;
+    &quot;branches_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/branches{/branch}&quot;,&#xd;
+    &quot;tags_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/tags&quot;,&#xd;
+    &quot;blobs_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/blobs{/sha}&quot;,&#xd;
+    &quot;git_tags_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/tags{/sha}&quot;,&#xd;
+    &quot;git_refs_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/refs{/sha}&quot;,&#xd;
+    &quot;trees_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/trees{/sha}&quot;,&#xd;
+    &quot;statuses_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/statuses/{sha}&quot;,&#xd;
+    &quot;languages_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/languages&quot;,&#xd;
+    &quot;stargazers_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/stargazers&quot;,&#xd;
+    &quot;contributors_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contributors&quot;,&#xd;
+    &quot;subscribers_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscribers&quot;,&#xd;
+    &quot;subscription_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/subscription&quot;,&#xd;
+    &quot;commits_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/commits{/sha}&quot;,&#xd;
+    &quot;git_commits_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/git/commits{/sha}&quot;,&#xd;
+    &quot;comments_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/comments{/number}&quot;,&#xd;
+    &quot;issue_comment_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues/comments{/number}&quot;,&#xd;
+    &quot;contents_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/contents/{+path}&quot;,&#xd;
+    &quot;compare_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/compare/{base}...{head}&quot;,&#xd;
+    &quot;merges_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/merges&quot;,&#xd;
+    &quot;archive_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/{archive_format}{/ref}&quot;,&#xd;
+    &quot;downloads_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/downloads&quot;,&#xd;
+    &quot;issues_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/issues{/number}&quot;,&#xd;
+    &quot;pulls_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/pulls{/number}&quot;,&#xd;
+    &quot;milestones_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/milestones{/number}&quot;,&#xd;
+    &quot;notifications_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/notifications{?since,all,participating}&quot;,&#xd;
+    &quot;labels_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/labels{/name}&quot;,&#xd;
+    &quot;releases_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/releases{/id}&quot;,&#xd;
+    &quot;deployments_url&quot;: &quot;https://api.github.com/repos/DenisKirilov/gamified-hiring-kaloyan-dutsolov6/deployments&quot;,&#xd;
+    &quot;created_at&quot;: &quot;2021-04-15T10:03:35Z&quot;,&#xd;
+    &quot;updated_at&quot;: &quot;2021-04-15T10:03:35Z&quot;,&#xd;
+    &quot;pushed_at&quot;: &quot;2021-04-15T10:03:36Z&quot;,&#xd;
+    &quot;git_url&quot;: &quot;git://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+    &quot;ssh_url&quot;: &quot;git@github.com:DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+    &quot;clone_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6.git&quot;,&#xd;
+    &quot;svn_url&quot;: &quot;https://github.com/DenisKirilov/gamified-hiring-kaloyan-dutsolov6&quot;,&#xd;
+    &quot;homepage&quot;: null,&#xd;
+    &quot;size&quot;: 0,&#xd;
+    &quot;stargazers_count&quot;: 0,&#xd;
+    &quot;watchers_count&quot;: 0,&#xd;
+    &quot;language&quot;: null,&#xd;
+    &quot;has_issues&quot;: true,&#xd;
+    &quot;has_projects&quot;: true,&#xd;
+    &quot;has_downloads&quot;: true,&#xd;
+    &quot;has_wiki&quot;: true,&#xd;
+    &quot;has_pages&quot;: false,&#xd;
+    &quot;forks_count&quot;: 0,&#xd;
+    &quot;mirror_url&quot;: null,&#xd;
+    &quot;archived&quot;: false,&#xd;
+    &quot;disabled&quot;: false,&#xd;
+    &quot;open_issues_count&quot;: 0,&#xd;
+    &quot;license&quot;: null,&#xd;
+    &quot;forks&quot;: 0,&#xd;
+    &quot;open_issues&quot;: 0,&#xd;
+    &quot;watchers&quot;: 0,&#xd;
+    &quot;default_branch&quot;: &quot;main&quot;&#xd;
+  },&#xd;
+  &quot;sender&quot;: {&#xd;
+    &quot;login&quot;: &quot;DenisKirilov&quot;,&#xd;
+    &quot;id&quot;: 38264680,&#xd;
+    &quot;node_id&quot;: &quot;MDQ6VXNlcjM4MjY0Njgw&quot;,&#xd;
+    &quot;avatar_url&quot;: &quot;https://avatars.githubusercontent.com/u/38264680?v=4&quot;,&#xd;
+    &quot;gravatar_id&quot;: &quot;&quot;,&#xd;
+    &quot;url&quot;: &quot;https://api.github.com/users/DenisKirilov&quot;,&#xd;
+    &quot;html_url&quot;: &quot;https://github.com/DenisKirilov&quot;,&#xd;
+    &quot;followers_url&quot;: &quot;https://api.github.com/users/DenisKirilov/followers&quot;,&#xd;
+    &quot;following_url&quot;: &quot;https://api.github.com/users/DenisKirilov/following{/other_user}&quot;,&#xd;
+    &quot;gists_url&quot;: &quot;https://api.github.com/users/DenisKirilov/gists{/gist_id}&quot;,&#xd;
+    &quot;starred_url&quot;: &quot;https://api.github.com/users/DenisKirilov/starred{/owner}{/repo}&quot;,&#xd;
+    &quot;subscriptions_url&quot;: &quot;https://api.github.com/users/DenisKirilov/subscriptions&quot;,&#xd;
+    &quot;organizations_url&quot;: &quot;https://api.github.com/users/DenisKirilov/orgs&quot;,&#xd;
+    &quot;repos_url&quot;: &quot;https://api.github.com/users/DenisKirilov/repos&quot;,&#xd;
+    &quot;events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/events{/privacy}&quot;,&#xd;
+    &quot;received_events_url&quot;: &quot;https://api.github.com/users/DenisKirilov/received_events&quot;,&#xd;
+    &quot;type&quot;: &quot;User&quot;,&#xd;
+    &quot;site_admin&quot;: false&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/run</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Points update in DB" enabled="true">
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+            <boolProp name="TransactionController.parent">true</boolProp>
+          </TransactionController>
+          <hashTree>
+            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+              <stringProp name="TestPlan.comments">while score is updated in db</stringProp>
+              <stringProp name="WhileController.condition">${__javaScript(${score} == &quot;0&quot;)}</stringProp>
+            </WhileController>
+            <hashTree>
+              <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Get points from DB" enabled="true">
+                <stringProp name="dataSource">codenjoy</stringProp>
+                <stringProp name="queryType">Select Statement</stringProp>
+                <stringProp name="query">select saves.score from public.users join public.saves 
+on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&apos;;</stringProp>
+                <stringProp name="queryArguments"></stringProp>
+                <stringProp name="queryArgumentsTypes"></stringProp>
+                <stringProp name="variableNames"></stringProp>
+                <stringProp name="resultVariable"></stringProp>
+                <stringProp name="queryTimeout"></stringProp>
+                <stringProp name="resultSetMaxRows"></stringProp>
+                <stringProp name="resultSetHandler">Store as String</stringProp>
+              </JDBCSampler>
+              <hashTree>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">score</stringProp>
+                  <stringProp name="RegexExtractor.regex">([0-9]+)</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">0</stringProp>
+                  <stringProp name="RegexExtractor.match_number">1</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+              </hashTree>
+              <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 5000ms" enabled="true">
+                <intProp name="ActionProcessor.action">1</intProp>
+                <intProp name="ActionProcessor.target">0</intProp>
+                <stringProp name="ActionProcessor.duration">5000</stringProp>
+              </TestAction>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Slack messages recieved" enabled="false">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+          <boolProp name="TransactionController.parent">true</boolProp>
+        </TransactionController>
+        <hashTree>
+          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+            <stringProp name="WhileController.condition">${__javaScript(${slack_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
+          </WhileController>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer SLACK TOKEN</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get last slack messages" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="channel" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">C01QJ0JEE05</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                    <stringProp name="Argument.name">channel</stringProp>
+                  </elementProp>
+                  <elementProp name="limit" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">10</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                    <stringProp name="Argument.name">limit</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">slack.com</stringProp>
+              <stringProp name="HTTPSampler.port"></stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">/api/conversations.history</stringProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            </HTTPSamplerProxy>
+            <hashTree>
+              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
+                <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                <stringProp name="RegexExtractor.refname">slack_message</stringProp>
+                <stringProp name="RegexExtractor.regex">(&quot;This is a test message for ${ID} ${NAME}&quot;)</stringProp>
+                <stringProp name="RegexExtractor.template">$1$</stringProp>
+                <stringProp name="RegexExtractor.default">&quot;&quot;</stringProp>
+                <stringProp name="RegexExtractor.match_number">1</stringProp>
+              </RegexExtractor>
+              <hashTree/>
+            </hashTree>
+            <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 5000ms" enabled="true">
+              <intProp name="ActionProcessor.action">1</intProp>
+              <intProp name="ActionProcessor.target">0</intProp>
+              <stringProp name="ActionProcessor.duration">5000</stringProp>
+            </TestAction>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Mail messages recieved" enabled="false">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+          <boolProp name="TransactionController.parent">true</boolProp>
+        </TransactionController>
+        <hashTree>
+          <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+            <stringProp name="WhileController.condition">${__javaScript(${mail_message} != &quot;This is a test message for ${ID} ${NAME}&quot;)}</stringProp>
+          </WhileController>
+          <hashTree>
+            <MailReaderSampler guiclass="MailReaderSamplerGui" testclass="MailReaderSampler" testname="Get all mail messages" enabled="true">
+              <stringProp name="host_type">imaps</stringProp>
+              <stringProp name="folder">INBOX</stringProp>
+              <stringProp name="host">imap.googlemail.com</stringProp>
+              <stringProp name="port">993</stringProp>
+              <stringProp name="username">GMAIL ACCOUNT</stringProp>
+              <stringProp name="password">GMAIL PASSWORD</stringProp>
+              <intProp name="num_messages">-1</intProp>
+              <boolProp name="delete">false</boolProp>
+              <boolProp name="storeMimeMessage">true</boolProp>
+              <stringProp name="SMTPSampler.useSSL">true</stringProp>
+              <stringProp name="SMTPSampler.useStartTLS">false</stringProp>
+              <stringProp name="SMTPSampler.trustAllCerts">false</stringProp>
+              <stringProp name="SMTPSampler.enforceStartTLS">false</stringProp>
+              <stringProp name="SMTPSampler.useLocalTrustStore">false</stringProp>
+              <stringProp name="SMTPSampler.trustStoreToUse"></stringProp>
+              <stringProp name="SMTPSampler.tlsProtocols"></stringProp>
+            </MailReaderSampler>
+            <hashTree>
+              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="true">
+                <stringProp name="RegexExtractor.useHeaders">unescaped</stringProp>
+                <stringProp name="RegexExtractor.refname">mail_message</stringProp>
+                <stringProp name="RegexExtractor.regex">(This is a test message for ${ID} ${NAME})</stringProp>
+                <stringProp name="RegexExtractor.template">&quot;$1$&quot;</stringProp>
+                <stringProp name="RegexExtractor.default">&quot;&quot;</stringProp>
+                <stringProp name="RegexExtractor.match_number">1</stringProp>
+                <stringProp name="Sample.scope">children</stringProp>
+              </RegexExtractor>
+              <hashTree/>
+            </hashTree>
+            <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 5000ms" enabled="true">
+              <intProp name="ActionProcessor.action">1</intProp>
+              <intProp name="ActionProcessor.target">0</intProp>
+              <stringProp name="ActionProcessor.duration">5000</stringProp>
+            </TestAction>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table - All" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree - All" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report - All" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
