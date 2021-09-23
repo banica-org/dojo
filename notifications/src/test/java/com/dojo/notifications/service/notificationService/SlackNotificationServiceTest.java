@@ -65,13 +65,14 @@ public class SlackNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         when(userDetails.getEmail()).thenReturn(EMAIL);
+        when(userDetails.getSlackEmail()).thenReturn(EMAIL);
         when(slackClient.getConversationId(EMAIL)).thenReturn(CHANNEL);
         when(notification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
 
         slackNotificationService.notify(userDetails, notification, contest);
 
         verify(slackClientManager, times(1)).getSlackClient(TOKEN);
-        verify(slackClient, times(1)).getConversationId(EMAIL);
+        verify(slackClient, times(2)).getConversationId(EMAIL);
         verify(notification, times(1)).getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL);
         verify(slackClient, times(1)).postMessage(chatPostMessageParams);
     }
