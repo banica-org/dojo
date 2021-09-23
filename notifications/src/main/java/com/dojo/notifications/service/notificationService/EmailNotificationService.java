@@ -54,6 +54,10 @@ public class EmailNotificationService implements NotificationService {
         contest.getSenseiEmails().forEach(email -> sendEmail(email, data, contest, notification.getType()));
     }
 
+    public void notifyForSlackInvitation(String to, String message, Contest contest){
+        sendEmail(to,message,contest, NotificationType.INVITATION);
+    }
+
     private void sendEmail(String to, String data, Contest contest, NotificationType type) {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper;

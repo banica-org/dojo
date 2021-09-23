@@ -19,16 +19,21 @@ import java.util.stream.Collectors;
 @Service
 public class SlackNotificationService implements NotificationService {
 
+    //Expires 29 days after 17/9/2021
+    private static final String INVITATION_URL = "https://join.slack.com/t/dojo-dpa3499/shared_invite/zt-w6owx7j4-JLbpsCRUWQtVp30FIiunwQ";
+
     private final SlackClientManager slackClientManager;
     private final Map<NotificationType, SlackMessageGenerator> slackMessageGenerators;
+    private final EmailNotificationService emailNotificationService;
 
 
     @Autowired
-    public SlackNotificationService(SlackClientManager slackClientManager, Collection<SlackMessageGenerator> slackMessageGenerators) {
+    public SlackNotificationService(SlackClientManager slackClientManager, Collection<SlackMessageGenerator> slackMessageGenerators, EmailNotificationService emailNotificationService) {
         this.slackClientManager = slackClientManager;
         this.slackMessageGenerators = slackMessageGenerators.stream()
                 .collect(Collectors.toMap(SlackMessageGenerator::getMessageGeneratorTypeMapping, Function.identity()));
 
+        this.emailNotificationService = emailNotificationService;
     }
 
     @Override
@@ -39,9 +44,15 @@ public class SlackNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        CustomSlackClient slackClient = getSlackClient(contest);
-        String slackChannel = slackClient.getConversationId(userDetails.getEmail());
-        slackClient.postMessage(notification.getAsSlackNotification(slackMessageGenerators.get(notification.getType()), slackClient, slackChannel));
+        if(!userDetails.getSlackEmail().equals("")) {
+            CustomSlackClient slackClient = getSlackClient(contest);
+            if (slackClient.getConversationId(userDetails.getSlackEmail()).equals("")) {
+                emailNotificationService.notifyForSlackInvitation(userDetails.getEmail(), INVITATION_URL, contest);
+            } else {
+                String slackChannel = slackClient.getConversationId(userDetails.getSlackEmail());
+                slackClient.postMessage(notification.getAsSlackNotification(slackMessageGenerators.get(notification.getType()), slackClient, slackChannel));
+            }
+        }
     }
 
     // Notify channel

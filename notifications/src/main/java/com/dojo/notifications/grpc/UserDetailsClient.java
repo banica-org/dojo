@@ -57,6 +57,7 @@ public class UserDetailsClient {
         UserDetails userDetails = new UserDetails();
         userDetails.setId(response.getId());
         userDetails.setEmail(response.getEmail());
+        userDetails.setSlackEmail(response.getSlackEmail());
 
         return userDetails;
     }

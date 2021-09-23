@@ -5,7 +5,8 @@ public enum NotificationType {
     IMAGE("Image build for "),
     CONTAINER("Container run for "),
     TEST_RESULTS("Test results for "),
-    QUERY_RESULT("Query result for ");
+    QUERY_RESULT("Query result for "),
+    INVITATION("Slack channel invitation for ");
 
     private String message;
 

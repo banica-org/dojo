@@ -44,11 +44,14 @@ public class SlackNotificationServiceTest {
     @Mock
     private SlackMessageGenerator slackMessageGenerator;
 
+    @Mock
+    private EmailNotificationService emailNotificationService;
+
     private SlackNotificationService slackNotificationService;
 
     @Before
     public void setUp() {
-        slackNotificationService = new SlackNotificationService(slackClientManager, Collections.singletonList(slackMessageGenerator));
+        slackNotificationService = new SlackNotificationService(slackClientManager, Collections.singletonList(slackMessageGenerator), emailNotificationService);
         when(contest.getSlackToken()).thenReturn(TOKEN);
         when(slackClientManager.getSlackClient(TOKEN)).thenReturn(slackClient);
         chatPostMessageParams = ChatPostMessageParams.builder().addBlocks(Divider.builder().build()).setChannelId(CHANNEL).build();
