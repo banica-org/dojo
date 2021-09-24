@@ -14,7 +14,8 @@
     <div class="container">
         <h2 style="text-align:center">Notification for event</h2>
         <br>
-        <form action="#" th:action="@{/event}" th:object="${newContest}" method="post">            <div class="form-group">
+        <form action="#" th:action="@{/event}" th:object="${newContest}" method="post">
+            <div class="form-group">
                 <label for="contestId">Game:</label>
                 <th:block th:if="*{contestId}">
                     <select class="form-control" id="contestId" th:field="*{contestId}" disabled>
@@ -40,7 +41,6 @@
 
             <table style="width:100%">
             <h4 style="text-align:center">Notifications</h4>
-
                 <tr>
                     <td>
                         <div id="slack" class="container">
@@ -69,10 +69,8 @@
                         </div>
                     </td>
                 </tr>
-
                 <hr>
                 <br>
-
                 <tr>
                     <td>
                         <div class="form-group">
