@@ -4,8 +4,8 @@ ARG user_name
 ARG repo_name
 WORKDIR /app
 #RUN git clone --depth 1 --no-tags https://github.com/$user_name/$repo_name
-RUN git clone --depth 1 --no-tags https://GITHUB_USERNAME:GITHUB_TOKEN@github.com/banica-org/dojo-docker-parent
-RUN git clone --depth 1 --no-tags https://GITHUB_USERNAME:GITHUB_TOKEN@github.com/banica-org/dojo-container-event-executor
+RUN git clone --depth 1 --no-tags https://Dzhemile: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 @github.com/Dzhemile/dojo-docker-parent
+RUN git clone --depth 1 --no-tags https://Dzhemile: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 @github.com/Dzhemile/dojo-container-event-executor
 
 #FROM openjdk:11 AS bazel-build
 FROM maven:3.6.3-openjdk-11 AS bazel-build
