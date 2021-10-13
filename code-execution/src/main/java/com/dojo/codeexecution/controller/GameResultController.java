@@ -30,8 +30,10 @@ public class GameResultController {
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
         String username = testResult.getUsername();
+        String game = testResult.getGame();
         int points = testResult.getPoints();
-        final String url = codenjoyConfigProperties.getPointsUpdateUrlStart() + username
+        final String url = codenjoyConfigProperties.getPointsUpdateUrlStart()
+                + username + "/" + game
                 + codenjoyConfigProperties.getPointsUpdateUrlTail();
         HttpHeaders headers = new HttpHeaders();
 
@@ -39,6 +41,6 @@ public class GameResultController {
         HttpEntity<Double> entity = new HttpEntity(points, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases());
+        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases(), game);
     }
 }
