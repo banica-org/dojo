@@ -17,7 +17,7 @@ public class GitEventReceiver {
     private static final String REPO_PREFIX = "gamified-hiring-";
 
     @Autowired
-    DockerService dockerService;
+    private DockerService dockerService;
 
     @GetMapping(path = "/build")
     public String buildParent() {
