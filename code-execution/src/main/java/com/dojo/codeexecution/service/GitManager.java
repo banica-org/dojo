@@ -1,5 +1,6 @@
 package com.dojo.codeexecution.service;
 
+import com.codenjoy.dojo.User;
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
@@ -59,8 +60,9 @@ public class GitManager {
 
     @Retryable
     public URL createGitHubRepository(String username) throws IOException {
+        System.out.println(username);
         GHUser user = getGitHubUser(username);
-        String repoName = REPO_PREFIX + "/" + user.getLogin();
+        String repoName = REPO_PREFIX + "/" + user.getLogin() + "-" + getGame(username);
 
         GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
 
@@ -81,15 +83,24 @@ public class GitManager {
     }
 
     private String getRepositoryNameByOwner(String username) throws IOException {
-        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-" + getGitHubUser(username).getLogin();
+        return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-"
+                + getGitHubUser(getUsername(username)).getLogin()  + "-" +  getGame(username);
     }
 
     private GHUser getGitHubUser(String username) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
+        List<GHUser> users = gitHub.searchUsers().q(getUsername(username)).list().toList();
         if (users.size() == 1) {
             return users.get(0);
         }
         throw new IllegalArgumentException("User not found!");
+    }
+
+    private String getGame(String username){
+        return username.split("-")[1];
+    }
+
+    private String getUsername(String username){
+        return username.split("-")[0];
     }
 
 }
