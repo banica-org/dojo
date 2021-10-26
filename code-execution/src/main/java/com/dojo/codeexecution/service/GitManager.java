@@ -54,15 +54,14 @@ public class GitManager {
     }
 
     @Retryable
-    public URL getExistingGitHubRepository(String username) throws IOException {
-        return gitHub.getRepository(getRepositoryNameByOwner(username)).getHtmlUrl();
+    public URL getExistingGitHubRepository(String username, String game) throws IOException {
+        return gitHub.getRepository(getRepositoryNameByOwner(username, game)).getHtmlUrl();
     }
 
     @Retryable
-    public URL createGitHubRepository(String username) throws IOException {
-        System.out.println(username);
+    public URL createGitHubRepository(String username, String game) throws IOException {
         GHUser user = getGitHubUser(username);
-        String repoName = REPO_PREFIX + "/" + user.getLogin() + "-" + getGame(username);
+        String repoName = REPO_PREFIX + "/" + user.getLogin() + "-" + game;
 
         GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
 
@@ -73,34 +72,25 @@ public class GitManager {
         return repo.getHtmlUrl();
     }
 
-    public boolean hasUserExistingRepository(String username) {
+    public boolean hasUserExistingRepository(String username, String game) {
         try {
-            gitHub.getRepository(getRepositoryNameByOwner(username));
+            gitHub.getRepository(getRepositoryNameByOwner(username, game));
         } catch (IOException e) {
             return false;
         }
         return true;
     }
 
-    private String getRepositoryNameByOwner(String username) throws IOException {
+    private String getRepositoryNameByOwner(String username, String game) throws IOException {
         return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-"
-                + getGitHubUser(getUsername(username)).getLogin()  + "-" +  getGame(username);
+                + getGitHubUser(username).getLogin() + "-" + game;
     }
 
     private GHUser getGitHubUser(String username) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(getUsername(username)).list().toList();
+        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
         if (users.size() == 1) {
             return users.get(0);
         }
         throw new IllegalArgumentException("User not found!");
     }
-
-    private String getGame(String username){
-        return username.split("-")[1];
-    }
-
-    private String getUsername(String username){
-        return username.split("-")[0];
-    }
-
 }

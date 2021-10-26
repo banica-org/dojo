@@ -32,14 +32,14 @@ public class RequestReceiverTest {
         String expected = expectedURL.toString();
 
         //Act
-        when(gitManager.hasUserExistingRepository(username)).thenReturn(true);
-        when(gitManager.getExistingGitHubRepository(username)).thenReturn(expectedURL);
+        when(gitManager.hasUserExistingRepository(username,"kata")).thenReturn(true);
+        when(gitManager.getExistingGitHubRepository(username, "kata")).thenReturn(expectedURL);
         String actual = requestReceiver.getRepository(username);
 
         //Assert
         assertEquals(expected, actual);
-        verify(gitManager, times(1)).getExistingGitHubRepository(username);
-        verify(gitManager, times(1)).hasUserExistingRepository(username);
+        verify(gitManager, times(1)).getExistingGitHubRepository(username, "kata");
+        verify(gitManager, times(1)).hasUserExistingRepository(username, "kata");
     }
 
     @Test
@@ -50,13 +50,13 @@ public class RequestReceiverTest {
         String expected = expectedURL.toString();
 
         //Act
-        when(gitManager.hasUserExistingRepository(username)).thenReturn(false);
-        when(gitManager.createGitHubRepository(username)).thenReturn(expectedURL);
+        when(gitManager.hasUserExistingRepository(username, "kata")).thenReturn(false);
+        when(gitManager.createGitHubRepository(username, "kata")).thenReturn(expectedURL);
         String actual = requestReceiver.getRepository(username);
 
         //Assert
         assertEquals(expected, actual);
-        verify(gitManager, times(1)).hasUserExistingRepository(username);
-        verify(gitManager, times(1)).createGitHubRepository(username);
+        verify(gitManager, times(1)).hasUserExistingRepository(username, "kata");
+        verify(gitManager, times(1)).createGitHubRepository(username, "kata");
     }
 }

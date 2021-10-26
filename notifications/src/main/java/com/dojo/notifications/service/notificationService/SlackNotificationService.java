@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class SlackNotificationService implements NotificationService {
 
-    //Expires 29 days after 17/9/2021
-    private static final String INVITATION_URL = "https://join.slack.com/t/dojo-dpa3499/shared_invite/zt-w6owx7j4-JLbpsCRUWQtVp30FIiunwQ";
+    //Expires 24 days after 26/10/2021
+    private static final String INVITATION_URL = "https://join.slack.com/t/dojo-dpa3499/shared_invite/zt-xbluulpj-bBihigTmj6x3WlSkuiCeUA";
 
     private final SlackClientManager slackClientManager;
     private final Map<NotificationType, SlackMessageGenerator> slackMessageGenerators;

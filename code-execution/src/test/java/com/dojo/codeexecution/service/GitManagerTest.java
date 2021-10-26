@@ -58,7 +58,7 @@ public class GitManagerTest {
         when(gitHub.getMyself().getLogin()).thenReturn("https://github.com/dummy-user");
         when(gitHub.getRepository(expected).getHtmlUrl()).thenReturn(repository);
 
-        String actual = gitManager.getExistingGitHubRepository(username).toString();
+        String actual = gitManager.getExistingGitHubRepository(username, "kata").toString();
 
         //Assert
         assertEquals(expected, actual);
@@ -67,7 +67,7 @@ public class GitManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void getExistingRepositoryReturnsNotFound() throws IOException {
-        gitManager.getExistingGitHubRepository(username);
+        gitManager.getExistingGitHubRepository(username, "kata");
     }
 
 
@@ -82,13 +82,13 @@ public class GitManagerTest {
         when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
 
         //Assert
-        gitManager.createGitHubRepository(username);
+        gitManager.createGitHubRepository(username, "kata");
         verify(gitHub, times(1)).createRepository(repositoryName);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createGitHubRepositoryReturnsNotFound() throws IOException {
-        gitManager.createGitHubRepository(username);
+        gitManager.createGitHubRepository(username, "kata");
     }
 
     @Test
@@ -96,7 +96,7 @@ public class GitManagerTest {
         //Act
         List<GHUser> users = Collections.singletonList(dummyUser);
         when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
-        Boolean actual = gitManager.hasUserExistingRepository(username);
+        Boolean actual = gitManager.hasUserExistingRepository(username, "kata");
 
         //Assert
         assertEquals(true, actual);
@@ -107,7 +107,7 @@ public class GitManagerTest {
         //Act
         when(gitHub.searchUsers().q(username).list().toList()).thenThrow(IOException.class);
 
-        Boolean actual = gitManager.hasUserExistingRepository(username);
+        Boolean actual = gitManager.hasUserExistingRepository(username, "kata");
         //Assert
         assertEquals(false, actual);
     }

@@ -30,7 +30,7 @@ public class GameResultController {
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
         String username = testResult.getUsername();
-        String game = testResult.getGame();
+        String game = getGame(username);
         int points = testResult.getPoints();
         final String url = codenjoyConfigProperties.getPointsUpdateUrlStart()
                 + username + "/" + game
@@ -42,5 +42,10 @@ public class GameResultController {
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases(), game);
+    }
+
+    private String getGame(String username){
+        String[] splitUsername = username.split("-");
+        return splitUsername[splitUsername.length-1];
     }
 }
