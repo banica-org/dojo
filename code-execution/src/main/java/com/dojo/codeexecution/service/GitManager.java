@@ -88,7 +88,7 @@ public class GitManager {
 
     private GHUser getGitHubUser(String username) throws IOException {
         List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
-        if (users.size() == 1) {
+        if (users.size() >= 1) {
             return users.get(0);
         }
         throw new IllegalArgumentException("User not found!");
