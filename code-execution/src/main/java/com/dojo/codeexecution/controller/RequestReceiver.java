@@ -20,18 +20,12 @@ public class RequestReceiver {
     private GitManager gitManager;
 
     @GetMapping(value = "/repository")
-    public String getRepository(@RequestParam(value = "username") String username) throws IOException {
-        String game = getGame(username);
-        String githubUsername = username.replace("-" + game, "");
-        if (gitManager.hasUserExistingRepository(githubUsername, game)) {
-            return gitManager.getExistingGitHubRepository(githubUsername, game).toString();
+    public String getRepository(@RequestParam(value = "username") String username,
+                                @RequestParam(value = "game") String game) throws IOException {
+        if (gitManager.hasUserExistingRepository(username, game)) {
+            return gitManager.getExistingGitHubRepository(username, game).toString();
         } else {
-            return gitManager.createGitHubRepository(githubUsername, game).toString();
+            return gitManager.createGitHubRepository(username, game).toString();
         }
-    }
-
-    private String getGame(String username) {
-        String[] splitUsername = username.split("-");
-        return splitUsername[splitUsername.length - 1];
     }
 }
