@@ -33,8 +33,7 @@ message ContainerResponse{
 
 message TestResultResponse{
   string username = 1;
-  string game = 2;
-  repeated FailedTestCase failedTestCase = 3;
+  repeated FailedTestCase failedTestCase = 2;
 }
 
 message FailedTestCase{
