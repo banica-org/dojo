@@ -44,7 +44,10 @@ public class EmailNotificationService implements NotificationService {
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
         String data = notification.getAsEmailNotification(mailMessageGenerators.get(notification.getType()));
-        sendEmail(userDetails.getEmail(), data, contest, notification.getType());
+        System.out.println("HERE -------------" + userDetails.getId() + userDetails.isSubscribed());
+        if(userDetails.isSubscribed()) {
+            sendEmail(userDetails.getEmail(), data, contest, notification.getType());
+        }
     }
 
     // Notify channel

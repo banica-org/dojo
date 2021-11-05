@@ -22,6 +22,7 @@ public class RequestReceiver {
     @GetMapping(value = "/repository")
     public String getRepository(@RequestParam(value = "username") String username,
                                 @RequestParam(value = "game") String game) throws IOException {
+        System.out.println(username + " " + game);
         if (gitManager.hasUserExistingRepository(username, game)) {
             return gitManager.getExistingGitHubRepository(username, game).toString();
         } else {

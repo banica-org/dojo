@@ -26,6 +26,7 @@ public class UserDetailsService extends UserDetailsServiceGrpc.UserDetailsServic
         UserDetailsResponse response = UserDetailsResponse.newBuilder()
                 .setId(userDetails.get("id"))
                 .setEmail(userDetails.get("email"))
+                .setSubscribed(request.getSubscribed())
                 .build();
 
         responseObserver.onNext(response);
