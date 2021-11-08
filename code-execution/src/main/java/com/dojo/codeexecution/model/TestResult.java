@@ -4,7 +4,6 @@ import java.util.List;
 
 public class TestResult {
     private String username;
-    private String game;
     private int points;
     private List<FailedTestCase> failedTestCases;
 
@@ -14,14 +13,6 @@ public class TestResult {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getGame() {
-        return game;
-    }
-
-    public void setGame(String game) {
-        this.game = game;
     }
 
     public int getPoints() {

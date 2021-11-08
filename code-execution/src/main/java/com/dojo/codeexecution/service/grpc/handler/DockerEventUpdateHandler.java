@@ -46,8 +46,7 @@ public class DockerEventUpdateHandler {
 
     private DockerEventResponse generateTestResultsResponse(String username, String game, List<FailedTestCase> failedTestCases) {
         TestResultResponse.Builder responseBuilder = TestResultResponse.newBuilder()
-                .setUsername(username)
-                .setGame(game);
+                .setUsername(username);
 
         failedTestCases.forEach(failedTestCase -> responseBuilder.addFailedTestCase(convertToFailedTestCase(failedTestCase)));
         return DockerEventResponse.newBuilder().setTestResults(responseBuilder.build()).build();
