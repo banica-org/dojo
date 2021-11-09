@@ -13,6 +13,9 @@
         },
         {
           "service": "codenjoy.UserDetailsService"
+        },
+        {
+          "service": "notifications.QueryService"
         }
       ],
       "retryPolicy": {

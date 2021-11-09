@@ -4,7 +4,9 @@ import com.codenjoy.dojo.EventServiceGrpc;
 import com.codenjoy.dojo.LeaderboardServiceGrpc;
 import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.dojo.codeexecution.DockerServiceGrpc;
+import com.dojo.common.GrpcServer;
 import com.dojo.common.channel.GrpcChannel;
+import com.dojo.notifications.service.grpc.QueryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +19,24 @@ import java.util.Map;
 @Component
 public class GrpcConfig {
 
+    private final GrpcServer grpcServer;
     private final GrpcChannel codenjoyChannel;
     private final Map<String, GrpcChannel> gameServerChannels;
 
-    public GrpcConfig(@Value("${grpc.codenjoy.host}") String host, @Value("${grpc.codenjoy.port}") int port) {
-        this.codenjoyChannel = new GrpcChannel(host, port);
+    public GrpcConfig(@Value("${executor.pool.size}") final int applicationExecutorPoolSize,
+                      @Value("${grpc.server.port}") final int port,
+                      @Value("${grpc.codenjoy.host}") String host,
+                      @Value("${grpc.codenjoy.port}") int codenjoyPort,
+                      final QueryService queryService) {
+        this.grpcServer = new GrpcServer(applicationExecutorPoolSize, port, queryService);
+        this.codenjoyChannel = new GrpcChannel(host, codenjoyPort);
         this.gameServerChannels = new HashMap<>();
+
+    }
+
+    @Bean
+    public GrpcServer getGrpcServer () {
+        return grpcServer;
     }
 
     @Bean
