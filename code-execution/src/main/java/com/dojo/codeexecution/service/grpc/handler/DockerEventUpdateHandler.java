@@ -27,12 +27,12 @@ public class DockerEventUpdateHandler {
         return this.streamObservers.remove(id);
     }
 
-    public void sendUpdate(String status, String username, List<String> logs) {
-        this.streamObservers.forEach((id, observer) -> observer.onNext(generateContainerResponse(status, username, logs)));
+    public void sendUpdate(String status, String usernameAndGame, List<String> logs) {
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateContainerResponse(status, usernameAndGame, logs)));
     }
 
-    public void sendUpdate(String username,  List<FailedTestCase> failedTestCases, String game) {
-        this.streamObservers.forEach((id, observer) -> observer.onNext(generateTestResultsResponse(username, game, failedTestCases)));
+    public void sendUpdate(String username, List<FailedTestCase> failedTestCases) {
+        this.streamObservers.forEach((id, observer) -> observer.onNext(generateTestResultsResponse(username, failedTestCases)));
     }
 
     private DockerEventResponse generateContainerResponse(String status, String username, List<String> logs) {
@@ -44,7 +44,7 @@ public class DockerEventUpdateHandler {
         return DockerEventResponse.newBuilder().setContainer(responseBuilder.build()).build();
     }
 
-    private DockerEventResponse generateTestResultsResponse(String username, String game, List<FailedTestCase> failedTestCases) {
+    private DockerEventResponse generateTestResultsResponse(String username, List<FailedTestCase> failedTestCases) {
         TestResultResponse.Builder responseBuilder = TestResultResponse.newBuilder()
                 .setUsername(username);
 
