@@ -4,7 +4,6 @@ import com.dojo.codeexecution.service.DockerService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,24 +17,7 @@ public class GitEventReceiver {
     private static final String REPO_PREFIX = "gamified-hiring-";
 
     @Autowired
-    DockerService dockerService;
-
-    @PostMapping(path = "/pushEvent")
-    public boolean acceptNewTaskSubmition(@RequestBody Map<String, Object> payload) {
-
-        System.out.println("received push event" + payload);
-
-//        say to docker to start docker image
-
-        //reponame
-        //getcode
-
-//        Request request = new Request(task);
-//        request.execute();
-
-
-        return true;
-    }
+    private DockerService dockerService;
 
     @GetMapping(path = "/build")
     public String buildParent() {
@@ -54,3 +36,4 @@ public class GitEventReceiver {
         return "OK";
     }
 }
+

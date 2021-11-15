@@ -455,7 +455,7 @@
               <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Get points from DB" enabled="true">
                 <stringProp name="dataSource">codenjoy</stringProp>
                 <stringProp name="queryType">Select Statement</stringProp>
-                <stringProp name="query">select saves.score from public.users join public.saves 
+                <stringProp name="query">select saves.score from public.users join public.saves
 on saves.player_id = users.id where users.github_username = &apos;${USERNAME}&apos;;</stringProp>
                 <stringProp name="queryArguments"></stringProp>
                 <stringProp name="queryArgumentsTypes"></stringProp>

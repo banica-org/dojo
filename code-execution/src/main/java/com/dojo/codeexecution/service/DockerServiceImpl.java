@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DockerServiceImpl implements DockerService {
@@ -42,7 +41,6 @@ public class DockerServiceImpl implements DockerService {
     private final DockerClient dockerClient;
     private final DockerConfigProperties dockerConfigProperties;
     private final GitConfigProperties gitConfigProperties;
-    private final AtomicInteger containerCounter;
     private final Map<String, String> containerUserCache;
     private final ExecutorService singleThreadExecutor;
 
@@ -56,7 +54,6 @@ public class DockerServiceImpl implements DockerService {
         this.dockerClient = dockerClient;
         this.dockerConfigProperties = dockerConfigProperties;
         this.gitConfigProperties = gitConfigProperties;
-        this.containerCounter = new AtomicInteger();
         this.containerUserCache = new ConcurrentHashMap<>();
         this.singleThreadExecutor = singleThreadExecutor;
     }
@@ -110,7 +107,6 @@ public class DockerServiceImpl implements DockerService {
         dockerClient.removeContainerCmd(containerId)
                 .withRemoveVolumes(true)
                 .withForce(true).exec();
-        decrementContainerCounter();
     }
 
     private void deleteUnnecessaryImages() {
@@ -124,18 +120,16 @@ public class DockerServiceImpl implements DockerService {
 
     private String getImageTag(String imageId) {
         return Objects.requireNonNull(dockerClient.inspectImageCmd(imageId).exec()
-                .getRepoTags())
+                        .getRepoTags())
                 .get(0);
     }
 
     private CreateContainerResponse createContainer(String imageTag, String username) {
-        incrementContainerCounter();
-        String containerName = imageTag.split(":")[0] + this.getContainerCounter();
         List<String> shellArgs = new ArrayList<>(dockerConfigProperties.getShellArguments());
         shellArgs.add(username);
         return dockerClient.createContainerCmd(imageTag)
                 .withCmd(shellArgs)
-                .withName(containerName).exec();
+                .exec();
     }
 
     private BuildImageResultCallback getImageBuildResultCallBack() {
@@ -167,7 +161,7 @@ public class DockerServiceImpl implements DockerService {
                     stringBuilder.delete(0, stringBuilder.length());
                 }
                 if (!itemValue.equals(LOG_SEPARATOR)) {
-                    stringBuilder.append(item.toString());
+                    stringBuilder.append(item);
                     stringBuilder.append('\n');
                 }
             }
@@ -198,18 +192,6 @@ public class DockerServiceImpl implements DockerService {
         InspectContainerResponse inspectContainerResponse =
                 dockerClient.inspectContainerCmd(containerId).exec();
         return inspectContainerResponse.getState().getStatus();
-    }
-
-    public int getContainerCounter() {
-        return containerCounter.get();
-    }
-
-    private int incrementContainerCounter() {
-        return containerCounter.incrementAndGet();
-    }
-
-    private int decrementContainerCounter() {
-        return containerCounter.decrementAndGet();
     }
 
     private void addContainerUsername(String containerId, String username) {

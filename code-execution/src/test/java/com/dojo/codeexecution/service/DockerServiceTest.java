@@ -72,7 +72,6 @@ public class DockerServiceTest {
     @Test
     public void runContainer() {
         //Arrange
-        String dummyContainerName = dummyImageTag.split(":")[0] + (dockerServiceImpl.getContainerCounter() + 1);
         CreateContainerResponse createContainerResponseMock = mock(CreateContainerResponse.class);
         StartContainerCmd startContainerCmdMock = mock(StartContainerCmd.class);
         WaitContainerCmd waitContainerMock = mock(WaitContainerCmd.class);
@@ -85,7 +84,6 @@ public class DockerServiceTest {
         //Act
         when(dockerConfigProperties.getShellArguments()).thenReturn(Collections.singletonList(""));
         when(dockerClient.createContainerCmd(dummyImageTag).withCmd(dockerConfigProperties.getShellArguments())
-                .withName(dummyContainerName)
                 .exec()).thenReturn(createContainerResponseMock);
         when(createContainerResponseMock.getId()).thenReturn(dummyId);
         when(dockerClient.startContainerCmd(dummyId)).thenReturn(startContainerCmdMock);
