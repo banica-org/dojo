@@ -29,8 +29,10 @@ public class GameResultController {
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
-        String username = testResult.getUsername();
-        String game = getGame(username);
+        String usernameAndGame = testResult.getUsername();
+        String username = getUsername(usernameAndGame);
+        String game = getGame(usernameAndGame);
+
         int points = testResult.getPoints();
         final String url = codenjoyConfigProperties.getPointsUpdateUrlStart()
                 + username + "/" + game
@@ -41,11 +43,16 @@ public class GameResultController {
         HttpEntity<Double> entity = new HttpEntity(points, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases(), game);
+        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases());
     }
 
-    private String getGame(String username){
-        String[] splitUsername = username.split("-");
-        return splitUsername[splitUsername.length-1];
+    private String getUsername(String usernameAndGame) {
+        String game = getGame(usernameAndGame);
+        return usernameAndGame.substring(0, usernameAndGame.length() - (game.length() + 1));
+    }
+
+    private String getGame(String usernameAndGame) {
+        String[] splitUsernameAndGame = usernameAndGame.split("-");
+        return splitUsernameAndGame[splitUsernameAndGame.length - 1];
     }
 }
