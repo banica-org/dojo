@@ -34,7 +34,7 @@ public class RequestReceiverTest {
         //Act
         when(gitManager.hasUserExistingRepository(username,"kata")).thenReturn(true);
         when(gitManager.getExistingGitHubRepository(username, "kata")).thenReturn(expectedURL);
-        String actual = requestReceiver.getRepository(username);
+        String actual = requestReceiver.getRepository(username,"kata");
 
         //Assert
         assertEquals(expected, actual);
@@ -52,7 +52,7 @@ public class RequestReceiverTest {
         //Act
         when(gitManager.hasUserExistingRepository(username, "kata")).thenReturn(false);
         when(gitManager.createGitHubRepository(username, "kata")).thenReturn(expectedURL);
-        String actual = requestReceiver.getRepository(username);
+        String actual = requestReceiver.getRepository(username,"kata");
 
         //Assert
         assertEquals(expected, actual);
