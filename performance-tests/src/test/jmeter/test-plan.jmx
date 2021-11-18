@@ -9,7 +9,7 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
-      <stringProp name="TestPlan.user_define_classpath">C:\Users\Nikola_Nguen\JMeter\apache-jmeter-5.4.1\lib\postgresql-42.2.23 (1).jar</stringProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users" enabled="true">
@@ -118,7 +118,7 @@
           </collectionProp>
         </Arguments>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Register Player" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Register Player" enabled="false"/>
         <hashTree>
           <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
@@ -208,7 +208,7 @@
           <hashTree/>
           <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Extract Player ID" enabled="true">
             <stringProp name="dataSource">codenjoy</stringProp>
-            <stringProp name="query">SELECT id 
+            <stringProp name="query">SELECT id
 FROM public.users
 WHERE public.users.github_username =&apos;${GITHUB_USERNAME}&apos;;</stringProp>
             <stringProp name="queryArguments"></stringProp>
@@ -236,7 +236,7 @@ WHERE public.users.github_username =&apos;${GITHUB_USERNAME}&apos;;</stringProp>
           </hashTree>
           <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Check Player ID in DB" enabled="true">
             <stringProp name="dataSource">codenjoy</stringProp>
-            <stringProp name="query">SELECT id 
+            <stringProp name="query">SELECT id
 FROM public.users
 WHERE public.users.github_username =&apos;${GITHUB_USERNAME}&apos;;</stringProp>
             <stringProp name="queryArguments"></stringProp>
@@ -261,7 +261,7 @@ WHERE public.users.github_username =&apos;${GITHUB_USERNAME}&apos;;</stringProp>
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Join Player" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Join Player" enabled="false"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login player" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -343,7 +343,7 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="View Game" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="View Game" enabled="false"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="View players in game" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -373,7 +373,7 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
           </HTTPSamplerProxy>
           <hashTree/>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Push Solution" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Push Solution" enabled="false"/>
         <hashTree>
           <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
@@ -596,7 +596,7 @@ WHERE users.github_username = &apos;${GITHUB_USERNAME}&apos; AND users.id = &apo
             </hashTree>
           </hashTree>
         </hashTree>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Mail Messages Received" enabled="true">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Mail Messages Received" enabled="false">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
@@ -643,7 +643,7 @@ WHERE users.github_username = &apos;${GITHUB_USERNAME}&apos; AND users.id = &apo
             <hashTree/>
           </hashTree>
         </hashTree>
-        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Slack Messages Received" enabled="true">
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Slack Messages Received" enabled="false">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
@@ -713,7 +713,7 @@ WHERE users.github_username = &apos;${GITHUB_USERNAME}&apos; AND users.id = &apo
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Clear Data" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Clear Data" enabled="false"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Remove player registration by id" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
