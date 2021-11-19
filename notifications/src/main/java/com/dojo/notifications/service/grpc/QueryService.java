@@ -5,8 +5,9 @@ import com.dojo.notifications.QueryRequest;
 import com.dojo.notifications.QueryResponse;
 import com.dojo.notifications.QueryServiceGrpc;
 import com.dojo.notifications.model.request.SelectRequest;
-import com.dojo.notifications.service.SelectRequestService;
 
+import com.dojo.notifications.service.ActiveRequestsService;
+import com.dojo.notifications.service.SelectRequestService;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,21 +19,26 @@ import java.util.List;
 public class QueryService extends QueryServiceGrpc.QueryServiceImplBase{
 
     private final SelectRequestService selectRequestService;
+    private final ActiveRequestsService activeRequestsService;
 
     @Autowired
-    public QueryService(SelectRequestService selectRequestService) {
+    public QueryService(SelectRequestService selectRequestService, ActiveRequestsService activeRequestsService) {
         this.selectRequestService = selectRequestService;
+        this.activeRequestsService = activeRequestsService;
     }
 
     @Override
     public void getQueryRequestsForContest(QueryRequest request, StreamObserver<QueryResponse> responseObserver) {
-        List<SelectRequest> requests = selectRequestService.getAllRequests();
+        List<SelectRequest> requestsForContest = activeRequestsService.getSelectRequestsForContest(request.getContestId());
+
         List<Query> queries = new ArrayList<>();
-        requests.forEach(request1 -> queries.add(Query.newBuilder()
+        requestsForContest.forEach(request1 -> queries.add(Query.newBuilder()
                 .setId(request1.getId())
                 .setDescription(request1.getQueryDescription())
                 .build()));
+
         QueryResponse response = QueryResponse.newBuilder().addAllQuery(queries).build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

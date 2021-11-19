@@ -174,6 +174,7 @@ public class LeaderboardNotifierService {
     private void notifyQueried(Contest contest, Leaderboard newLeaderboard, Set<String> userIds, SelectRequest request) {
         List<UserDetails> userDetails = new ArrayList<>();
         userIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
+        userDetails.forEach(details -> userDetailsService.getUserSubscriptionForQuery(details, request.getId(), contest.getContestId()));
 
         for (UserDetails user : userDetails) {
             for (NotifierType notifierType : contest.getNotifiers()) {
