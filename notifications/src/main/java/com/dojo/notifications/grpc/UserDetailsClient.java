@@ -6,6 +6,8 @@ import com.codenjoy.dojo.UserDetailsServiceGrpc;
 import com.codenjoy.dojo.UserDetailsUsernameRequest;
 import com.codenjoy.dojo.UserRequest;
 import com.codenjoy.dojo.UserResponse;
+import com.codenjoy.dojo.UserSubscriptionRequest;
+import com.codenjoy.dojo.UserSubscriptionResponse;
 import com.dojo.notifications.model.user.User;
 import com.dojo.notifications.model.user.UserDetails;
 import com.dojo.notifications.model.user.enums.UserRole;
@@ -55,23 +57,34 @@ public class UserDetailsClient {
 
     private UserDetails getUserDetails(UserDetailsResponse response) {
         UserDetails userDetails = new UserDetails();
+        System.out.println(response.getId() + " " + response.getEmail() + " " + response.getSlackEmail());
         userDetails.setId(response.getId());
         userDetails.setEmail(response.getEmail());
         userDetails.setSlackEmail(response.getSlackEmail());
-        userDetails.setSubscribed(response.getSubscribed());
-
-        System.out.println(userDetails.getId() + userDetails.getEmail() + userDetails.getSlackEmail() + userDetails.isSubscribed());
 
         return userDetails;
     }
 
-    public List<User> getUsersForContest(String contestId){
+    public List<User> getUsersForContest(String contestId) {
         UserRequest userRequest = UserRequest.newBuilder()
                 .setContestId(contestId).build();
         UserResponse userResponse = userDetailsServiceBlockingStub.getUsersForContest(userRequest);
 
         return userResponse.getUserList().stream().map(user -> {
-            return new User(user.getId(),user.getUsername(),user.getName(), UserRole.valueOf(user.getRole().replace("ROLE_","")));
+            return new User(user.getId(), user.getUsername(), user.getName(), UserRole.valueOf(user.getRole().replace("ROLE_", "")));
         }).collect(Collectors.toList());
+    }
+
+    public void getUserSubscriptions(UserDetails details, int requestId, String contest) {
+        UserSubscriptionRequest userSubscriptionRequest = UserSubscriptionRequest.newBuilder()
+                .setId(details.getId())
+                .setRequestId(requestId)
+                .setGame(contest)
+                .build();
+
+        UserSubscriptionResponse userSubscriptionResponse = userDetailsServiceBlockingStub.getUserSubscriptionsForContest(userSubscriptionRequest);
+
+        details.setEmailSubscription(userSubscriptionResponse.getEmailSubscription());
+        details.setSlackSubscription(userSubscriptionResponse.getSlackSubscription());
     }
 }
