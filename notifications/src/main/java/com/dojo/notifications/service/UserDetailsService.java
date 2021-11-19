@@ -33,7 +33,7 @@ public class UserDetailsService {
 
     public UserDetails getUserDetailsById(String userId) {
         UserDetails userDetails = userDetailsCache.get(userId);
-        if (userDetails == null) {
+        if (userDetails == null && !userId.equals("Common")) {
 
             userDetails = userDetailsClient.getUserDetailsById(userId);
 
@@ -50,6 +50,7 @@ public class UserDetailsService {
     }
 
     public UserDetails getUserDetailsByUsername(String username) {
+        System.out.println(" USERNAME" + username);
         UserDetails userDetails = userDetailsClient.getUserDetailsByUsername(username);
         if (userDetails != null) {
             userDetailsCache.put(userDetails.getId(), userDetails);
@@ -77,6 +78,10 @@ public class UserDetailsService {
                 });
         group.forEach(user -> userIds.add(user.getId()));
         return userIds;
+    }
+
+    public void getUserSubscriptionForQuery(UserDetails details, int requestId, String contest) {
+        userDetailsClient.getUserSubscriptions(details, requestId, contest);
     }
 
     private boolean isParticipant(String id) {
