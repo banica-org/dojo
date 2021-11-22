@@ -1,13 +1,10 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
-import com.dojo.codeexecution.controller.RequestReceiver;
 import org.kohsuke.github.GHEvent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -17,26 +14,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
 public class GitManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestReceiver.class);
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
     private static final String PARENT_HOOK = "build";
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
-    private final DockerService dockerService;
 
     @Autowired
-    public GitManager(GitConfigProperties gitConfig, GitHub gitHub, DockerService dockerService) {
+    public GitManager(GitConfigProperties gitConfig, GitHub gitHub) {
         this.gitConfig = gitConfig;
         this.gitHub = gitHub;
-        this.dockerService = dockerService;
     }
 
     @PostConstruct
@@ -86,10 +79,6 @@ public class GitManager {
     }
 
     private GHUser getGitHubUser(String username) throws IOException {
-        List<GHUser> users = gitHub.searchUsers().q(username).list().toList();
-        if (users.size() >= 1) {
-            return users.get(0);
-        }
-        throw new IllegalArgumentException("User not found!");
+        return gitHub.getUser(username);
     }
 }
