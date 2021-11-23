@@ -43,6 +43,7 @@ public class ContestController {
         Contest contest = eventService.getContestById(id);
         if (contest != null) {
             eventService.removeContest(id);
+            activeRequestsService.removeCurrentRequestsForContest(contest.getContestId());
             notificationManagingService.stopNotifications(contest);
         }
         return new ResponseEntity<>("DELETE Response", HttpStatus.OK);

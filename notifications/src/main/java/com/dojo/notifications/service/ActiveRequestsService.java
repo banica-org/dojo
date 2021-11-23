@@ -49,7 +49,7 @@ public class ActiveRequestsService {
         }
     }
 
-    private void removeCurrentRequestsForContest(String contestId){
+    public void removeCurrentRequestsForContest(String contestId){
         getAllActiveRequests().stream()
                 .filter(activeContestRequests -> activeContestRequests.getContestId().equals(contestId))
                 .forEach(activeRequestsRepo::delete);
