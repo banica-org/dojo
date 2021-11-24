@@ -21,7 +21,7 @@ public class ActiveRequestsService {
         this.selectRequestService = selectRequestService;
     }
 
-    public List<ActiveContestRequests> getAllActiveRequests(){
+    public List<ActiveContestRequests> getAllActiveRequests() {
         List<ActiveContestRequests> activeContestRequests = new ArrayList<>();
 
         activeRequestsRepo.findAll().forEach(activeContestRequests::add);
@@ -29,18 +29,18 @@ public class ActiveRequestsService {
         return activeContestRequests;
     }
 
-    public List<SelectRequest> getSelectRequestsForContest(String contestId){
+    public List<SelectRequest> getSelectRequestsForContest(String contestId) {
         return getAllActiveRequests().stream()
                 .filter(activeContestRequests -> activeContestRequests.getContestId().equals(contestId))
                 .map(activeContestRequests -> selectRequestService.getRequestById(activeContestRequests.getQueryId()))
                 .collect(Collectors.toList());
     }
 
-    public void addActiveRequests(Set<Integer> queryIds, String contestId){
+    public void addActiveRequests(Set<Integer> queryIds, String contestId) {
         removeCurrentRequestsForContest(contestId);
 
-        if(queryIds!=null && contestId!=null){
-            queryIds.forEach(queryId ->{
+        if (queryIds != null && contestId != null) {
+            queryIds.forEach(queryId -> {
                 ActiveContestRequests activeContestRequest = new ActiveContestRequests();
                 activeContestRequest.setQueryId(queryId);
                 activeContestRequest.setContestId(contestId);
@@ -49,7 +49,7 @@ public class ActiveRequestsService {
         }
     }
 
-    public void removeCurrentRequestsForContest(String contestId){
+    public void removeCurrentRequestsForContest(String contestId) {
         getAllActiveRequests().stream()
                 .filter(activeContestRequests -> activeContestRequests.getContestId().equals(contestId))
                 .forEach(activeRequestsRepo::delete);

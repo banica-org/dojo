@@ -41,7 +41,7 @@ public class SelectRequestService {
         return requests;
     }
 
-    public SelectRequest getRequestById(int id){
+    public SelectRequest getRequestById(int id) {
         Optional<SelectRequest> request = selectRequestRepo.findById(id);
 
         return request.orElse(null);

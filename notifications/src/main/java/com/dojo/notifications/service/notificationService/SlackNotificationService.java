@@ -44,7 +44,7 @@ public class SlackNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        if(!userDetails.getSlackEmail().equals("") && userDetails.isSlackSubscription()) {
+        if (!userDetails.getSlackEmail().equals("") && userDetails.isSlackSubscription()) {
             CustomSlackClient slackClient = getSlackClient(contest);
             if (slackClient.getConversationId(userDetails.getSlackEmail()).equals("")) {
                 emailNotificationService.notifyForSlackInvitation(userDetails.getEmail(), INVITATION_URL, contest);

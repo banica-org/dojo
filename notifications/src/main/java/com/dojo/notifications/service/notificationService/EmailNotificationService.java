@@ -43,7 +43,7 @@ public class EmailNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        if(userDetails.isEmailSubscription()) {
+        if (userDetails.isEmailSubscription()) {
             String data = notification.getAsEmailNotification(mailMessageGenerators.get(notification.getType()));
             sendEmail(userDetails.getEmail(), data, contest, notification.getType());
         }

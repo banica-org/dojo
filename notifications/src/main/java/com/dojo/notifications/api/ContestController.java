@@ -26,7 +26,7 @@ public class ContestController {
             stopNotifications(contest.getContestId());
         }
         eventService.addContest(contest);
-        activeRequestsService.addActiveRequests(contest.getQueryIds(),contest.getContestId());
+        activeRequestsService.addActiveRequests(contest.getQueryIds(), contest.getContestId());
         notificationManagingService.startNotifications(contest);
         return new ResponseEntity<>(contest, HttpStatus.OK);
     }

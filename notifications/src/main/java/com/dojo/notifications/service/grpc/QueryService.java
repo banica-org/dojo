@@ -16,14 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class QueryService extends QueryServiceGrpc.QueryServiceImplBase{
+public class QueryService extends QueryServiceGrpc.QueryServiceImplBase {
 
-    private final SelectRequestService selectRequestService;
     private final ActiveRequestsService activeRequestsService;
 
     @Autowired
-    public QueryService(SelectRequestService selectRequestService, ActiveRequestsService activeRequestsService) {
-        this.selectRequestService = selectRequestService;
+    public QueryService(ActiveRequestsService activeRequestsService) {
         this.activeRequestsService = activeRequestsService;
     }
 
