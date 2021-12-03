@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,12 @@ public class SelectRequestService {
             }
         });
         return requests;
+    }
+
+    public SelectRequest getRequestById(int id) {
+        Optional<SelectRequest> request = selectRequestRepo.findById(id);
+
+        return request.orElse(null);
     }
 
     public List<SelectRequest> getJoinSelectRequestsForTable(String tableName) {

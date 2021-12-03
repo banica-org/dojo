@@ -43,8 +43,10 @@ public class EmailNotificationService implements NotificationService {
     // Notify user
     @Override
     public void notify(UserDetails userDetails, Notification notification, Contest contest) {
-        String data = notification.getAsEmailNotification(mailMessageGenerators.get(notification.getType()));
-        sendEmail(userDetails.getEmail(), data, contest, notification.getType());
+        if (userDetails.isEmailSubscription()) {
+            String data = notification.getAsEmailNotification(mailMessageGenerators.get(notification.getType()));
+            sendEmail(userDetails.getEmail(), data, contest, notification.getType());
+        }
     }
 
     // Notify channel
@@ -54,8 +56,8 @@ public class EmailNotificationService implements NotificationService {
         contest.getSenseiEmails().forEach(email -> sendEmail(email, data, contest, notification.getType()));
     }
 
-    public void notifyForSlackInvitation(String to, String message, Contest contest){
-        sendEmail(to,message,contest, NotificationType.INVITATION);
+    public void notifyForSlackInvitation(String to, String message, Contest contest) {
+        sendEmail(to, message, contest, NotificationType.INVITATION);
     }
 
     private void sendEmail(String to, String data, Contest contest, NotificationType type) {

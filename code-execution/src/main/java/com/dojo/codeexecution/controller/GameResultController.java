@@ -43,7 +43,7 @@ public class GameResultController {
         HttpEntity<Double> entity = new HttpEntity(points, headers);
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-        dockerEventUpdateHandler.sendUpdate(username, testResult.getFailedTestCases());
+        dockerEventUpdateHandler.sendUpdate(usernameAndGame, testResult.getFailedTestCases());
     }
 
     private String getUsername(String usernameAndGame) {

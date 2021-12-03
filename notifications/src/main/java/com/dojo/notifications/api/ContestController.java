@@ -1,5 +1,6 @@
 package com.dojo.notifications.api;
 
+import com.dojo.notifications.service.ActiveRequestsService;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.service.NotificationManagingService;
@@ -15,6 +16,8 @@ public class ContestController {
     private EventService eventService;
     @Autowired
     private NotificationManagingService notificationManagingService;
+    @Autowired
+    private ActiveRequestsService activeRequestsService;
 
     @PostMapping("/api/v1/contest")
     public @ResponseBody
@@ -23,6 +26,7 @@ public class ContestController {
             stopNotifications(contest.getContestId());
         }
         eventService.addContest(contest);
+        activeRequestsService.addActiveRequests(contest.getQueryIds(), contest.getContestId());
         notificationManagingService.startNotifications(contest);
         return new ResponseEntity<>(contest, HttpStatus.OK);
     }
@@ -39,6 +43,7 @@ public class ContestController {
         Contest contest = eventService.getContestById(id);
         if (contest != null) {
             eventService.removeContest(id);
+            activeRequestsService.removeCurrentRequestsForContest(contest.getContestId());
             notificationManagingService.stopNotifications(contest);
         }
         return new ResponseEntity<>("DELETE Response", HttpStatus.OK);
