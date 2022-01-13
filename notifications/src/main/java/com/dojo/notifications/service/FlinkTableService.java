@@ -19,6 +19,7 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableColumn;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -43,6 +44,12 @@ public class FlinkTableService {
     private static final String CONTAINER_TYPE = "container";
     private static final String TEST_RESULTS_TYPE = "test_results";
     private static final String EMPTY = "";
+
+    @Autowired
+    private SelectRequestService selectRequestService;
+
+    @Autowired
+    private ActiveRequestsService activeRequestsService;
 
     private Map<String, List<Map<String, String>>> tables;
 
@@ -207,6 +214,8 @@ public class FlinkTableService {
             table = tableEnvironment.sqlQuery(request.getQuery());
         } catch (Exception e) {
             e.printStackTrace();
+            selectRequestService.deleteRequest(request.getId());
+            activeRequestsService.removeRequestForAllContests(request.getId());
             return null;
         }
         tableEnvironment.dropTemporaryView(tableName);
@@ -220,6 +229,8 @@ public class FlinkTableService {
             firstTable = tableEnvironment.sqlQuery(selectRequest.getQuery());
         } catch (Exception e) {
             e.printStackTrace();
+            selectRequestService.deleteRequest(selectRequest.getId());
+            activeRequestsService.removeRequestForAllContests(selectRequest.getId());
             return null;
         }
         tableEnvironment.dropTemporaryView(firstTableName);

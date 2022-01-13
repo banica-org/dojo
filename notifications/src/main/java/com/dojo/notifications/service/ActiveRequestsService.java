@@ -54,4 +54,10 @@ public class ActiveRequestsService {
                 .filter(activeContestRequests -> activeContestRequests.getContestId().equals(contestId))
                 .forEach(activeRequestsRepo::delete);
     }
+
+    public void removeRequestForAllContests(int queryId){
+        getAllActiveRequests().stream()
+                .filter(activeContestRequests -> queryId == activeContestRequests.getQueryId())
+                .forEach(activeRequestsRepo::delete);
+    }
 }
