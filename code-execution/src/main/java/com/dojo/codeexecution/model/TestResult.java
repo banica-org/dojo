@@ -6,6 +6,7 @@ public class TestResult {
     private String username;
     private int points;
     private List<FailedTestCase> failedTestCases;
+    private String containerId;
 
     public String getUsername() {
         return username;
@@ -29,5 +30,13 @@ public class TestResult {
 
     public void setFailedTestCases(List<FailedTestCase> failedTestCases) {
         this.failedTestCases = failedTestCases;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 }

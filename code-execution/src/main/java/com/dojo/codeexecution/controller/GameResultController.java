@@ -3,6 +3,7 @@ package com.dojo.codeexecution.controller;
 import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
 import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
+import com.github.dockerjava.api.DockerClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,15 +21,19 @@ public class GameResultController {
     private final RestTemplate restTemplate;
     private final CodenjoyConfigProperties codenjoyConfigProperties;
 
+    private final DockerClient dockerClient;
+
     @Autowired
-    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
+    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties, DockerClient dockerClient) {
         this.dockerEventUpdateHandler = dockerEventUpdateHandler;
         this.restTemplate = restTemplate;
         this.codenjoyConfigProperties = codenjoyConfigProperties;
+        this.dockerClient = dockerClient;
     }
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
+                dockerClient.stopContainerCmd(testResult.getContainerId()).exec();
         String usernameAndGame = testResult.getUsername();
         String username = getUsername(usernameAndGame);
         String game = getGame(usernameAndGame);
