@@ -111,6 +111,9 @@ public class DockerServiceImpl implements DockerService {
 
     public void stopContainer(String containerId) {
         dockerClient.stopContainerCmd(containerId).exec();
+        if (getContainerStatus(containerId).equals("running")) {
+            dockerClient.killContainerCmd(containerId);
+        }
     }
 
     public String getContainerStatus(String containerId) {

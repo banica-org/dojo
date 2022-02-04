@@ -32,10 +32,7 @@ public class GameResultController {
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
-        String containerId = testResult.getContainerId();
-        if (dockerService.getContainerStatus(containerId).equals("running")) {
-            dockerService.stopContainer(containerId);
-        }
+        stopContainerIfRunning(testResult);
 
         String usernameAndGame = testResult.getUsername();
         String username = getUsername(usernameAndGame);
@@ -52,6 +49,13 @@ public class GameResultController {
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         dockerEventUpdateHandler.sendUpdate(usernameAndGame, testResult.getFailedTestCases());
+    }
+
+    private void stopContainerIfRunning(TestResult testResult) {
+        String containerId = testResult.getContainerId();
+        if (dockerService.getContainerStatus(containerId).equals("running")) {
+            dockerService.stopContainer(containerId);
+        }
     }
 
     private String getUsername(String usernameAndGame) {
