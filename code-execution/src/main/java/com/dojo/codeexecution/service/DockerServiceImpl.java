@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 public class DockerServiceImpl implements DockerService {
     private static final String USER_NAME = "user_name";
     private static final String REPO_NAME = "repo_name";
+    private static final String CLIENT_ID = "client_id_var";
+    private static final String CLIENT_SECRET = "client_secret_var";
     private static final String LOG_SEPARATOR = "STDOUT: build-log-separator";
 
     private final ImageUpdateHandler imageUpdateHandler;
@@ -88,7 +90,9 @@ public class DockerServiceImpl implements DockerService {
                 .withNoCache(true)
                 .withTags(Collections.singleton(dockerConfigProperties.getParentTag()))
                 .withBuildArg(USER_NAME, gitConfigProperties.getUser())
-                .withBuildArg(REPO_NAME, gitConfigProperties.getParentRepositoryName());
+                .withBuildArg(REPO_NAME, gitConfigProperties.getParentRepositoryName())
+                .withBuildArg(CLIENT_ID, "client_id")
+                .withBuildArg(CLIENT_SECRET, "client_secret");
         String imageId = buildImage.exec(getImageBuildResultCallBack()).awaitImageId();
         return getImageTag(imageId);
     }
