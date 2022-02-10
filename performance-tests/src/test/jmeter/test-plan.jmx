@@ -23,7 +23,7 @@
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
       </ThreadGroup>
       <hashTree>
         <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
@@ -112,6 +112,11 @@
             </elementProp>
             <elementProp name="player_id" elementType="Argument">
               <stringProp name="Argument.name">player_id</stringProp>
+              <stringProp name="Argument.value">&quot;&quot;</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="access_token" elementType="Argument">
+              <stringProp name="Argument.name">access_token</stringProp>
               <stringProp name="Argument.value">&quot;&quot;</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
@@ -333,7 +338,7 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Join Player Response Assertion" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="1709050683">https://github.com/&lt;add here&gt;/gamified-hiring-${GITHUB_USERNAME}</stringProp>
+                <stringProp name="-109969614">https://github.com/&lt;your github username&gt;/gamified-hiring-${GITHUB_USERNAME}</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message"></stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -373,6 +378,39 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
           </HTTPSamplerProxy>
           <hashTree/>
         </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Get Access Token For Code-Execution" enabled="false"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Send request to Keycloak for access token" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8180</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/auth/realms/dojo-realm/protocol/openid-connect/token</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <BoundaryExtractor guiclass="BoundaryExtractorGui" testclass="BoundaryExtractor" testname="Boundary Extractor" enabled="true">
+              <stringProp name="BoundaryExtractor.useHeaders">false</stringProp>
+              <stringProp name="BoundaryExtractor.refname">access_token</stringProp>
+              <stringProp name="BoundaryExtractor.lboundary">&quot;access_token&quot;:&quot;</stringProp>
+              <stringProp name="BoundaryExtractor.rboundary">&quot;,</stringProp>
+              <stringProp name="BoundaryExtractor.default"></stringProp>
+              <boolProp name="BoundaryExtractor.default_empty_value">false</boolProp>
+              <stringProp name="BoundaryExtractor.match_number">1</stringProp>
+            </BoundaryExtractor>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Push Solution" enabled="false"/>
         <hashTree>
           <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
@@ -380,6 +418,10 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${access_token}</stringProp>
               </elementProp>
             </collectionProp>
           </HeaderManager>
@@ -421,7 +463,7 @@ WHERE player_id=&apos;${player_id}&apos;;</stringProp>
       &quot;id&quot;:358211712,&#xd;
       &quot;node_id&quot;:&quot;MDEwOlJlcG9zaXRvcnkzNTgyMTE3MTI=&quot;,&#xd;
       &quot;name&quot;:&quot;parent-tag&quot;,&#xd;
-      &quot;full_name&quot;:&quot;&lt;add here&gt;/gamified-hiring-${GITHUB_USERNAME}-${GAME}&quot;,&#xd;
+      &quot;full_name&quot;:&quot;&lt;your github username&gt;/gamified-hiring-${GITHUB_USERNAME}-${GAME}&quot;,&#xd;
       &quot;private&quot;:true,&#xd;
       &quot;owner&quot;:{&#xd;
          &quot;login&quot;:&quot;DenisKirilov&quot;,&#xd;
@@ -715,6 +757,12 @@ WHERE users.github_username = &apos;${GITHUB_USERNAME}&apos; AND users.id = &apo
         </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Clear Data" enabled="false"/>
         <hashTree>
+          <TestAction guiclass="TestActionGui" testclass="TestAction" testname="pause 10000ms" enabled="true">
+            <intProp name="ActionProcessor.action">1</intProp>
+            <intProp name="ActionProcessor.target">0</intProp>
+            <stringProp name="ActionProcessor.duration">10000</stringProp>
+          </TestAction>
+          <hashTree/>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Remove player registration by id" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
               <collectionProp name="Arguments.arguments">
@@ -758,7 +806,7 @@ WHERE users.github_username = &apos;${GITHUB_USERNAME}&apos; AND users.id = &apo
             <stringProp name="HTTPSampler.port">8080</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/codenjoy-contest/admin/player/${player_id}/save/remove</stringProp>
+            <stringProp name="HTTPSampler.path">/codenjoy-contest/admin/player/${player_id}/${NICKNAME}/${GAME}/save/remove</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
