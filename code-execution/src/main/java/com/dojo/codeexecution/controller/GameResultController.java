@@ -2,6 +2,7 @@ package com.dojo.codeexecution.controller;
 
 import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
+import com.dojo.codeexecution.service.DockerServiceImpl;
 import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -16,19 +17,23 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class GameResultController {
     private final DockerEventUpdateHandler dockerEventUpdateHandler;
+    private final DockerServiceImpl dockerService;
 
     private final RestTemplate restTemplate;
     private final CodenjoyConfigProperties codenjoyConfigProperties;
 
     @Autowired
-    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
+    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, DockerServiceImpl dockerService, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
         this.dockerEventUpdateHandler = dockerEventUpdateHandler;
+        this.dockerService = dockerService;
         this.restTemplate = restTemplate;
         this.codenjoyConfigProperties = codenjoyConfigProperties;
     }
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
+        stopContainerIfRunning(testResult);
+
         String usernameAndGame = testResult.getUsername();
         String username = getUsername(usernameAndGame);
         String game = getGame(usernameAndGame);
@@ -44,6 +49,13 @@ public class GameResultController {
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         dockerEventUpdateHandler.sendUpdate(usernameAndGame, testResult.getFailedTestCases());
+    }
+
+    private void stopContainerIfRunning(TestResult testResult) {
+        String containerId = testResult.getContainerId();
+        if (dockerService.getContainerStatus(containerId).equals("running")) {
+            dockerService.stopContainer(containerId);
+        }
     }
 
     private String getUsername(String usernameAndGame) {

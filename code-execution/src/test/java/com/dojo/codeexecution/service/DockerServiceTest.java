@@ -194,7 +194,7 @@ public class DockerServiceTest {
                 .thenReturn(removeContainerCmdMock);
         doNothing().when(removeContainerCmdMock).exec();
 
-        dockerServiceImpl.deleteContainer(dummyId);
+        dockerServiceImpl.deleteContainerWithForce(dummyId);
 
         //Assert
         verify(removeContainerCmdMock, times(1)).exec();

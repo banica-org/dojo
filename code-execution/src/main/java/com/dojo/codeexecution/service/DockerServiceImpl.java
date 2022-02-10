@@ -107,10 +107,23 @@ public class DockerServiceImpl implements DockerService {
         return logs;
     }
 
-    public void deleteContainer(String containerId) {
+    public void deleteContainerWithForce(String containerId) {
         dockerClient.removeContainerCmd(containerId)
                 .withRemoveVolumes(true)
                 .withForce(true).exec();
+    }
+
+    public void stopContainer(String containerId) {
+        dockerClient.stopContainerCmd(containerId).exec();
+        if (getContainerStatus(containerId).equals("running")) {
+            dockerClient.killContainerCmd(containerId);
+        }
+    }
+
+    public String getContainerStatus(String containerId) {
+        InspectContainerResponse inspectContainerResponse =
+                dockerClient.inspectContainerCmd(containerId).exec();
+        return inspectContainerResponse.getState().getStatus();
     }
 
     private void deleteUnnecessaryImages() {
@@ -186,16 +199,10 @@ public class DockerServiceImpl implements DockerService {
                 }
                 logs.forEach(System.out::println);
                 deleteContainerUsername(containerId);
-                deleteContainer(containerId);
+                deleteContainerWithForce(containerId);
                 super.onNext(object);
             }
         };
-    }
-
-    private String getContainerStatus(String containerId) {
-        InspectContainerResponse inspectContainerResponse =
-                dockerClient.inspectContainerCmd(containerId).exec();
-        return inspectContainerResponse.getState().getStatus();
     }
 
     private void addContainerUsername(String containerId, String username) {
