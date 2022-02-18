@@ -2,6 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.kohsuke.github.GHEvent;
+import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -80,5 +84,28 @@ public class GitManager {
 
     private GHUser getGitHubUser(String username) throws IOException {
         return gitHub.getUser(username);
+    }
+
+    public String deleteReposForParticularGame(String game) throws IOException {
+        GHMyself account = gitHub.getMyself();
+        Collection<GHRepository> listOfAllRepos = account.getAllRepositories().values();
+        List<String> nameOfDeletedRepos = new ArrayList<>();
+        listOfAllRepos.stream()
+                .filter(repo->repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-"+game))
+                .peek(repo->nameOfDeletedRepos.add(repo.getName()))
+                .forEach(repo-> {
+                    try {
+                        repo.delete();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+        if(nameOfDeletedRepos.size() == 0) {
+            return "No repositories for that game have been found";
+        }
+        else {
+            return "Following repositories have been deleted: " + System.lineSeparator()
+                    + String.join(System.lineSeparator(), nameOfDeletedRepos);
+        }
     }
 }

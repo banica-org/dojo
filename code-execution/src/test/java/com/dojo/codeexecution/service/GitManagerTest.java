@@ -4,6 +4,7 @@ import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHHook;
+import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -15,9 +16,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +48,9 @@ public class GitManagerTest {
 
     @Mock
     private GHHook ghHook;
+
+    @Mock
+    private GHMyself myself;
 
     @Test
     public void getExistingRepositoryReturnsRepository() throws IOException {
@@ -148,5 +155,63 @@ public class GitManagerTest {
         verify(gitConfig, times(1)).getWebhookAddress();
         verify(gitConfig, times(1)).getUser();
         verify(gitConfig, times(1)).getParentRepositoryName();
+    }
+
+    @Test
+    public void testDeleteAllReposForSpecificGame() throws IOException{
+        when(ghRepository.getName()).thenReturn("gamified-hiring-user1-kata");
+        GHRepository repo2 = mock(GHRepository.class);
+        when(repo2.getName()).thenReturn("gamified-hiring-user2-kata");
+        GHRepository repo3 = mock(GHRepository.class);
+        when(repo3.getName()).thenReturn("gamified-hiring-unqualifying-bomberman");
+        Map<String, GHRepository> repoMap = new HashMap<>();
+        repoMap.put(ghRepository.getName(), ghRepository);
+        repoMap.put(repo2.getName(), repo2);
+        repoMap.put(repo3.getName(), repo3);
+        when(gitHub.getMyself()).thenReturn(myself);
+        when(myself.getAllRepositories()).thenReturn(repoMap);
+        String expectedResult = "Following repositories have been deleted: " + System.lineSeparator() +
+                "gamified-hiring-user1-kata" + System.lineSeparator()+
+                "gamified-hiring-user2-kata";
+        assertEquals(expectedResult, gitManager.deleteReposForParticularGame("kata"));
+    }
+
+    @Test
+    public void TestRepositoryDeletion_OnlyReposWithQualifyingNameShouldBeDeleted() throws Exception{
+        Map<String, GHRepository> allRepos = new HashMap<>();
+        Map<String, GHRepository> reposForDeletion = new HashMap<>();
+        Map<String, GHRepository> reposToKeep = new HashMap<>();
+        for (int i = 0; i < 100; i++) {
+            GHRepository repo = mock(GHRepository.class);
+            when(repo.getName()).thenReturn("gamified-hiring-"+i+"-kata");
+            allRepos.put(repo.getName(), repo);
+            reposForDeletion.put(repo.getName(), repo);
+        }
+
+        for (int i = 0; i < 100; i++) {
+            GHRepository repo = mock(GHRepository.class);
+            when(repo.getName()).thenReturn("some random name: " + i);
+            allRepos.put(repo.getName(), repo);
+            reposToKeep.put(repo.getName(), repo);
+        }
+
+        when(gitHub.getMyself()).thenReturn(myself);
+        when(myself.getAllRepositories()).thenReturn(allRepos);
+        gitManager.deleteReposForParticularGame("kata");
+        reposForDeletion.values().forEach(repo-> {
+            try {
+                verify(repo,times(1)).delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        reposToKeep.values().forEach(repo-> {
+            try {
+                verify(repo,times(0)).delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 }
