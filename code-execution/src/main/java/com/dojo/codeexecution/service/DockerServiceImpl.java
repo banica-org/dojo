@@ -82,8 +82,6 @@ public class DockerServiceImpl implements DockerService {
     }
 
     private String buildImageTask() {
-        deleteUnnecessaryContainers();
-        deleteUnnecessaryImages();
         BuildImageCmd buildImage = dockerClient.buildImageCmd()
                 .withDockerfile(new File(dockerConfigProperties.getFilepath()))
                 .withRemove(true)
@@ -94,6 +92,8 @@ public class DockerServiceImpl implements DockerService {
                 .withBuildArg(CLIENT_ID, "client_id")
                 .withBuildArg(CLIENT_SECRET, "client_secret");
         String imageId = buildImage.exec(getImageBuildResultCallBack()).awaitImageId();
+        deleteUnnecessaryContainers();
+        deleteUnnecessaryImages();
         return getImageTag(imageId);
     }
 
