@@ -127,7 +127,7 @@ public class DockerNotifierServiceTest {
 
     @Test
     public void notifyParticipantTest() {
-        dockerNotifierService.notifyParticipant(ID, contest, container, MESSAGE, NotificationType.CONTAINER);
+        dockerNotifierService.notifyParticipant(ID, contest, container, MESSAGE, NotificationType.CONTAINER, 1);
         verifyParticipantNotificationsSent();
     }
 

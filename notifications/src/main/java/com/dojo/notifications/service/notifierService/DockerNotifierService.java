@@ -72,7 +72,7 @@ public class DockerNotifierService {
                 List<String> queriedIds = flinkTableService.executeDockerQuery(request, object, id);
                 if (!queriedIds.isEmpty()) {
                     NotificationType finalType = (object instanceof Container) ? NotificationType.CONTAINER : NotificationType.TEST_RESULTS;
-                    queriedIds.forEach(queriedId -> notify(request.getReceivers(), queriedId, contest, object, message, finalType));
+                    queriedIds.forEach(queriedId -> notify(request.getReceivers(), queriedId, contest, object, message, finalType, request.getId()));
                 }
 
             } catch (Exception e) {
@@ -81,9 +81,9 @@ public class DockerNotifierService {
         }
     }
 
-    private void notify(String receivers, String id, Contest contest, Object object, String message, NotificationType notificationType) {
+    private void notify(String receivers, String id, Contest contest, Object object, String message, NotificationType notificationType, int requestId) {
 
-        notifyParticipant(id, contest, object, message, notificationType);
+        notifyParticipant(id, contest, object, message, notificationType, requestId);
 
         if (receivers != null) {
             notifyListeners(contest, userDetailsService.turnUsersToUserIds(receivers), object, message, notificationType);
@@ -105,8 +105,10 @@ public class DockerNotifierService {
         }
     }
 
-    public void notifyParticipant(String id, Contest contest, Object object, String message, NotificationType type) {
+    public void notifyParticipant(String id, Contest contest, Object object, String message, NotificationType type, int requestId) {
         UserDetails userDetails = userDetailsService.getUserDetailsById(id);
+        userDetailsService.getUserSubscriptionForQuery(userDetails, requestId, contest.getContestId());
+
         for (NotifierType notifierType : contest.getNotifiers()) {
             notificationServices.get(notifierType)
                     .notify(userDetails, new ParticipantNotification(userDetailsService, object, userDetails, message, type), contest);
