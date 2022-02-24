@@ -2,6 +2,9 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHHook;
 import org.kohsuke.github.GHMyself;
@@ -11,10 +14,12 @@ import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -157,61 +162,70 @@ public class GitManagerTest {
         verify(gitConfig, times(1)).getParentRepositoryName();
     }
 
-    @Test
-    public void testDeleteAllReposForSpecificGame() throws IOException{
-        when(ghRepository.getName()).thenReturn("gamified-hiring-user1-kata");
-        GHRepository repo2 = mock(GHRepository.class);
-        when(repo2.getName()).thenReturn("gamified-hiring-user2-kata");
-        GHRepository repo3 = mock(GHRepository.class);
-        when(repo3.getName()).thenReturn("gamified-hiring-unqualifying-bomberman");
-        Map<String, GHRepository> repoMap = new HashMap<>();
-        repoMap.put(ghRepository.getName(), ghRepository);
-        repoMap.put(repo2.getName(), repo2);
-        repoMap.put(repo3.getName(), repo3);
-        when(gitHub.getMyself()).thenReturn(myself);
-        when(myself.getAllRepositories()).thenReturn(repoMap);
-        String expectedResult = "Following repositories have been deleted: " + System.lineSeparator() +
-                "gamified-hiring-user2-kata" + System.lineSeparator()+
-                "gamified-hiring-user1-kata";
-        assertEquals(expectedResult, gitManager.deleteReposForParticularGame("kata"));
-    }
+    @Nested
+    @ExtendWith(MockitoExtension.class)
+    class DeleteTests {
 
-    @Test
-    public void TestRepositoryDeletion_OnlyReposWithQualifyingNameShouldBeDeleted() throws Exception{
-        Map<String, GHRepository> allRepos = new HashMap<>();
-        Map<String, GHRepository> reposForDeletion = new HashMap<>();
-        Map<String, GHRepository> reposToKeep = new HashMap<>();
-        for (int i = 0; i < 100; i++) {
-            GHRepository repo = mock(GHRepository.class);
-            when(repo.getName()).thenReturn("gamified-hiring-"+i+"-kata");
-            allRepos.put(repo.getName(), repo);
-            reposForDeletion.put(repo.getName(), repo);
+        private final String REPO_PREFIX = "gamified-hiring-";
+        private final String GAME = "kata";
+        private final String SUFFIX = "-" + GAME;
+        private final String RANDOM_REPO_NAME = "some random name: ";
+
+        private Map<String, GHRepository> allRepos;
+        private Map<String, GHRepository> reposForDeletion;
+        private Map<String, GHRepository> reposToKeep;
+
+        @BeforeEach
+        public void setUp() throws Exception{
+            allRepos = new HashMap<>();
+            reposForDeletion = new HashMap<>();
+            reposToKeep = new HashMap<>();
+
+            for (int i = 0; i < 100; i++) {
+                GHRepository repo = mock(GHRepository.class);
+                when(repo.getName()).thenReturn(REPO_PREFIX+i+SUFFIX);
+                allRepos.put(repo.getName(), repo);
+                reposForDeletion.put(repo.getName(), repo);
+            }
+
+            for (int i = 0; i < 100; i++) {
+                GHRepository repo = mock(GHRepository.class);
+                when(repo.getName()).thenReturn(RANDOM_REPO_NAME + i);
+                allRepos.put(repo.getName(), repo);
+                reposToKeep.put(repo.getName(), repo);
+            }
+
+            when(gitHub.getMyself()).thenReturn(myself);
+            when(myself.getAllRepositories()).thenReturn(allRepos);
         }
 
-        for (int i = 0; i < 100; i++) {
-            GHRepository repo = mock(GHRepository.class);
-            when(repo.getName()).thenReturn("some random name: " + i);
-            allRepos.put(repo.getName(), repo);
-            reposToKeep.put(repo.getName(), repo);
+        @org.junit.jupiter.api.Test
+        public void testDeleteAllReposForSpecificGame() throws IOException {
+            List<String> deletedRepos = new ArrayList<>(reposForDeletion.keySet());
+            Collections.sort(deletedRepos);
+            String expectedResult = "Following repositories have been deleted:"
+                    + System.lineSeparator() + String.join(System.lineSeparator(), deletedRepos);
+            assertEquals(expectedResult, gitManager.deleteReposForParticularGame(GAME));
         }
 
-        when(gitHub.getMyself()).thenReturn(myself);
-        when(myself.getAllRepositories()).thenReturn(allRepos);
-        gitManager.deleteReposForParticularGame("kata");
-        reposForDeletion.values().forEach(repo-> {
-            try {
-                verify(repo,times(1)).delete();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        reposToKeep.values().forEach(repo-> {
-            try {
-                verify(repo,times(0)).delete();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        @org.junit.jupiter.api.Test
+        public void TestRepositoryDeletion_OnlyReposWithQualifyingNameShouldBeDeleted() throws Exception {
+            gitManager.deleteReposForParticularGame(GAME);
+            reposForDeletion.values().forEach(repo -> {
+                try {
+                    verify(repo, times(1)).delete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            reposToKeep.values().forEach(repo -> {
+                try {
+                    verify(repo, times(0)).delete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
+        }
     }
 }

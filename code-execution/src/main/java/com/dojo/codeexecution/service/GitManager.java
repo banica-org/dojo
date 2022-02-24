@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,24 +88,29 @@ public class GitManager {
 
     public String deleteReposForParticularGame(String game) throws IOException {
         GHMyself account = gitHub.getMyself();
-        Collection<GHRepository> listOfAllRepos = account.getAllRepositories().values();
-        List<String> nameOfDeletedRepos = new CopyOnWriteArrayList<>();
-        listOfAllRepos.stream().parallel()
+        Collection<GHRepository> repos = account.getAllRepositories().values();
+        List<String> deletedRepos = new CopyOnWriteArrayList<>();
+        repos.stream().parallel()
                 .filter(repo->repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-"+game))
                 .forEach(repo-> {
                     try {
                         repo.delete();
-                        nameOfDeletedRepos.add(repo.getName());
+                        deletedRepos.add(repo.getName());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
-        if(nameOfDeletedRepos.size() == 0) {
+        return generateResult(deletedRepos);
+    }
+
+    private String generateResult(List<String> deletedRepos) {
+        if(deletedRepos.size() == 0) {
             return "No repositories for that game have been found";
         }
         else {
-            return "Following repositories have been deleted: " + System.lineSeparator()
-                    + String.join(System.lineSeparator(), nameOfDeletedRepos);
+            Collections.sort(deletedRepos);
+            return "Following repositories have been deleted:" + System.lineSeparator()
+                    + String.join(System.lineSeparator(), deletedRepos);
         }
     }
 }
