@@ -3,6 +3,7 @@ package com.dojo.notifications.service.notifierService;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.docker.Container;
+import com.dojo.notifications.model.notification.NotifierRequestModel;
 import com.dojo.notifications.model.notification.ParticipantNotification;
 import com.dojo.notifications.model.notification.SenseiNotification;
 import com.dojo.notifications.model.notification.enums.NotificationType;
@@ -72,7 +73,7 @@ public class DockerNotifierService {
                 List<String> queriedIds = flinkTableService.executeDockerQuery(request, object, id);
                 if (!queriedIds.isEmpty()) {
                     NotificationType finalType = (object instanceof Container) ? NotificationType.CONTAINER : NotificationType.TEST_RESULTS;
-                    queriedIds.forEach(queriedId -> notify(request.getReceivers(), queriedId, contest, object, message, finalType, request.getId()));
+                    queriedIds.forEach(queriedId -> notify(new NotifierRequestModel(request.getReceivers(), queriedId, contest, object, message, finalType, request.getId())));
                 }
 
             } catch (Exception e) {
@@ -81,42 +82,42 @@ public class DockerNotifierService {
         }
     }
 
-    private void notify(String receivers, String id, Contest contest, Object object, String message, NotificationType notificationType, int requestId) {
+    private void notify(NotifierRequestModel notifierRequestModel) {
 
-        notifyParticipant(id, contest, object, message, notificationType, requestId);
+        notifyParticipant(notifierRequestModel);
 
-        if (receivers != null) {
-            notifyListeners(contest, userDetailsService.turnUsersToUserIds(receivers), object, message, notificationType);
-            if (receivers.contains(RECEIVER_COMMON)) {
-                notifySensei(contest, object, message, notificationType);
+        if (notifierRequestModel.getReceivers() != null) {
+            notifyListeners(notifierRequestModel, userDetailsService.turnUsersToUserIds(notifierRequestModel.getReceivers()));
+            if (notifierRequestModel.getReceivers().contains(RECEIVER_COMMON)) {
+                notifySensei(notifierRequestModel);
             }
         }
     }
 
-    private void notifyListeners(Contest contest, Set<String> eventListenerIds, Object object, String queryMessage, NotificationType notificationType) {
+    private void notifyListeners(NotifierRequestModel notifierRequestModel, Set<String> eventListenerIds) {
         List<UserDetails> userDetails = new ArrayList<>();
         eventListenerIds.forEach(id -> userDetails.add(userDetailsService.getUserDetailsById(id)));
 
         for (UserDetails user : userDetails) {
-            for (NotifierType notifierType : contest.getNotifiers()) {
+            for (NotifierType notifierType : notifierRequestModel.getContest().getNotifiers()) {
                 notificationServices.get(notifierType)
-                        .notify(user, new SenseiNotification(userDetailsService, object, queryMessage, notificationType), contest);
+                        .notify(user, new SenseiNotification(userDetailsService, notifierRequestModel.getObject(), notifierRequestModel.getMessage(), notifierRequestModel.getNotificationType()), notifierRequestModel.getContest());
             }
         }
     }
 
-    public void notifyParticipant(String id, Contest contest, Object object, String message, NotificationType type, int requestId) {
-        UserDetails userDetails = userDetailsService.getUserDetailsById(id);
-        userDetailsService.getUserSubscriptionForQuery(userDetails, requestId, contest.getContestId());
+    public void notifyParticipant(NotifierRequestModel notifierRequestModel) {
+        UserDetails userDetails = userDetailsService.getUserDetailsById(notifierRequestModel.getQueriedId());
+        userDetailsService.getUserSubscriptionForQuery(userDetails, notifierRequestModel.getRequestId(), notifierRequestModel.getContest().getContestId());
 
-        for (NotifierType notifierType : contest.getNotifiers()) {
+        for (NotifierType notifierType : notifierRequestModel.getContest().getNotifiers()) {
             notificationServices.get(notifierType)
-                    .notify(userDetails, new ParticipantNotification(userDetailsService, object, userDetails, message, type), contest);
+                    .notify(userDetails, new ParticipantNotification(userDetailsService, notifierRequestModel.getObject(), userDetails, notifierRequestModel.getMessage(), notifierRequestModel.getNotificationType()), notifierRequestModel.getContest());
         }
     }
 
-    public void notifySensei(Contest contest, Object object, String message, NotificationType type) {
-        contest.getNotifiers().forEach(notifierType -> notificationServices.get(notifierType)
-                .notify(new SenseiNotification(userDetailsService, object, message, type), contest));
+    public void notifySensei(NotifierRequestModel notifierRequestModel) {
+        notifierRequestModel.getContest().getNotifiers().forEach(notifierType -> notificationServices.get(notifierType)
+                .notify(new SenseiNotification(userDetailsService, notifierRequestModel.getObject(), notifierRequestModel.getMessage(), notifierRequestModel.getNotificationType()), notifierRequestModel.getContest()));
     }
 }

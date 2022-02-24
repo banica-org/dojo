@@ -14,6 +14,7 @@ import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.docker.Container;
 import com.dojo.notifications.model.docker.Image;
 import com.dojo.notifications.model.docker.TestResults;
+import com.dojo.notifications.model.notification.NotifierRequestModel;
 import com.dojo.notifications.model.notification.enums.NotificationType;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.UserDetailsService;
@@ -105,7 +106,8 @@ public class DockerClient {
 
                         //image build results are always sent to sensei
                         //not configurable
-                        dockerNotifierService.notifySensei(contest, image, String.format(IMAGE_MESSAGE, contest.getContestId()), NotificationType.IMAGE);
+                        NotifierRequestModel notifierRequestModel = new NotifierRequestModel(null, null, contest, image, String.format(IMAGE_MESSAGE, contest.getContestId()), NotificationType.IMAGE, 0);
+                        dockerNotifierService.notifySensei(notifierRequestModel);
                         LOGGER.info(RESPONSE_MESSAGE, imageResponse);
                     }
 
