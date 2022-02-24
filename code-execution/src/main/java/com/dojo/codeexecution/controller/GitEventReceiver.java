@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.controller;
 
-import com.dojo.codeexecution.service.DockerService;
+import com.dojo.codeexecution.service.docker.DockerService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

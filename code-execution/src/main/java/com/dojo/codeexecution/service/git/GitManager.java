@@ -1,4 +1,4 @@
-package com.dojo.codeexecution.service;
+package com.dojo.codeexecution.service.git;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.kohsuke.github.GHEvent;
@@ -100,17 +100,8 @@ public class GitManager {
                         e.printStackTrace();
                     }
                 });
-        return generateResult(deletedRepos);
+        return ResultGenerator.generateResult(deletedRepos);
     }
 
-    private String generateResult(List<String> deletedRepos) {
-        if(deletedRepos.size() == 0) {
-            return "No repositories for that game have been found";
-        }
-        else {
-            Collections.sort(deletedRepos);
-            return "Following repositories have been deleted:" + System.lineSeparator()
-                    + String.join(System.lineSeparator(), deletedRepos);
-        }
-    }
+
 }

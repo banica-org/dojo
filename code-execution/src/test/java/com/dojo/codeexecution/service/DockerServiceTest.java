@@ -2,6 +2,7 @@ package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
+import com.dojo.codeexecution.service.docker.DockerServiceImpl;
 import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;

@@ -1,11 +1,11 @@
 package com.dojo.codeexecution.service;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
-import org.junit.Test;
+import com.dojo.codeexecution.service.git.GitManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.kohsuke.github.GHHook;
 import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
@@ -14,8 +14,7 @@ import org.kohsuke.github.GitHub;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,12 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class GitManagerTest {
 
     private final String username = "dummy-user";
@@ -77,9 +77,9 @@ public class GitManagerTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getExistingRepositoryReturnsNotFound() throws IOException {
-        gitManager.getExistingGitHubRepository(username, "kata");
+        assertThrows(IllegalArgumentException.class, ()->gitManager.getExistingGitHubRepository(username, "kata"));
     }
 
 
@@ -98,9 +98,9 @@ public class GitManagerTest {
         verify(gitHub, times(1)).createRepository(repositoryName);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void createGitHubRepositoryReturnsNotFound() throws IOException {
-        gitManager.createGitHubRepository(username, "kata");
+        assertThrows(IllegalArgumentException.class, ()->gitManager.createGitHubRepository(username, "kata"));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class GitManagerTest {
     }
 
     @Nested
-    @ExtendWith(MockitoExtension.class)
+    @ExtendWith(SpringExtension.class)
     class DeleteTests {
 
         private final String REPO_PREFIX = "gamified-hiring-";
@@ -199,7 +199,7 @@ public class GitManagerTest {
             when(myself.getAllRepositories()).thenReturn(allRepos);
         }
 
-        @org.junit.jupiter.api.Test
+        @Test
         public void testDeleteAllReposForSpecificGame() throws IOException {
             List<String> deletedRepos = new ArrayList<>(reposForDeletion.keySet());
             Collections.sort(deletedRepos);
@@ -208,7 +208,7 @@ public class GitManagerTest {
             assertEquals(expectedResult, gitManager.deleteReposForParticularGame(GAME));
         }
 
-        @org.junit.jupiter.api.Test
+        @Test
         public void TestRepositoryDeletion_OnlyReposWithQualifyingNameShouldBeDeleted() throws Exception {
             gitManager.deleteReposForParticularGame(GAME);
             reposForDeletion.values().forEach(repo -> {
