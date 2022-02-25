@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,7 +61,7 @@ public class GitManagerTest {
     @Test
     public void getExistingRepositoryReturnsRepository() throws IOException {
         //Arrange
-        String expected = "https://github.com/dummy-user/gamified-hiring-dummy-user";
+        String expected = "https://github.com/dummy-user/gamified-hiring-dummy-user-kata";
         URL repository = new URL(expected);
 
         //Act
@@ -68,6 +69,7 @@ public class GitManagerTest {
         List<GHUser> users = Collections.singletonList(dummyUser);
         when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
         when(gitHub.getMyself().getLogin()).thenReturn("https://github.com/dummy-user");
+        when(gitHub.getUser(eq(username)).getLogin()).thenReturn(username);
         when(gitHub.getRepository(expected).getHtmlUrl()).thenReturn(repository);
 
         String actual = gitManager.getExistingGitHubRepository(username, "kata").toString();
@@ -76,19 +78,13 @@ public class GitManagerTest {
         assertEquals(expected, actual);
     }
 
-
-    @Test
-    public void getExistingRepositoryReturnsNotFound() throws IOException {
-        assertThrows(IllegalArgumentException.class, ()->gitManager.getExistingGitHubRepository(username, "kata"));
-    }
-
-
     @Test
     public void createGitHubRepository() throws IOException {
         //Arrange
-        String repositoryName = "gamified-hiring/dummy-user";
+        String repositoryName = "gamified-hiring/dummy-user-kata";
 
         //Act
+        when(gitHub.getUser(username)).thenReturn(dummyUser);
         when(dummyUser.getLogin()).thenReturn(username);
         List<GHUser> users = Collections.singletonList(dummyUser);
         when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
@@ -98,10 +94,6 @@ public class GitManagerTest {
         verify(gitHub, times(1)).createRepository(repositoryName);
     }
 
-    @Test
-    public void createGitHubRepositoryReturnsNotFound() throws IOException {
-        assertThrows(IllegalArgumentException.class, ()->gitManager.createGitHubRepository(username, "kata"));
-    }
 
     @Test
     public void hasUserExistingRepositoryReturnsTrue() throws IOException {
@@ -117,7 +109,7 @@ public class GitManagerTest {
     @Test
     public void hasUserExistingRepositoryReturnsFalse() throws IOException {
         //Act
-        when(gitHub.searchUsers().q(username).list().toList()).thenThrow(IOException.class);
+        when(gitHub.getRepository(any())).thenThrow(IOException.class);
 
         Boolean actual = gitManager.hasUserExistingRepository(username, "kata");
         //Assert
