@@ -3,6 +3,7 @@ package com.dojo.notifications.service.notifierService;
 import com.dojo.notifications.model.contest.Contest;
 import com.dojo.notifications.model.contest.enums.NotifierType;
 import com.dojo.notifications.model.docker.Container;
+import com.dojo.notifications.model.notification.NotifierRequestModel;
 import com.dojo.notifications.model.notification.ParticipantNotification;
 import com.dojo.notifications.model.notification.SenseiNotification;
 import com.dojo.notifications.model.notification.enums.NotificationType;
@@ -127,13 +128,15 @@ public class DockerNotifierServiceTest {
 
     @Test
     public void notifyParticipantTest() {
-        dockerNotifierService.notifyParticipant(ID, contest, container, MESSAGE, NotificationType.CONTAINER);
+        NotifierRequestModel notifierRequestModel = new NotifierRequestModel(null, ID, contest, container, MESSAGE, NotificationType.CONTAINER, 1);
+        dockerNotifierService.notifyParticipant(notifierRequestModel);
         verifyParticipantNotificationsSent();
     }
 
     @Test
     public void notifySenseiTest() {
-        dockerNotifierService.notifySensei(contest, container, MESSAGE, NotificationType.CONTAINER);
+        NotifierRequestModel notifierRequestModel = new NotifierRequestModel(null, ID, contest, container, MESSAGE, NotificationType.CONTAINER, 1);
+        dockerNotifierService.notifySensei(notifierRequestModel);
         verifyCommonNotificationsSent();
     }
 
