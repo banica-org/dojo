@@ -53,19 +53,6 @@ public class ContestControllerTest {
     }
 
     @Test
-    public void subscribeForNullContestTest() {
-        //Arrange
-        ResponseEntity<Contest> expected = new ResponseEntity<>(null, HttpStatus.OK);
-
-        //Act
-        ResponseEntity<Contest> actual = contestController.subscribeForContest(null);
-
-        //Assert
-        assertEquals(expected, actual);
-        verify(eventService, times(1)).addContest(null);
-    }
-
-    @Test
     public void subscribeForNotNullContestTest() {
         //Arrange
         Contest notNull = new Contest();
@@ -93,19 +80,6 @@ public class ContestControllerTest {
         //Assert
         assertEquals(expected, actual);
         verify(eventService, times(1)).addContest(contest);
-    }
-
-    @Test
-    public void editForNullContestTest() {
-        //Arrange
-        ResponseEntity<Contest> expected = new ResponseEntity<>(null, HttpStatus.OK);
-
-        //Act
-        ResponseEntity<Contest> actual = contestController.editContest(null);
-
-        //Assert
-        assertEquals(expected, actual);
-        verify(eventService, times(1)).addContest(null);
     }
 
     @Test
