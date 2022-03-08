@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 public class GitManagerTest {
 
     private final String username = "dummy-user";
+    private static final String TEMPLATE_URL = "https://github.com/dojoprojectrepos/docker-test-child";
 
     @InjectMocks
     private GitManager gitManager;
@@ -82,13 +83,13 @@ public class GitManagerTest {
         when(gitHub.searchUsers().q(username).list().toList()).thenReturn(users);
 
         //Assert
-        gitManager.createGitHubRepository(username, "kata");
+        gitManager.createGitHubRepository(username, "kata", TEMPLATE_URL);
         verify(gitHub, times(1)).createRepository(repositoryName);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createGitHubRepositoryReturnsNotFound() throws IOException {
-        gitManager.createGitHubRepository(username, "kata");
+        gitManager.createGitHubRepository(username, "kata", TEMPLATE_URL);
     }
 
     @Test

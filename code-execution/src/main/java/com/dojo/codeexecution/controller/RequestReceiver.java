@@ -16,11 +16,12 @@ public class RequestReceiver {
 
     @GetMapping(value = "/repository")
     public String getRepository(@RequestParam(value = "username") String username,
-                                @RequestParam(value = "game") String game) throws IOException {
+                                @RequestParam(value = "game") String game,
+                                @RequestParam(value = "templateURL") String templateURL) throws IOException {
         if (gitManager.hasUserExistingRepository(username, game)) {
             return gitManager.getExistingGitHubRepository(username, game).toString();
         } else {
-            return gitManager.createGitHubRepository(username, game).toString();
+            return gitManager.createGitHubRepository(username, game, templateURL).toString();
         }
     }
 }

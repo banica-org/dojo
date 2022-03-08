@@ -18,6 +18,8 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class RequestReceiverTest {
 
+    private static final String TEMPLATE_URL = "https://github.com/dojoprojectrepos/docker-test-child";
+
     @InjectMocks
     private RequestReceiver requestReceiver;
 
@@ -34,7 +36,7 @@ public class RequestReceiverTest {
         //Act
         when(gitManager.hasUserExistingRepository(username,"kata")).thenReturn(true);
         when(gitManager.getExistingGitHubRepository(username, "kata")).thenReturn(expectedURL);
-        String actual = requestReceiver.getRepository(username,"kata");
+        String actual = requestReceiver.getRepository(username,"kata", TEMPLATE_URL);
 
         //Assert
         assertEquals(expected, actual);
@@ -51,12 +53,12 @@ public class RequestReceiverTest {
 
         //Act
         when(gitManager.hasUserExistingRepository(username, "kata")).thenReturn(false);
-        when(gitManager.createGitHubRepository(username, "kata")).thenReturn(expectedURL);
-        String actual = requestReceiver.getRepository(username,"kata");
+        when(gitManager.createGitHubRepository(username, "kata", TEMPLATE_URL)).thenReturn(expectedURL);
+        String actual = requestReceiver.getRepository(username,"kata", TEMPLATE_URL);
 
         //Assert
         assertEquals(expected, actual);
         verify(gitManager, times(1)).hasUserExistingRepository(username, "kata");
-        verify(gitManager, times(1)).createGitHubRepository(username, "kata");
+        verify(gitManager, times(1)).createGitHubRepository(username, "kata", TEMPLATE_URL);
     }
 }

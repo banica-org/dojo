@@ -22,6 +22,7 @@ public class GitManager {
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
     private static final String PARENT_HOOK = "build";
+    private static final String GITHUB_HEAD_URL = "https://github.com/";
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
@@ -51,11 +52,14 @@ public class GitManager {
     }
 
     @Retryable
-    public URL createGitHubRepository(String username, String game) throws IOException {
+    public URL createGitHubRepository(String username, String game, String templateURL) throws IOException {
         GHUser user = getGitHubUser(username);
         String repoName = REPO_PREFIX + "/" + user.getLogin() + "-" + game;
+        String templateRepoName = templateURL.replace(GITHUB_HEAD_URL + gitConfig.getUser() + "/", "");
 
-        GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
+        GHRepository repo = gitHub.createRepository(repoName)
+                .fromTemplateRepository(gitConfig.getUser(), templateRepoName)
+                .private_(true).create();
 
         repo.createHook(WEB_HOOK_PREFIX, gitConfig.getWebhookConfig(),
                 Collections.singletonList(GHEvent.PUSH), true);
