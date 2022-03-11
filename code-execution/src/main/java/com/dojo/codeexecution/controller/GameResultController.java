@@ -2,7 +2,7 @@ package com.dojo.codeexecution.controller;
 
 import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
-import com.dojo.codeexecution.service.DockerServiceImpl;
+import com.dojo.codeexecution.service.docker.DockerServiceImpl;
 import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
