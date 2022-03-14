@@ -1,4 +1,4 @@
-package com.dojo.codeexecution.service;
+package com.dojo.codeexecution.service.docker;
 
 
 public interface DockerService {

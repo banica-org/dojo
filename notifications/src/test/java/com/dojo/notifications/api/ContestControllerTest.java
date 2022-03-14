@@ -1,6 +1,7 @@
 package com.dojo.notifications.api;
 
 import com.dojo.notifications.model.contest.Contest;
+import com.dojo.notifications.service.ActiveRequestsService;
 import com.dojo.notifications.service.EventService;
 import com.dojo.notifications.service.NotificationManagingService;
 import org.junit.Test;
@@ -26,6 +27,9 @@ public class ContestControllerTest {
 
     @Mock
     private NotificationManagingService notificationManagingService;
+
+    @Mock
+    private ActiveRequestsService activeRequestsService;
 
     @Mock
     private Contest contest;

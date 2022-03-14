@@ -1,6 +1,6 @@
 package com.dojo.codeexecution.controller;
 
-import com.dojo.codeexecution.service.GitManager;
+import com.dojo.codeexecution.service.git.GitManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

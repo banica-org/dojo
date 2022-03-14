@@ -1,4 +1,4 @@
-package com.dojo.codeexecution.service;
+package com.dojo.codeexecution.service.docker;
 
 import com.dojo.codeexecution.config.docker.DockerConfigProperties;
 import com.dojo.codeexecution.config.github.GitConfigProperties;

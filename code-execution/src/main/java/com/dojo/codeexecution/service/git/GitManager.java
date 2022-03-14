@@ -1,7 +1,8 @@
-package com.dojo.codeexecution.service;
+package com.dojo.codeexecution.service.git;
 
 import com.dojo.codeexecution.config.github.GitConfigProperties;
 import org.kohsuke.github.GHEvent;
+import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -12,9 +13,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class GitManager {
@@ -102,4 +106,23 @@ public class GitManager {
     private GHUser getGitHubUser(String username) throws IOException {
         return gitHub.getUser(username);
     }
+
+    public String deleteReposForParticularGame(String game) throws IOException {
+        GHMyself account = gitHub.getMyself();
+        Collection<GHRepository> repos = account.getAllRepositories().values();
+        List<String> deletedRepos = new CopyOnWriteArrayList<>();
+        repos.stream().parallel()
+                .filter(repo->repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-"+game))
+                .forEach(repo-> {
+                    try {
+                        repo.delete();
+                        deletedRepos.add(repo.getName());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+        return ResultGenerator.generateResult(deletedRepos);
+    }
+
+
 }

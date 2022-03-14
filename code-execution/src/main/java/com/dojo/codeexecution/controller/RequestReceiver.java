@@ -1,8 +1,10 @@
 package com.dojo.codeexecution.controller;
 
-import com.dojo.codeexecution.service.GitManager;
+import com.dojo.codeexecution.service.git.GitManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,5 +31,10 @@ public class RequestReceiver {
     @PostMapping(value = "/remove/collaborators")
     public void removeCollaboratorsForGame(@RequestParam(value = "game") String game){
         gitManager.removeCollaboratorsForGame(game);
+    }
+
+    @DeleteMapping("/repository/{game}")
+    public String deleteAllRepositoriesForAGame(@PathVariable("game") String game) throws IOException{
+        return gitManager.deleteReposForParticularGame(game);
     }
 }
