@@ -77,6 +77,23 @@ public class GitManager {
         return true;
     }
 
+    public void removeCollaboratorsForGame(String game){
+        try {
+            gitHub.getMyself().getAllRepositories()
+                    .entrySet().stream()
+                    .filter(entry -> entry.getKey().contains(game))
+                    .forEach(entry -> {
+                    try {
+                        entry.getValue().removeCollaborators(entry.getValue().getCollaborators());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getRepositoryNameByOwner(String username, String game) throws IOException {
         return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-"
                 + getGitHubUser(username).getLogin() + "-" + game;
