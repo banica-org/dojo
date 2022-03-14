@@ -29,8 +29,8 @@ public class RequestReceiver {
     }
 
     @PostMapping(value = "/remove/collaborators")
-    public void removeCollaboratorsForGame(@RequestParam(value = "game") String game){
-        gitManager.removeCollaboratorsForGame(game);
+    public String removeCollaboratorsForGame(@RequestParam(value = "game") String game){
+        return gitManager.removeCollaboratorsForGame(game);
     }
 
     @DeleteMapping("/repository/{game}")

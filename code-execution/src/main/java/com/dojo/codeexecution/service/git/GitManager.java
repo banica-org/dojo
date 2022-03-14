@@ -81,21 +81,23 @@ public class GitManager {
         return true;
     }
 
-    public void removeCollaboratorsForGame(String game){
+    public String removeCollaboratorsForGame(String game) {
         try {
             gitHub.getMyself().getAllRepositories()
                     .entrySet().stream()
-                    .filter(entry -> entry.getKey().contains(game))
+                    .filter(entry -> entry.getValue().getName().startsWith(REPO_PREFIX)
+                            && entry.getValue().getName().endsWith("-" + game))
                     .forEach(entry -> {
-                    try {
-                        entry.getValue().removeCollaborators(entry.getValue().getCollaborators());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                        try {
+                            entry.getValue().removeCollaborators(entry.getValue().getCollaborators());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return "Removed Collaborators";
     }
 
     private String getRepositoryNameByOwner(String username, String game) throws IOException {
@@ -112,8 +114,8 @@ public class GitManager {
         Collection<GHRepository> repos = account.getAllRepositories().values();
         List<String> deletedRepos = new CopyOnWriteArrayList<>();
         repos.stream().parallel()
-                .filter(repo->repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-"+game))
-                .forEach(repo-> {
+                .filter(repo -> repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-" + game))
+                .forEach(repo -> {
                     try {
                         repo.delete();
                         deletedRepos.add(repo.getName());
