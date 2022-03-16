@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -83,8 +84,7 @@ public class DockerServiceTest {
                 mock(InspectContainerResponse.ContainerState.class);
 
         //Act
-        when(dockerConfigProperties.getShellArguments()).thenReturn(Collections.singletonList(""));
-        when(dockerClient.createContainerCmd(dummyImageTag).withCmd(dockerConfigProperties.getShellArguments())
+        when(dockerClient.createContainerCmd(dummyImageTag).withCmd(any(List.class))
                 .exec()).thenReturn(createContainerResponseMock);
         when(createContainerResponseMock.getId()).thenReturn(dummyId);
         when(dockerClient.startContainerCmd(dummyId)).thenReturn(startContainerCmdMock);
@@ -94,7 +94,7 @@ public class DockerServiceTest {
         when(inspectContainerResponseMock.getState()).thenReturn(containerStateMock);
         when(containerStateMock.getStatus()).thenReturn(dummyContainerStatus);
         when(dockerClient.waitContainerCmd(dummyId)).thenReturn(waitContainerMock);
-        when(waitContainerMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallback);
+        when(waitContainerMock.exec(any(ResultCallback.Adapter.class))).thenReturn(resultCallback);
 
         dockerServiceImpl.runContainer(dummyImageTag, dummyRepoUsername);
 
@@ -105,64 +105,19 @@ public class DockerServiceTest {
         verify(inspectContainerCmdMock, times(1)).exec();
         verify(inspectContainerResponseMock, times(1)).getState();
         verify(containerStateMock, times(1)).getStatus();
-        verify(waitContainerMock, times(1)).exec(Mockito.any(ResultCallback.class));
+        verify(waitContainerMock, times(1)).exec(any(ResultCallback.class));
     }
-
-//    @Test
-//    public void buildImage_ShouldExecute_With_Success() throws NullPointerException {
-//        //Arrange
-//        BuildImageCmd buildImageMock = mock(BuildImageCmd.class);
-//        BuildImageResultCallback resultCallback = mock(BuildImageResultCallback.class);
-//        RemoveImageCmd removeImageCmd = mock(RemoveImageCmd.class);
-//        PruneResponse pruneResponse = mock(PruneResponse.class);
-//        String dummyParentName = "dummy-tag";
-//
-//        //Act
-//
-//        when(dockerConfigProperties.getFilepath()).thenReturn("code-execution/src/main/docker/Dockerfile");
-//        when(dockerConfigProperties.getParentTag()).thenReturn(dummyParentName);
-//        when(dockerClient.pruneCmd(PruneType.CONTAINERS).withDangling(true).exec()).thenReturn(pruneResponse);
-//        when(dockerClient.pruneCmd(PruneType.IMAGES).withDangling(true).exec()).thenReturn(pruneResponse);
-//        when(dockerClient.removeImageCmd(dummyParentName).withForce(true)).thenReturn(removeImageCmd);
-//        doNothing().when(removeImageCmd).exec();
-//
-//        when(gitConfigProperties.getUser()).thenReturn(dummyRepoUsername);
-//        when(gitConfigProperties.getParentRepositoryName()).thenReturn(dummyRepoName);
-//
-//        when(dockerClient.buildImageCmd()
-//                .withDockerfile(new File("code-execution/src/main/docker/Dockerfile"))
-//                .withRemove(true)
-//                .withNoCache(true)
-//                .withTags(Collections.singleton(dummyParentName))
-//                .withBuildArg(user_name, dummyRepoUsername)
-//                .withBuildArg(repo_name, dummyRepoName))
-//                .thenReturn(buildImageMock);
-//        when(resultCallback.awaitImageId()).thenReturn(dummyId);
-//        when(buildImageMock.exec(Mockito.any(BuildImageResultCallback.class))).thenReturn(resultCallback);
-//        when(dockerClient.inspectImageCmd(dummyId).exec().getRepoTags().get(0)).thenReturn(dummyParentName);
-//
-////        String actual = dockerServiceImpl.buildImage();
-//
-//        //Assert
-////        Assert.assertEquals(dummyParentName, actual);
-//        verify(buildImageMock, times(1)).exec(Mockito.any(ResultCallback.class));
-//        verify(resultCallback, times(1)).awaitImageId();
-//        verify(dockerConfigProperties, times(1)).getFilepath();
-//        verify(dockerConfigProperties, times(1)).getParentTag();
-//        verify(gitConfigProperties, times(1)).getUser();
-//        verify(gitConfigProperties, times(1)).getParentRepositoryName();
-//    }
 
     @Test
     public void buildImage_ShouldExecute_With_Success() {
         //Arrange
-        when(singleThreadExecutor.submit(Mockito.any(Runnable.class))).thenReturn(Mockito.mock(Future.class));
+        when(singleThreadExecutor.submit(any(Runnable.class))).thenReturn(Mockito.mock(Future.class));
 
         //Act
         dockerServiceImpl.buildImage();
 
         //Assert
-        verify(singleThreadExecutor, times(1)).submit(Mockito.any(Runnable.class));
+        verify(singleThreadExecutor, times(1)).submit(any(Runnable.class));
     }
 
     @Test
@@ -175,13 +130,13 @@ public class DockerServiceTest {
         //Act
         when(dockerClient.logContainerCmd(dummyId).withStdOut(true).withStdErr(true))
                 .thenReturn(logContainerCmdMock);
-        when(logContainerCmdMock.exec(Mockito.any(ResultCallback.Adapter.class))).thenReturn(resultCallbackMock);
+        when(logContainerCmdMock.exec(any(ResultCallback.Adapter.class))).thenReturn(resultCallbackMock);
         when(resultCallbackMock.awaitCompletion()).thenReturn(resultCallbackMock);
 
         List<String> actual = dockerServiceImpl.getContainerLog(dummyId, dummyLogs);
         //Assert
         Assert.assertEquals(0, actual.size());
-        verify(logContainerCmdMock, times(1)).exec(Mockito.any(ResultCallback.class));
+        verify(logContainerCmdMock, times(1)).exec(any(ResultCallback.class));
         verify(resultCallbackMock, times(1)).awaitCompletion();
     }
 

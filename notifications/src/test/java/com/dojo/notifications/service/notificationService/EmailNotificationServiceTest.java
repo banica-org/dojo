@@ -78,6 +78,7 @@ public class EmailNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         //Arrange
+        when(userDetails.isEmailSubscription()).thenReturn(true);
         when(notification.getAsEmailNotification(mailMessageGenerator)).thenReturn(CONVERTED_STRING_FOR_NOTIFICATIONS);
         when(userDetails.getEmail()).thenReturn(EMAIL_FOR_USER);
         when(emailSender.createMimeMessage()).thenReturn(mimeMessage);

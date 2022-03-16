@@ -159,7 +159,7 @@ public class LeaderboardNotifierServiceTest {
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
         verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
         verify(userDetailsService, times(1)).getUserDetailsById(any());
-        verify(contest, times(2)).getContestId();
+        verify(contest, times(3)).getContestId();
         verify(contest, times(1)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any(), any());
         verify(userDetailsService, times(1)).getUserDetailsById(any());
@@ -190,7 +190,7 @@ public class LeaderboardNotifierServiceTest {
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
         verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
         verify(userDetailsService, times(1)).turnUsersToUserIds(SELECT_REQUEST.getReceivers());
-        verify(contest, times(2)).getContestId();
+        verify(contest, times(3)).getContestId();
         verify(contest, times(3)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());
         verify(userDetailsService, times(3)).getUserDetailsById(any());
@@ -218,7 +218,7 @@ public class LeaderboardNotifierServiceTest {
         verify(selectRequestService, times(1)).getSpecificRequests(contest.getQueryIds(), Collections.singletonList(SELECT_REQUEST));
         verify(selectRequestService, times(1)).getRequestsForTable(TABLE_NAME);
         verify(flinkTableService, times(1)).executeLeaderboardQuery(eq(SELECT_REQUEST), any());
-        verify(contest, times(2)).getContestId();
+        verify(contest, times(3)).getContestId();
         verify(contest, times(2)).getNotifiers();
         verify(notificationService, times(1)).notify(any(), any());
         verify(userDetailsService, times(2)).getUserDetailsById(any());

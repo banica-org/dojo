@@ -65,6 +65,7 @@ public class SlackNotificationServiceTest {
     @Test
     public void notifyUserTest() {
         when(userDetails.getEmail()).thenReturn(EMAIL);
+        when(userDetails.isSlackSubscription()).thenReturn(true);
         when(userDetails.getSlackEmail()).thenReturn(EMAIL);
         when(slackClient.getConversationId(EMAIL)).thenReturn(CHANNEL);
         when(notification.getAsSlackNotification(slackMessageGenerator, slackClient, CHANNEL)).thenReturn(chatPostMessageParams);
