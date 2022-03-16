@@ -26,6 +26,7 @@ public class GitManager {
     private static final String WEB_HOOK_PREFIX = "web";
     private static final String REPO_PREFIX = "gamified-hiring";
     private static final String PARENT_HOOK = "build";
+    private static final String GITHUB_HEAD_URL = "https://github.com/";
 
     private final GitConfigProperties gitConfig;
     private final GitHub gitHub;
@@ -55,11 +56,14 @@ public class GitManager {
     }
 
     @Retryable
-    public URL createGitHubRepository(String username, String game) throws IOException {
+    public URL createGitHubRepository(String username, String game, String templateURL) throws IOException {
         GHUser user = getGitHubUser(username);
         String repoName = REPO_PREFIX + "/" + user.getLogin() + "-" + game;
+        String templateRepoName = templateURL.replace(GITHUB_HEAD_URL + gitConfig.getUser() + "/", "");
 
-        GHRepository repo = gitHub.createRepository(repoName).private_(true).create();
+        GHRepository repo = gitHub.createRepository(repoName)
+                .fromTemplateRepository(gitConfig.getUser(), templateRepoName)
+                .private_(true).create();
 
         repo.createHook(WEB_HOOK_PREFIX, gitConfig.getWebhookConfig(),
                 Collections.singletonList(GHEvent.PUSH), true);
@@ -77,6 +81,25 @@ public class GitManager {
         return true;
     }
 
+    public String removeCollaboratorsForGame(String game) {
+        try {
+            gitHub.getMyself().getAllRepositories()
+                    .entrySet().stream()
+                    .filter(entry -> entry.getValue().getName().startsWith(REPO_PREFIX)
+                            && entry.getValue().getName().endsWith("-" + game))
+                    .forEach(entry -> {
+                        try {
+                            entry.getValue().removeCollaborators(entry.getValue().getCollaborators());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Removed Collaborators";
+    }
+
     private String getRepositoryNameByOwner(String username, String game) throws IOException {
         return gitHub.getMyself().getLogin() + "/" + REPO_PREFIX + "-"
                 + getGitHubUser(username).getLogin() + "-" + game;
@@ -91,8 +114,8 @@ public class GitManager {
         Collection<GHRepository> repos = account.getAllRepositories().values();
         List<String> deletedRepos = new CopyOnWriteArrayList<>();
         repos.stream().parallel()
-                .filter(repo->repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-"+game))
-                .forEach(repo-> {
+                .filter(repo -> repo.getName().startsWith(REPO_PREFIX) && repo.getName().endsWith("-" + game))
+                .forEach(repo -> {
                     try {
                         repo.delete();
                         deletedRepos.add(repo.getName());
