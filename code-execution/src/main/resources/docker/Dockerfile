@@ -1,5 +1,3 @@
-# user_name
-
 FROM maven:3.6.3-openjdk-15 AS parent-build
 ARG user_name
 ARG repo_name
