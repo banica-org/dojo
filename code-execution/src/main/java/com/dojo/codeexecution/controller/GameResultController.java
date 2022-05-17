@@ -3,6 +3,7 @@ package com.dojo.codeexecution.controller;
 import com.dojo.codeexecution.config.CodenjoyConfigProperties;
 import com.dojo.codeexecution.model.TestResult;
 import com.dojo.codeexecution.service.docker.DockerServiceImpl;
+import com.dojo.codeexecution.service.grpc.UpdateScoreService;
 import com.dojo.codeexecution.service.grpc.handler.DockerEventUpdateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -21,31 +22,27 @@ public class GameResultController {
 
     private final RestTemplate restTemplate;
     private final CodenjoyConfigProperties codenjoyConfigProperties;
+    private final UpdateScoreService updateScoreService;
 
     @Autowired
-    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, DockerServiceImpl dockerService, RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties) {
+    public GameResultController(DockerEventUpdateHandler dockerEventUpdateHandler, DockerServiceImpl dockerService,
+                                RestTemplate restTemplate, CodenjoyConfigProperties codenjoyConfigProperties, UpdateScoreService updateScoreService) {
         this.dockerEventUpdateHandler = dockerEventUpdateHandler;
         this.dockerService = dockerService;
         this.restTemplate = restTemplate;
         this.codenjoyConfigProperties = codenjoyConfigProperties;
+        this.updateScoreService = updateScoreService;
     }
 
     @PostMapping(path = "/test/result")
     public void testResult(@RequestBody TestResult testResult) {
+
         String usernameAndGame = testResult.getUsername();
         String username = getUsername(usernameAndGame);
         String game = getGame(usernameAndGame);
-
         int points = testResult.getPoints();
-        final String url = codenjoyConfigProperties.getPointsUpdateUrlStart()
-                + username + "/" + game
-                + codenjoyConfigProperties.getPointsUpdateUrlTail();
-        HttpHeaders headers = new HttpHeaders();
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Double> entity = new HttpEntity(points, headers);
-        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
+        updateScoreService.updateScore(username, game, points);
         dockerEventUpdateHandler.sendUpdate(usernameAndGame, testResult.getFailedTestCases());
         stopContainerIfRunning(testResult);
     }

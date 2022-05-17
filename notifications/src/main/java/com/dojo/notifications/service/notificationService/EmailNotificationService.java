@@ -74,7 +74,7 @@ public class EmailNotificationService implements NotificationService {
             emailSender.send(message);
 
         } catch (MessagingException e) {
-            LOGGER.warn("Email could not be sent: {}", e.getCause().getMessage());
+            LOGGER.warn("Email could not be sent: {}", e.getMessage());
         }
     }
 }
