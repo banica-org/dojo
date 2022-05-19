@@ -1,15 +1,5 @@
-FROM java:openjdk-8-jre-alpine
-
-WORKDIR app
-COPY ./target/code-execution-1.0.0-SNAPSHOT.jar .
-COPY ./src/main/docker/ app/docker
-
-ENV DOCKER_FILEPATH="app/docker/Dockerfile"
-ENV CODENJOY_ADDRESS="172.20.0.1"
-ENV DOCKER_HOST="host.docker.internal"
-
-EXPOSE 9091
+FROM openjdk:11
+ADD target/code-execution-1.0.0-SNAPSHOT.jar app.jar
+COPY src/main/resources/docker /docker
 EXPOSE 8081
-EXPOSE 2375
-
-CMD java -jar code-execution-1.0.0-SNAPSHOT.jar -Ddocker.file=${DOCKER_FILEPATH} -Dcodenjoy.host=${CODENJOY_ADDRESS} -Ddocker.host=${DOCKER_HOST}
+CMD ["java", "-Ddocker.host=host.docker.internal", "-Dcodenjoy.host=codenjoy", "-Dkeycloak.host=keycloak", "-Ddocker.file=/docker/Dockerfile", "-Dkeycloak.port=8080", "-jar", "app.jar"]

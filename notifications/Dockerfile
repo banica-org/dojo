@@ -1,9 +1,4 @@
-FROM java:openjdk-8-jre-alpine
-
-WORKDIR app
-COPY ./target/notifications-1.0.0-SNAPSHOT.jar .
-ENV CODENJOY_HOST="172.20.0.1"
-
+FROM openjdk:11
+ADD target/notifications-1.0.0-SNAPSHOT.jar app.jar
 EXPOSE 8090
-
-CMD java -jar notifications-1.0.0-SNAPSHOT.jar -Dcodenjoy.host=${CODENJOY_HOST}
+CMD ["java", "-Dcodenjoy.host=codenjoy", "-Dkeycloak.host=keycloak", "-DCODE_EXECUTION_HOST=code-execution", "-jar", "app.jar"]
