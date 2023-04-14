@@ -13,7 +13,7 @@
 
     <properties>
         <docker-java.version>3.2.7</docker-java.version>
-        <json.version>20180130</json.version>
+        <json.version>20230227</json.version>
         <oauth2-oidc-sdk.version>9.11</oauth2-oidc-sdk.version>
     </properties>
 
